@@ -117,6 +117,18 @@ def reporting_count_transform(data):
     return data
 
 
+def get_year_and_month_cols(df):
+
+    df = df.reset_index()
+
+    df["year"] = pd.DatetimeIndex(df["date"]).year
+    df["month"] = pd.DatetimeIndex(df["date"]).strftime("%b")
+
+    df = df.set_index(["date", "year", "month"])
+
+    return df
+
+
 # Data cleaning methods for dataset selection and callbacks
 
 
@@ -167,7 +179,7 @@ def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=Fal
         return data_out
 
 
-def check_index(df, index=["id", "date", "year", "month", "facility_name"]):
+def check_index(df, index=["id", "date", "facility_name"]):
     """
     Check that the dataframe is formatted in the expected way, with expected indexes. Restructure the dataframe (set the indices) if this is not the case.
     """
@@ -179,7 +191,7 @@ def check_index(df, index=["id", "date", "year", "month", "facility_name"]):
 
 
 def get_national_sum(df, indicator):
-    return df.groupby(["date"], as_index=False).agg({indicator: "sum"})
+    return df.groupby("date", as_index=False).agg({indicator: "sum"})
 
 
 def get_district_sum(df, indicator):
