@@ -27,3 +27,4 @@ coc-dashboard/data/old_data/outlier_data.csv
 coc-dashboard/data/old_data/report_data.csv
 coc-dashboard/data/old_data/std_no_outlier_data.csv
 coc-dashboard/data/pop.csv
+coc-dashboard/data/db.sqlite
