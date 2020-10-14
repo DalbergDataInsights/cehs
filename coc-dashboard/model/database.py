@@ -48,7 +48,7 @@ class Population(Base):
 
     def serialize(self):
         return {
-            "district_name": self.district_info.name,
+            "id": self.district_info.name,
             "year": self.year,
             "female": self.female,
             "total": self.total,
@@ -138,4 +138,4 @@ class PopulationTarget(Base):
 
     def serialize(self):
 
-        return {"indicator": self.indicator_info.name, "car": self.cat}
+        return {"indicator": self.indicator_info.name, "cat": self.cat}

@@ -36,12 +36,12 @@ class Navbar:
                 id="reporting",
                 className=active_style if active == "reporting" else "nav-element",
             ),
-            html.P(
-                "Overview",
-                id="overview",
-                # active_style if active == "overview" else "nav-element",
-                className="nav-element disabled",
-            ),
+            # html.P(
+            #     "Overview",
+            #     id="overview",
+            #     # active_style if active == "overview" else "nav-element",
+            #     className="nav-element disabled",
+            # ),
         ]
 
         return buttons

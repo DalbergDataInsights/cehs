@@ -49,9 +49,9 @@ def global_story_callback(*inputs):
     CONTROLS["reference_month"] = reference_month
     CONTROLS["indicator_group"] = indicator_group
 
-    ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+    df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
-    ds.switch_data_set(ds)
+    ds.switch_data_set(df)
 
     return [ds.get_layout()]
 

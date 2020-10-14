@@ -168,6 +168,8 @@ def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=Fal
 
         data_in = df.groupby(index, as_index=False).sum()
 
+        data_in = get_year_and_month_cols(data_in).reset_index()
+
         data_in = pd.merge(data_in, pop_in, how="left", left_on=merge, right_on=merge)
 
         data_in[val_col] = (data_in[val_col] / data_in[target]) * 12

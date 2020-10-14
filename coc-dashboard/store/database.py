@@ -36,10 +36,9 @@ class Database(metaclass=SingletonMeta):
     Return: Database
     """
 
-    repo_view_query = """SELECT district_name, facility_name, date, indicator_name, value_raw, value_rep FROM dataset;"""
     dropdown_query = """SELECT * FROM dropdown_indicator;"""
     fetch_data_query = """SELECT * FROM {}"""
-    repos = ["value_raw", "value_rep"]
+    repos = ["value_raw", "value_rep", "value_std", "value_iqr"]
 
     data_types = {
         # "district_name": str,
@@ -154,8 +153,8 @@ class Database(metaclass=SingletonMeta):
 
     def filter_by_policy(self, policy):
         dropdown_filters = {
-            "Correct outliers - using standard deviation": "value_raw",
-            "Correct outliers - using interquartile range": "value_raw",
+            "Correct outliers - using standard deviation": "value_std",
+            "Correct outliers - using interquartile range": "value_iqr",
             "Keep outliers": "value_raw",
             "Reporting": "value_rep",
         }
