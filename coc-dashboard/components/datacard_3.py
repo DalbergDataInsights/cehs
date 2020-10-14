@@ -1,7 +1,7 @@
 import pandas as pd
 from package.layout.chart_card import ChartDataCard
 
-from store import get_sub_dfs, timeit, month_order, init_data_set
+from store import get_sub_dfs, timeit, month_order, init_data_set, get_year_and_month_cols
 
 
 from package.layout.chart_card import ChartDataCard
@@ -13,6 +13,8 @@ def scatter_district_plot(df):
     df_district = df.get("district")
 
     df_district = df_district[df_district[df_district.columns[0]] > 0]
+
+    df_district = get_year_and_month_cols(df_district)
 
     df_district = get_sub_dfs(
         df_district, "year", [2018, 2019, 2020], "month", month_order

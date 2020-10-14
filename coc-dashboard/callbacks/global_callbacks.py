@@ -1,28 +1,26 @@
 from datetime import datetime
 
+from numpy.lib.shape_base import dsplit
+
 from components import (
     country_overview_scatter,
     district_overview_scatter,
     facility_scatter,
     stacked_bar_district,
     stacked_bar_reporting_country,
-    tree_map_district)
+    tree_map_district,
+)
 
 from store import (
     CONTROLS,
     LAST_CONTROLS,
     define_datasets,
-    dfs,
-    district_control_group,
-    init_data_set,
     month_order,
-    reference_date,
-    static,
-    target_date,
     timeit,
-    indicator_groups,
+    # indicator_groups,
     get_perc_description,
-    get_new_indic_name)
+    # get_new_indic_name,
+)
 
 from view import ds
 
@@ -51,17 +49,9 @@ def global_story_callback(*inputs):
     CONTROLS["reference_month"] = reference_month
     CONTROLS["indicator_group"] = indicator_group
 
-    global init_data_set
+    df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
-    init_data_set = define_datasets(
-        static,
-        dfs,
-        controls=CONTROLS,
-        last_controls=LAST_CONTROLS,
-        datasets=init_data_set,
-    )
-
-    ds.switch_data_set(init_data_set)
+    ds.switch_data_set(df)
 
     return [ds.get_layout()]
 
@@ -78,8 +68,9 @@ def change_titles(*inputs):
     district = inputs[6]
     indicator_group_select = inputs[7]
 
-    indicator_view_name = get_new_indic_name(
-        indicator_groups, indicator, indicator_group_select)
+    indicator_view_name = indicator
+    # indicator_view_name = get_new_indic_name(
+    #     indicator_groups, indicator, indicator_group_select)
 
     # Data card 1
 
@@ -194,23 +185,14 @@ def update_on_click(*inputs):
 
         label = inp.get("points")[0].get("label")
 
-        global init_data_set
-
         LAST_CONTROLS = CONTROLS.copy()
 
         CONTROLS["facility"] = label
 
-        init_data_set = define_datasets(
-            static,
-            dfs,
-            controls=CONTROLS,
-            last_controls=LAST_CONTROLS,
-            datasets=init_data_set,
-        )
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
-        facility_scatter.data = init_data_set
-        facility_scatter.figure = facility_scatter._get_figure(
-            facility_scatter.data)
+        facility_scatter.data = ds
+        facility_scatter.figure = facility_scatter._get_figure(facility_scatter.data)
         facility_scatter.figure_title = (
             f"Evolution of $label$ in {label} (click on the graph above to filter)"
         )

@@ -1,6 +1,4 @@
 from store import (
-    filter_df_by_policy,
-    filter_df_by_indicator,
     filter_df_by_dates,
     filter_by_district,
     get_district_sum,
@@ -8,9 +6,9 @@ from store import (
     get_percentage,
     get_sub_dfs,
     month_order,
-    index_base_columns,
     timeit,
-    get_new_indic_name,
+    Database,
+    static,
 )
 
 import pandas as pd
@@ -18,12 +16,15 @@ import pandas as pd
 # CARD 1
 
 
-def scatter_country_data(dfs, static, *, outlier, indicator, indicator_group, **kwargs):
+def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
 
-    df = filter_df_by_policy(dfs, outlier)
+    # dfs, static,
 
-    df = filter_df_by_indicator(
-        df, indicator, persist_columns=index_base_columns)
+    db = Database()
+
+    df = db.filter_by_policy(outlier)
+
+    df = db.filter_by_indicator(df, indicator)
 
     df_country = get_percentage(
         df,
@@ -34,11 +35,14 @@ def scatter_country_data(dfs, static, *, outlier, indicator, indicator_group, **
         all_country=True,
     )
 
-    df_country.rename(
-        columns={indicator: get_new_indic_name(static.get("indicator_groups"),
-                                               indicator,
-                                               indicator_group)},
-        inplace=True)
+    # df_country.rename(
+    #     columns={
+    #         indicator: get_new_indic_name(
+    #             static.get("indicator_groups"), indicator, indicator_group
+    #         )
+    #     },
+    #     inplace=True,
+    # )
 
     return df_country
 
@@ -47,8 +51,6 @@ def scatter_country_data(dfs, static, *, outlier, indicator, indicator_group, **
 
 
 def map_bar_country_dated_data(
-    dfs,
-    static,
     *,
     outlier,
     indicator,
@@ -60,10 +62,11 @@ def map_bar_country_dated_data(
     **kwargs,
 ):
 
-    df = filter_df_by_policy(dfs, outlier)
+    db = Database()
 
-    df = filter_df_by_indicator(
-        df, indicator, persist_columns=index_base_columns)
+    df = db.filter_by_policy(outlier)
+
+    df = db.filter_by_indicator(df, indicator)
 
     data_in = filter_df_by_dates(
         df, target_year, target_month, reference_year, reference_month
@@ -81,16 +84,17 @@ def map_bar_country_dated_data(
 
     # TODO updat teh filter by data function so that this step is no longer needed
 
-    mask = (
-        (data_in.year == int(reference_year)) & (
-            data_in.month == reference_month)
-    ) | ((data_in.year == int(target_year)) & (data_in.month == target_month))
+    min_date = data_in.date.min()
+    max_date = data_in.date.max()
+
+    mask = (data_in.date == min_date) | (data_in.date == max_date)
 
     data_in = data_in[mask]
 
-    data_in = data_in.groupby(by=["id", "year", "month"], as_index=False).agg(
-        {indicator: "sum"}
-    )
+    data_in = data_in.groupby(by=["id", "date"], as_index=False).agg({indicator: "sum"})
+
+    data_in["year"] = data_in.date.apply(lambda x: x.year)
+
     data_in = data_in.pivot_table(columns="year", values=indicator, index="id")
 
     data_in[indicator] = (
@@ -105,11 +109,14 @@ def map_bar_country_dated_data(
     data_in = data_in.set_index("id")
     data_out = data_in[~pd.isna(data_in[indicator])]
 
-    data_out.rename(
-        columns={indicator: get_new_indic_name(static.get("indicator_groups"),
-                                               indicator,
-                                               indicator_group)},
-        inplace=True)
+    # data_out.rename(
+    #     columns={
+    #         indicator: get_new_indic_name(
+    #             static.get("indicator_groups"), indicator, indicator_group
+    #         )
+    #     },
+    #     inplace=True,
+    # )
 
     return data_out
 
@@ -117,13 +124,13 @@ def map_bar_country_dated_data(
 # CARD 3
 
 
-def scatter_district_data(
-    dfs, static, *, outlier, indicator, indicator_group, district, **kwargs
-):
-    df = filter_df_by_policy(dfs, outlier)
+def scatter_district_data(*, outlier, indicator, indicator_group, district, **kwargs):
 
-    df = filter_df_by_indicator(
-        df, indicator, persist_columns=index_base_columns)
+    db = Database()
+
+    df = db.filter_by_policy(outlier)
+
+    df = db.filter_by_indicator(df, indicator)
 
     df_district = filter_by_district(df, district)
     df_district = get_district_sum(df_district, indicator)
@@ -134,11 +141,15 @@ def scatter_district_data(
         indicator_group,
         indicator,
     )
-    df_district.rename(
-        columns={indicator: get_new_indic_name(static.get("indicator_groups"),
-                                               indicator,
-                                               indicator_group)},
-        inplace=True)
+
+    # df_district.rename(
+    #     columns={
+    #         indicator: get_new_indic_name(
+    #             static.get("indicator_groups"), indicator, indicator_group
+    #         )
+    #     },
+    #     inplace=True,
+    # )
 
     return df_district
 
@@ -147,8 +158,6 @@ def scatter_district_data(
 
 
 def tree_map_district_dated_data(
-    dfs,
-    static,
     *,
     outlier,
     indicator,
@@ -160,10 +169,11 @@ def tree_map_district_dated_data(
     **kwargs,
 ):
 
-    df = filter_df_by_policy(dfs, outlier)
+    db = Database()
 
-    df = filter_df_by_indicator(
-        df, indicator, persist_columns=index_base_columns)
+    df = db.filter_by_policy(outlier)
+
+    df = db.filter_by_indicator(df, indicator)
 
     # TODO check how the date function works such that it shows only target date
 
@@ -173,69 +183,68 @@ def tree_map_district_dated_data(
 
     df_district_dated = filter_by_district(df_district_dated, district)
 
-    df_district_dated.rename(
-        columns={indicator: get_new_indic_name(static.get("indicator_groups"),
-                                               indicator)},
-        inplace=True)
+    # df_district_dated.rename(
+    #     columns={
+    #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)
+    #     },
+    #     inplace=True,
+    # )
 
     return df_district_dated
 
 
-def scatter_facility_data(
-    dfs, static, *, outlier, indicator, district, facility, **kwargs
-):
+def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
 
-    df = filter_df_by_policy(dfs, outlier)
+    db = Database()
 
-    df = filter_df_by_indicator(
-        df, indicator, persist_columns=index_base_columns)
+    df = db.filter_by_policy(outlier)
 
-    df_facility = filter_by_district(df, district)
+    df = db.filter_by_indicator(df, indicator)
+
+    df = filter_by_district(df, district)
 
     # TODO Reorder such that its the one facility with the on selected data max value that shows
 
-    if facility:
-        df_facility = df_facility[df_facility.facility_name == facility].reset_index(
-            drop=True
-        )
-    else:
-        df_facility = df_facility[
-            df_facility.facility_name == df_facility.facility_name[0]
-        ].reset_index(drop=True)
+    if not facility:
+        facility = df.facility_name[0]
 
-    df_facility.rename(
-        columns={indicator: get_new_indic_name(static.get("indicator_groups"),
-                                               indicator)},
-        inplace=True)
+    df = df[df.facility_name == facility].reset_index(drop=True)
 
-    return df_facility
+    # df_facility.rename(
+    #     columns={
+    #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)
+    #     },
+    #     inplace=True,
+    # )
+
+    return df
 
 
 # CARD 5
 
 
-def bar_reporting_country_data(dfs, static, *, indicator, **kwargs):
+def bar_reporting_country_data(*, indicator, **kwargs):
 
-    df_reporting = filter_df_by_policy(dfs, "Reporting")
+    db = Database()
 
-    df_reporting = filter_df_by_indicator(
-        df_reporting, indicator, persist_columns=index_base_columns
-    )
+    df = db.raw_data.get("value_rep")  # !FIXME
 
-    df_reporting.rename(
-        columns={indicator: get_new_indic_name(static.get("indicator_groups"),
-                                               indicator)},
-        inplace=True)
+    df = db.filter_by_indicator(df, indicator)
 
-    return df_reporting
+    # df.rename(
+    #     columns={
+    #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)
+    #     },
+    #     inplace=True,
+    # )
+
+    return df
 
 
 # CARD 6
 
 
 def map_reporting_dated_data(
-    dfs,
-    static,
     *,
     indicator,
     target_year,
@@ -245,41 +254,45 @@ def map_reporting_dated_data(
     **kwargs,
 ):
 
-    df_reporting = filter_df_by_policy(dfs, "Reporting")
+    db = Database()
 
-    df_reporting = filter_df_by_indicator(
-        df_reporting, indicator, persist_columns=index_base_columns
+    df = db.raw_data.get("value_rep")  # !FIXME
+
+    df = db.filter_by_indicator(df, indicator)
+
+    df = filter_df_by_dates(
+        df, target_year, target_month, reference_year, reference_month
     )
 
-    df_reporting_dated = filter_df_by_dates(
-        df_reporting, target_year, target_month, reference_year, reference_month
-    )
+    # df.rename(
+    #     columns={
+    #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)
+    #     },
+    #     inplace=True,
+    # )
 
-    df_reporting_dated.rename(
-        columns={indicator: get_new_indic_name(static.get("indicator_groups"),
-                                               indicator)},
-        inplace=True)
-
-    return df_reporting_dated
+    return df
 
 
 # CARD 7
 
 
-def scatter_reporting_district_data(dfs, static, *, indicator, district, **kwargs):
+def scatter_reporting_district_data(*, indicator, district, **kwargs):
 
-    df_reporting = filter_df_by_policy(dfs, "Reporting")
+    db = Database()
 
-    df_reporting = filter_df_by_indicator(
-        df_reporting, indicator, persist_columns=index_base_columns
-    )
+    df = db.raw_data.get("value_rep")  # !FIXME
 
-    df_reporting_district = filter_by_district(df_reporting, district)
+    df = db.filter_by_indicator(df, indicator)
 
-    df_reporting_district.rename(
-        columns={indicator: get_new_indic_name(static.get("indicator_groups"),
-                                               indicator)},
-        inplace=True)
+    df_reporting_district = filter_by_district(df, district)
+
+    # df_reporting_district.rename(
+    #     columns={
+    #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)
+    #     },
+    #     inplace=True,
+    # )
 
     return df_reporting_district
 
@@ -287,9 +300,11 @@ def scatter_reporting_district_data(dfs, static, *, indicator, district, **kwarg
 # Indicator group grid
 
 
-def indicator_group(dfs, static, *, indicator_group, outlier, **kwargs):
+def indicator_group(*, indicator_group, outlier, **kwargs):
 
-    df = filter_df_by_policy(dfs, outlier)
+    db = Database()
+
+    df = db.filter_by_policy(outlier)
 
     # !FIXME when mutations and store are decoupled! !IMPORTANT
 
@@ -305,18 +320,40 @@ def indicator_group(dfs, static, *, indicator_group, outlier, **kwargs):
             "Newborn deaths",
             "Postnatal Visits",
         ],
-        EPI=['BCG (all)', 'BCG (outreach)', 'BCG (static)',
-             'DPT1 (all)', 'DPT1 (outreach)', 'DPT1 (static)',
-             'DPT3 (all)', 'DPT3 (outreach)', 'DPT3 (static)',
-             'HPV1 (all)', 'HPV1 (community)', 'HPV1 (school)',
-             'HPV2 (all)', 'HPV2 (community)', 'HPV2 (school)',
-             'MR1 (all)', 'MR1 (outreach)', 'MR1 (static)',
-             'PCV1 (all)', 'PCV1 (outreach)', 'PCV1 (static)',
-             'PCV3 (all)', 'PCV3 (outreach)', 'PCV3 (static)',
-             'TD1 (nonpregnant)', 'TD1 (pregnant)',
-             'TD2 (nonpregnant)', 'TD2 (pregnant)',
-             'TD3 (nonpregnant)', 'TD3 (pregnant)',
-             'TD4-5 (nonpregnant)', 'TD4-5 (pregnant)'],
+        EPI=[
+            "BCG (all)",
+            "BCG (outreach)",
+            "BCG (static)",
+            "DPT1 (all)",
+            "DPT1 (outreach)",
+            "DPT1 (static)",
+            "DPT3 (all)",
+            "DPT3 (outreach)",
+            "DPT3 (static)",
+            "HPV1 (all)",
+            "HPV1 (community)",
+            "HPV1 (school)",
+            "HPV2 (all)",
+            "HPV2 (community)",
+            "HPV2 (school)",
+            "MR1 (all)",
+            "MR1 (outreach)",
+            "MR1 (static)",
+            "PCV1 (all)",
+            "PCV1 (outreach)",
+            "PCV1 (static)",
+            "PCV3 (all)",
+            "PCV3 (outreach)",
+            "PCV3 (static)",
+            "TD1 (nonpregnant)",
+            "TD1 (pregnant)",
+            "TD2 (nonpregnant)",
+            "TD2 (pregnant)",
+            "TD3 (nonpregnant)",
+            "TD3 (pregnant)",
+            "TD4-5 (nonpregnant)",
+            "TD4-5 (pregnant)",
+        ],
         GENERAL=["OPD attendance", "IPD attendance"],
         HIV=[
             "Tested HIV",
@@ -358,7 +395,7 @@ def indicator_group(dfs, static, *, indicator_group, outlier, **kwargs):
         indicators_groups[indicators_groups.group == indicator_group].indicator
     )
 
-    columns_to_keep = index_base_columns + indicators
+    columns_to_keep = db.index_columns + indicators
     df = df[columns_to_keep]
 
     return df

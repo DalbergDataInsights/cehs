@@ -30,7 +30,6 @@ class DataStory(Dashboard):
             self.__name = str(self).split(">")[0][-11:]
         return self.__name
 
-    @timeit
     def get_layout(self):
 
         layout = (
@@ -46,7 +45,6 @@ class DataStory(Dashboard):
 
         return layout
 
-    @timeit
     def get_container(self):
         return dbc.Container(self.get_layout(), id="ds-container")
 
