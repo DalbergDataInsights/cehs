@@ -1,8 +1,9 @@
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from model.database import Repository, FetchDate, Population, PopulationTarget, District
+from model.database import FetchDate, Population, PopulationTarget, District, Indicator
 import pandas as pd
+from .helpers import timeit
 
 
 class SingletonMeta(type):
@@ -37,6 +38,8 @@ class Database(metaclass=SingletonMeta):
 
     repo_view_query = """SELECT district_name, facility_name, date, indicator_name, value_raw, value_rep FROM dataset;"""
     dropdown_query = """SELECT * FROM dropdown_indicator;"""
+    fetch_data_query = """SELECT * FROM {}"""
+    repos = ["value_raw", "value_rep"]
 
     data_types = {
         # "district_name": str,
@@ -60,56 +63,53 @@ class Database(metaclass=SingletonMeta):
         if bind_string:
             self.engine = create_engine(bind_string)
             self.Session = sessionmaker(bind=self.engine)
+            self.init = True
 
             print("Fetching data")
-            repo_data = self.get_repository()  # VERY COSTLY, USE WITH CARE
-            print("Setting districts")
-            self.__districts = repo_data.id.unique().tolist()
-            self.__districts.sort()
-            print("Pivoting data")
-            for val_col in ["value_raw", "value_rep"]:
-                df = self.pivot_df(repo_data, val_col)
-                self.raw_data[val_col] = df
-
-            self.init = True
+            for repo in self.repos:
+                self.raw_data[repo] = self.get_repository(repo)
+            self.districts = self.raw_data["value_raw"].id.unique()
+            self.districts.sort()
 
         assert self.init, "You must pass a DB bind string to use Database first!"
         self.__indicator_dropdown = pd.DataFrame()
 
     def get_session(self):
         assert (
-            self.init
+            self.init == True
         ), "You must pass the bind_string into the class initialization first."
         print("Opening session")
         session = self.Session()
         return session
 
-    def get_repository(self):
+    def get_repository(self, repo_name):
 
-        __dataframe = pd.read_sql(self.repo_view_query, con=self.engine)
-
-        for col in __dataframe.columns:
-            if col in self.data_types.keys():
-                print(f"Convering {col}")
-                __dataframe[col] = __dataframe[col].astype(self.data_types.get(col))
+        __dataframe = pd.read_sql(
+            self.fetch_data_query.format(repo_name), con=self.engine
+        )
 
         __dataframe.rename(columns={"district_name": "id"}, inplace=True)
+        __dataframe.date = __dataframe.date.astype("datetime64[ns]")
+
+        rn = self.get_indicators_rename()
+
+        __dataframe.rename(columns=rn, inplace=True)
 
         return __dataframe
 
-    def pivot_df(self, df, value_column):
-        out = df.reset_index()
-        out = out[self.index_columns + ["indicator_name", value_column]]
-        out = pd.pivot_table(
-            out, index=self.index_columns, columns="indicator_name", aggfunc="first"
-        )
-        out.columns = out.columns.droplevel(0)
-        out = out.reset_index()
-        return out
+    def get_indicators_view(self):
+        session = self.get_session()
+        res = session.query(Indicator).all()
+        rn = {x.name: x.view for x in res}
+        session.close()
+        return rn
 
-    @property
-    def districts(self):
-        return self.__districts
+    def get_indicators_rename(self):
+        session = self.get_session()
+        res = session.query(Indicator).all()
+        rn = {x.id: x.name for x in res}
+        session.close()
+        return rn
 
     @property
     def indicator_dropdowns(self):
@@ -128,7 +128,6 @@ class Database(metaclass=SingletonMeta):
         df = df.reset_index()
         try:
             df = df[self.index_columns + [indicator]]
-            # df = df.set_index(self.index_columns)
         except Exception as e:
             print(e)
             print("No such column is present in the dataframe")

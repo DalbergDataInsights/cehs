@@ -25,7 +25,11 @@ def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
 
     df = db.filter_by_policy(outlier)
 
+    print(df)
+
     df = db.filter_by_indicator(df, indicator)
+
+    print(df)
 
     df_country = get_percentage(
         df,
@@ -233,7 +237,7 @@ def bar_reporting_country_data(*, indicator, **kwargs):
 
     db = Database()
 
-    df = db.raw_data.get("value_rep")
+    df = db.raw_data.get("report_data")
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -263,7 +267,7 @@ def map_reporting_dated_data(
 
     db = Database()
 
-    df = db.raw_data.get("value_rep")
+    df = db.raw_data.get("report_data")
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -289,7 +293,7 @@ def scatter_reporting_district_data(*, indicator, district, **kwargs):
 
     db = Database()
 
-    df = db.raw_data.get("value_rep")
+    df = db.raw_data.get("report_data")
 
     df = db.filter_by_indicator(df, indicator)
 

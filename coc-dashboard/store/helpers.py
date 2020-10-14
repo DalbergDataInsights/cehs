@@ -179,13 +179,11 @@ def check_index(df, index=["id", "date", "year", "month", "facility_name"]):
 
 
 def get_national_sum(df, indicator):
-    return df.groupby(["date", "year", "month"], as_index=False).agg({indicator: "sum"})
+    return df.groupby(["date"], as_index=False).agg({indicator: "sum"})
 
 
 def get_district_sum(df, indicator):
-    return df.groupby(["id", "date", "year", "month"], as_index=False).agg(
-        {indicator: "sum"}
-    )
+    return df.groupby(["id", "date"], as_index=False).agg({indicator: "sum"})
 
 
 # Decorators

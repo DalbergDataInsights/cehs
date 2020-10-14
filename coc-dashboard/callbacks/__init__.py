@@ -10,10 +10,8 @@ from dash.dependencies import Input, Output, State
 from store import (
     district_control_group,
     indicator_dropdown_group,
-    init_data_set,
     outlier_policy_dropdown_group,
     reference_date,
-    static,
     target_date,
 )
 
