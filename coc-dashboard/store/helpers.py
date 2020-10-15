@@ -241,7 +241,7 @@ def get_perc_description(perc):
 
 
 def get_new_indic_name(indicator_group, indicator, indicator_group_select=None):
-    if indicator_group_select:
+    if indicator_group_select:   
         indicator_view_name = indicator_group[
             (indicator_group['Choose an indicator'] == indicator) &
             (indicator_group['Choose an indicator group'] == indicator_group_select)]['View'].values[0]

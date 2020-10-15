@@ -35,9 +35,9 @@ def toggle_fade_info(n1, n2, is_open):
 @timeit
 def download_data(n_clicks):
     if n_clicks:
-        print("Yes")
+        print("yes")
         href_data = download_file(dfs)
-
+        print(href_data)
         return [href_data]
     else:
         return [None]

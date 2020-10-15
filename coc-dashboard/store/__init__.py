@@ -7,6 +7,7 @@ from .read_data import read_data
 from .static_info import *
 import os
 from dropdown import initiate_dropdowns, set_dropdown_defaults
+from store import download_file
 
 
 # READ FROM DATABASE
@@ -30,6 +31,9 @@ for key, df in dfs.items():
     dfs[key] = df
 
 static["indicator_groups"] = indicator_groups
+
+if os.path.isfile('./coc-dashboard/package/static/data/cehs.xlsx') == False:
+    download_file(dfs) # write to excel file for download
 
 # NAVIGATION
 

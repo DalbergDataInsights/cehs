@@ -59,10 +59,13 @@ class Navbar:
                 html.Div(
                     [
                         dbc.Button("Controls", id="fade-button"),
-                        html.P(
+                        html.A(
                             html.Span("cloud_download",
                                       className="material-icons"),
                             className="nav-element",
+                            id = "download",
+                            href=r"/static/data/cehs.xlsx",
+                            download="cehs.xlsx",
                         ),
                         html.P(
                             html.Span("info", className="material-icons"),

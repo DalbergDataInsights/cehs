@@ -63,11 +63,11 @@ def define_callbacks(ds):
             "function": toggle_fade_info,
             "states": [State("info-fade", "is_open")],
         },
-        # {
-        #     "inputs": [Input("download-excel", "n_clicks")],
-        #     "outputs": [Output("download-excel", "href")],
-        #     "function": download_data,
-        # },
+         #{
+            # "inputs": [Input("download", "n_clicks")],
+            # "outputs": [Output("download", "href")],
+            # "function": download_data,
+        #},
         {
             "inputs": [
                 Input("trends", "n_clicks"),
