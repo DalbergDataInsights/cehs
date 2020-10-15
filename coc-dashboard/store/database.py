@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from model.database import FetchDate, Population, PopulationTarget, District, Indicator
+from model.database import FetchDate, Population, PopulationTarget
 import pandas as pd
 from .helpers import timeit
 
@@ -41,14 +41,11 @@ class Database(metaclass=SingletonMeta):
     repos = ["value_raw", "value_rep", "value_std", "value_iqr"]
 
     data_types = {
-        # "district_name": str,
-        # "facility_name": str,
+        "district_name": str,
+        "facility_name": str,
         "date": "datetime64[ns]",
-        # "indicator_name": str,
-        # "value_raw": float,
-        # "value_iqr": float,
-        # "value_std": float,
-        # "value_rep": int
+        "indicator_name": str,
+        "*": int,
     }
 
     index_columns = ["id", "facility_name", "date"]
@@ -81,34 +78,31 @@ class Database(metaclass=SingletonMeta):
         session = self.Session()
         return session
 
+    @timeit
     def get_repository(self, repo_name):
 
         __dataframe = pd.read_sql(
             self.fetch_data_query.format(repo_name), con=self.engine
         )
 
+        for col in __dataframe.columns:
+            try:
+                __dataframe[col] = __dataframe[col].astype(
+                    self.data_types.get(col, self.data_types.get("*"))
+                )
+            except:
+                print(f"Was not able to convert {col}")
+
         __dataframe.rename(columns={"district_name": "id"}, inplace=True)
-        __dataframe.date = __dataframe.date.astype("datetime64[ns]")
-
-        rn = self.get_indicators_rename()
-
-        __dataframe.rename(columns=rn, inplace=True)
 
         return __dataframe
 
-    def get_indicators_view(self):
-        session = self.get_session()
-        res = session.query(Indicator).all()
-        rn = {x.name: x.view for x in res}
-        session.close()
-        return rn
-
-    def get_indicators_rename(self):
-        session = self.get_session()
-        res = session.query(Indicator).all()
-        rn = {x.id: x.name for x in res}
-        session.close()
-        return rn
+    # def get_indicators_view(self):
+    #     session = self.get_session()
+    #     res = session.query(IndicatorGroup).all()
+    #     rn = {x.name: x.view for x in res}
+    #     session.close()
+    #     return rn
 
     @property
     def indicator_dropdowns(self):
@@ -159,3 +153,18 @@ class Database(metaclass=SingletonMeta):
             "Reporting": "value_rep",
         }
         return self.raw_data.get(dropdown_filters.get(policy)).copy()
+
+    # def get_indicator_view(self, indicator_group, indicator):
+    #     if indicator_group_select:
+    #         indicator_view_name = indicator_group[
+    #             (indicator_group["Choose an indicator"] == indicator)
+    #             & (
+    #                 indicator_group["Choose an indicator group"]
+    #                 == indicator_group_select
+    #             )
+    #         ]["View"].values[0]
+    #     else:
+    #         indicator_view_name = indicator_group[
+    #             indicator_group["Choose an indicator"] == indicator
+    #         ]["View"].values[0]
+    #     return indicator_view_name
