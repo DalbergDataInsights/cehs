@@ -210,6 +210,11 @@ def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
 
     df = df[df.facility_name == facility].reset_index(drop=True)
 
+    # indicator = db.get_view(indicator_name)
+    # df.rename(indicator)
+    # or
+    # df = db.rename_indicator_to_view(df)
+
     # df_facility.rename(
     #     columns={
     #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)

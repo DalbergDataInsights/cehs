@@ -1,7 +1,7 @@
 from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from model.database import FetchDate, Population, PopulationTarget
+from model.database import FetchDate, Population, PopulationTarget, IndicatorGroup
 import pandas as pd
 from .helpers import timeit
 
@@ -36,9 +36,10 @@ class Database(metaclass=SingletonMeta):
     Return: Database
     """
 
-    dropdown_query = """SELECT * FROM dropdown_indicator;"""
     fetch_data_query = """SELECT * FROM {}"""
     repos = ["value_raw", "value_rep", "value_std", "value_iqr"]
+
+    indicator_group_fetch_query = """SELECT * FROM indicator_group;"""
 
     data_types = {
         "district_name": str,
@@ -68,7 +69,7 @@ class Database(metaclass=SingletonMeta):
             self.districts.sort()
 
         assert self.init, "You must pass a DB bind string to use Database first!"
-        self.__indicator_dropdown = pd.DataFrame()
+        self.set_indicator_groups_and_view()
 
     def get_session(self):
         assert (
@@ -97,19 +98,6 @@ class Database(metaclass=SingletonMeta):
 
         return __dataframe
 
-    # def get_indicators_view(self):
-    #     session = self.get_session()
-    #     res = session.query(IndicatorGroup).all()
-    #     rn = {x.name: x.view for x in res}
-    #     session.close()
-    #     return rn
-
-    @property
-    def indicator_dropdowns(self):
-        if self.__indicator_dropdown.empty:
-            self.__indicator_dropdown = pd.read_sql(self.dropdown_query, self.engine)
-        return self.__indicator_dropdown
-
     @property
     def fetch_date(self):
         session = self.Session()
@@ -137,6 +125,7 @@ class Database(metaclass=SingletonMeta):
         session = self.Session()
         objects = session.query(sqlalchemy_obj).all()
         df = pd.DataFrame([obj.serialize() for obj in objects])
+        session.close()
         return df
 
     def get_population_data(self):
@@ -144,6 +133,13 @@ class Database(metaclass=SingletonMeta):
 
     def get_population_target(self):
         return self.get_serialized_into_df(PopulationTarget)
+
+    def set_indicator_groups_and_view(self):
+        indicator_groups = self.get_serialized_into_df(IndicatorGroup)
+        # !TODO Pick 2 columns, rename columns
+        self.__indicator_dropdown = pd.DataFrame()  # for the dropdown
+        self.__indicator_view = pd.DataFrame()  # for the renaming
+        # !FIXME
 
     def filter_by_policy(self, policy):
         dropdown_filters = {
@@ -154,6 +150,15 @@ class Database(metaclass=SingletonMeta):
         }
         return self.raw_data.get(dropdown_filters.get(policy)).copy()
 
+    @property
+    def indicator_dropdown(self):
+        return self.__indicator_dropdown
+
+    @property
+    def indicator_view(self):
+        self.__indicator_view
+
+    # !FIXME
     # def get_indicator_view(self, indicator_group, indicator):
     #     if indicator_group_select:
     #         indicator_view_name = indicator_group[

@@ -51,6 +51,10 @@ class IndicatorGroup(Base):
     indicator_name = Column(String, nullable=False)
     indicator_view = Column(String, nullable=False)
 
+    def serialize(self):
+        return {"indicator_group": self.indicator_group}
+        # !FIXME
+
 
 class FetchDate(Base):
 
@@ -69,8 +73,6 @@ class PopulationTarget(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     indicator_name = Column(String)
     cat = Column(String)
-
-    indicator_info = relationship("Indicator")
 
     def serialize(self):
         return {"indicator": self.indicator_name, "cat": self.cat}
