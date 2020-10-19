@@ -70,6 +70,7 @@ class IndicatorGroup(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     indicator_id = Column(String, ForeignKey("indicator.id"))
+    view = Column(String)
 
 
 class Indicator(Base):
@@ -78,7 +79,6 @@ class Indicator(Base):
 
     id = Column(String, primary_key=True)
     name = Column(String)
-    view = Column(String)
 
 
 class Repository(Base):
