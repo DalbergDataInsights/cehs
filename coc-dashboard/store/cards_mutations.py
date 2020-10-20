@@ -26,7 +26,7 @@ def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
 
     df = db.filter_by_indicator(df, indicator)
 
-    df_country = get_percentage(
+    df = get_percentage(
         df,
         static.get("population data"),
         static.get("target population type"),
@@ -35,16 +35,7 @@ def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
         all_country=True,
     )
 
-    # df_country.rename(
-    #     columns={
-    #         indicator: get_new_indic_name(
-    #             static.get("indicator_groups"), indicator, indicator_group
-    #         )
-    #     },
-    #     inplace=True,
-    # )
-
-    return df_country
+    return df
 
 
 # CARD 2
@@ -109,15 +100,6 @@ def map_bar_country_dated_data(
     data_in = data_in.set_index("id")
     data_out = data_in[~pd.isna(data_in[indicator])]
 
-    # data_out.rename(
-    #     columns={
-    #         indicator: get_new_indic_name(
-    #             static.get("indicator_groups"), indicator, indicator_group
-    #         )
-    #     },
-    #     inplace=True,
-    # )
-
     return data_out
 
 
@@ -141,15 +123,6 @@ def scatter_district_data(*, outlier, indicator, indicator_group, district, **kw
         indicator_group,
         indicator,
     )
-
-    # df_district.rename(
-    #     columns={
-    #         indicator: get_new_indic_name(
-    #             static.get("indicator_groups"), indicator, indicator_group
-    #         )
-    #     },
-    #     inplace=True,
-    # )
 
     return df_district
 
@@ -183,12 +156,7 @@ def tree_map_district_dated_data(
 
     df_district_dated = filter_by_district(df_district_dated, district)
 
-    # df_district_dated.rename(
-    #     columns={
-    #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)
-    #     },
-    #     inplace=True,
-    # )
+    df_district_dated = db.rename_df_columns(df_district_dated)
 
     return df_district_dated
 
@@ -210,18 +178,6 @@ def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
 
     df = df[df.facility_name == facility].reset_index(drop=True)
 
-    # indicator = db.get_view(indicator_name)
-    # df.rename(indicator)
-    # or
-    # df = db.rename_indicator_to_view(df)
-
-    # df_facility.rename(
-    #     columns={
-    #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)
-    #     },
-    #     inplace=True,
-    # )
-
     return df
 
 
@@ -232,16 +188,9 @@ def bar_reporting_country_data(*, indicator, **kwargs):
 
     db = Database()
 
-    df = db.raw_data.get("value_rep")  # !FIXME
+    df = db.raw_data.get("value_rep")  # FIXME
 
     df = db.filter_by_indicator(df, indicator)
-
-    # df.rename(
-    #     columns={
-    #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)
-    #     },
-    #     inplace=True,
-    # )
 
     return df
 
@@ -261,20 +210,13 @@ def map_reporting_dated_data(
 
     db = Database()
 
-    df = db.raw_data.get("value_rep")  # !FIXME
+    df = db.raw_data.get("value_rep")  # FIXME
 
     df = db.filter_by_indicator(df, indicator)
 
     df = filter_df_by_dates(
         df, target_year, target_month, reference_year, reference_month
     )
-
-    # df.rename(
-    #     columns={
-    #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)
-    #     },
-    #     inplace=True,
-    # )
 
     return df
 
@@ -286,18 +228,11 @@ def scatter_reporting_district_data(*, indicator, district, **kwargs):
 
     db = Database()
 
-    df = db.raw_data.get("value_rep")  # !FIXME
+    df = db.raw_data.get("value_rep")  # FIXME
 
     df = db.filter_by_indicator(df, indicator)
 
     df_reporting_district = filter_by_district(df, district)
-
-    # df_reporting_district.rename(
-    #     columns={
-    #         indicator: get_new_indic_name(static.get("indicator_groups"), indicator)
-    #     },
-    #     inplace=True,
-    # )
 
     return df_reporting_district
 
@@ -311,7 +246,7 @@ def indicator_group(*, indicator_group, outlier, **kwargs):
 
     df = db.filter_by_policy(outlier)
 
-    # !FIXME when mutations and store are decoupled! !IMPORTANT
+    # FIXME when mutations and store are decoupled! !IMPORTANT
 
     groups = dict(
         MNCH=[

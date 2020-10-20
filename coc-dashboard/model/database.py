@@ -52,8 +52,12 @@ class IndicatorGroup(Base):
     indicator_view = Column(String, nullable=False)
 
     def serialize(self):
-        return {"indicator_group": self.indicator_group}
-        # !FIXME
+        return {
+            "indicator_id": self.id,
+            "indicator_group": self.indicator_group,
+            "indicator_name": self.indicator_name,
+            "indicator_view": self.indicator_view,
+        }
 
 
 class FetchDate(Base):
