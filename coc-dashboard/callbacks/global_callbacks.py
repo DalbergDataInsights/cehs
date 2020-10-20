@@ -17,9 +17,8 @@ from store import (
     define_datasets,
     month_order,
     timeit,
-    # indicator_groups,
+    Database,
     get_perc_description,
-    # get_new_indic_name,
 )
 
 from view import ds
@@ -68,11 +67,13 @@ def change_titles(*inputs):
     district = inputs[6]
     indicator_group_select = inputs[7]
 
-    indicator_view_name = indicator
-    # indicator_view_name = get_new_indic_name(
-    #     indicator_groups, indicator, indicator_group_select)
-
     # Data card 1
+
+    db = Database()
+
+    indicator_view_name = db.get_indicator_view(
+        indicator, indicator_group=indicator_group_select
+    )
 
     try:
 

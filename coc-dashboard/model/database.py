@@ -6,31 +6,12 @@ import json
 Base = declarative_base()
 
 
-class District(Base):
-
-    __tablename__ = "district"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-
-
-class Facility(Base):
-
-    __tablename__ = "facility"
-
-    id = Column(String, primary_key=True)
-    name = Column(String)
-    district_id = Column(Integer, ForeignKey("district.id"))
-
-    district_info = relationship("District")
-
-
 class Population(Base):
 
     __tablename__ = "population"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    district_id = Column(Integer, ForeignKey("district.id"))
+    district_name = Column(String, nullable=False)
     year = Column(Integer, nullable=False)
     male = Column(Integer)
     female = Column(Integer)
@@ -44,16 +25,14 @@ class Population(Base):
     u15 = Column(Integer)
     suspect_tb = Column(Integer)
 
-    district_info = relationship("District")
-
     def serialize(self):
         return {
-            "id": self.district_info.name,
+            "id": self.district_name,
             "year": self.year,
             "female": self.female,
             "total": self.total,
             "childbearing_age": self.childbearing_age,
-            "pregnant": self.childbearing_age,
+            "pregnant": self.pregnant,
             "not_pregnant": self.not_pregnant,
             "births": self.births,
             "u1": self.u1,
@@ -68,52 +47,17 @@ class IndicatorGroup(Base):
     __tablename__ = "indicator_group"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
-    indicator_id = Column(String, ForeignKey("indicator.id"))
-    view = Column(String)
+    indicator_group = Column(String, nullable=False)
+    indicator_name = Column(String, nullable=False)
+    indicator_view = Column(String, nullable=False)
 
-
-class Indicator(Base):
-
-    __tablename__ = "indicator"
-
-    id = Column(String, primary_key=True)
-    name = Column(String)
-
-
-class Repository(Base):
-
-    __tablename__ = "repository"
-
-    id = Column(Integer, primary_key=True, autoincrement=True)
-
-    facility_id = Column(String, ForeignKey("facility.id"))
-    date = Column(Date, nullable=False)
-    indicator = Column(String, ForeignKey("indicator.id"))
-    value_raw = Column(Integer)
-    value_iqr = Column(Integer)
-    value_std = Column(Integer)
-    value_rep = Column(Integer)
-
-    indicator_info = relationship("Indicator")
-    facility_info = relationship("Facility")
-
-    @property
-    def display_data_dict(self):
-
-        serializeable = {
-            "district_name": self.facility_info.district_info.name,
-            "facility_name": self.facility_info.name,
-            "date": self.date,
-            "indicator_name": self.indicator_info.name,
-            "indicator_view": self.indicator_info.view,
-            "value_raw": self.value_raw,
-            "value_iqr": self.value_iqr,
-            "value_std": self.value_std,
-            "value_rep": self.value_rep,
+    def serialize(self):
+        return {
+            "indicator_id": self.id,
+            "indicator_group": self.indicator_group,
+            "indicator_name": self.indicator_name,
+            "indicator_view": self.indicator_view,
         }
-
-        return serializeable
 
 
 class FetchDate(Base):
@@ -131,11 +75,8 @@ class PopulationTarget(Base):
 
     __tablename__ = "population_target"
     id = Column(Integer, primary_key=True, autoincrement=True)
-    indicator_id = Column(String, ForeignKey("indicator.id"))
+    indicator_name = Column(String)
     cat = Column(String)
 
-    indicator_info = relationship("Indicator")
-
     def serialize(self):
-
-        return {"indicator": self.indicator_info.name, "cat": self.cat}
+        return {"indicator": self.indicator_name, "cat": self.cat}
