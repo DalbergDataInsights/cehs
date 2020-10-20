@@ -42,21 +42,21 @@ class Population(Base):
         }
 
 
-class IndicatorGroup(Base):
+class Indicator(Base):
 
-    __tablename__ = "indicator_group"
+    __tablename__ = "indicator"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    indicator_group = Column(String, nullable=False)
-    indicator_name = Column(String, nullable=False)
-    indicator_view = Column(String, nullable=False)
+    group = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+    view = Column(String, nullable=False)
 
     def serialize(self):
         return {
             "indicator_id": self.id,
-            "indicator_group": self.indicator_group,
-            "indicator_name": self.indicator_name,
-            "indicator_view": self.indicator_view,
+            "indicator_group": self.group,
+            "indicator_name": self.name,
+            "indicator_view": self.view,
         }
 
 

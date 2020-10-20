@@ -21,10 +21,10 @@ def get_year_and_month_cols(df):
 
     df = df.reset_index()
 
-    df['year'] = pd.DatetimeIndex(df['date']).year
-    df['month'] = pd.DatetimeIndex(df['date']).strftime("%b")
+    df["year"] = pd.DatetimeIndex(df["date"]).year
+    df["month"] = pd.DatetimeIndex(df["date"]).strftime("%b")
 
-    df = df.set_index(['date', 'year', 'month'])
+    df = df.set_index(["date", "year", "month"])
 
     return df
 
@@ -45,13 +45,9 @@ def get_sub_dfs(df, select_index, values, new_index, order=None):
     return traces
 
 
-rng = pd.date_range(start='2019-04-01', end='2020-04-01', periods=12)
-df = pd.DataFrame({'date': rng, 'val': np.random.randn(len(rng))})
+rng = pd.date_range(start="2019-04-01", end="2020-04-01", periods=12)
+df = pd.DataFrame({"date": rng, "val": np.random.randn(len(rng))})
 
 df1 = get_year_and_month_cols(df)
 
-df2 = get_sub_dfs(
-    df1, "year", [2018, 2019, 2020], "month", month_order)
-
-
-print(df1.head())
+df2 = get_sub_dfs(df1, "year", [2018, 2019, 2020], "month", month_order)

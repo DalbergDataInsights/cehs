@@ -35,6 +35,8 @@ def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
         all_country=True,
     )
 
+    df = db.rename_df_columns(df)
+
     return df
 
 
@@ -100,6 +102,8 @@ def map_bar_country_dated_data(
     data_in = data_in.set_index("id")
     data_out = data_in[~pd.isna(data_in[indicator])]
 
+    data_out = db.rename_df_columns(data_out)
+
     return data_out
 
 
@@ -123,6 +127,8 @@ def scatter_district_data(*, outlier, indicator, indicator_group, district, **kw
         indicator_group,
         indicator,
     )
+
+    df_district = db.rename_df_columns(df_district)
 
     return df_district
 
@@ -178,6 +184,8 @@ def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
 
     df = df[df.facility_name == facility].reset_index(drop=True)
 
+    df = db.rename_df_columns(df)
+
     return df
 
 
@@ -191,6 +199,8 @@ def bar_reporting_country_data(*, indicator, **kwargs):
     df = db.raw_data.get("value_rep")  # FIXME
 
     df = db.filter_by_indicator(df, indicator)
+
+    df = db.rename_df_columns(df)
 
     return df
 
@@ -218,6 +228,8 @@ def map_reporting_dated_data(
         df, target_year, target_month, reference_year, reference_month
     )
 
+    df = db.rename_df_columns(df)
+
     return df
 
 
@@ -232,9 +244,11 @@ def scatter_reporting_district_data(*, indicator, district, **kwargs):
 
     df = db.filter_by_indicator(df, indicator)
 
-    df_reporting_district = filter_by_district(df, district)
+    df = filter_by_district(df, district)
 
-    return df_reporting_district
+    df = db.rename_df_columns(df)
+
+    return df
 
 
 # Indicator group grid

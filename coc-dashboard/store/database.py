@@ -3,7 +3,7 @@ from os import rename
 from sqlalchemy import create_engine
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
-from model.database import FetchDate, Population, PopulationTarget, IndicatorGroup
+from model.database import FetchDate, Population, PopulationTarget, Indicator
 import pandas as pd
 from .helpers import timeit
 
@@ -41,8 +41,6 @@ class Database(metaclass=SingletonMeta):
     fetch_data_query = """SELECT * FROM {}"""
     repos = ["value_raw", "value_rep", "value_std", "value_iqr"]
 
-    indicator_group_fetch_query = """SELECT * FROM indicator_group;"""
-
     data_types = {
         "district_name": str,
         "facility_name": str,
@@ -64,14 +62,14 @@ class Database(metaclass=SingletonMeta):
             self.Session = sessionmaker(bind=self.engine)
             self.init = True
 
+            self.set_indicator_groups_and_view()
+
             print("Fetching data")
             for repo in self.repos:
                 self.raw_data[repo] = self.get_repository(repo)
             self.districts = self.raw_data["value_raw"].id.unique()
             self.districts.sort()
-
         assert self.init, "You must pass a DB bind string to use Database first!"
-        self.set_indicator_groups_and_view()
 
     @timeit
     def get_repository(self, repo_name):
@@ -89,6 +87,9 @@ class Database(metaclass=SingletonMeta):
                 print(f"Was not able to convert {col}")
 
         __dataframe.rename(columns={"district_name": "id"}, inplace=True)
+        __dataframe.rename(
+            columns=self.get_renaming_dict(rename_to="indicator_name"), inplace=True
+        )
 
         return __dataframe
 
@@ -132,7 +133,7 @@ class Database(metaclass=SingletonMeta):
         return self.get_serialized_into_df(PopulationTarget)
 
     def set_indicator_groups_and_view(self):
-        serialized_groups = self.get_serialized_obj(IndicatorGroup)
+        serialized_groups = self.get_serialized_obj(Indicator)
         self.__indicator_serialized = serialized_groups
         indicator_groups = pd.DataFrame(serialized_groups)
         self.__indicator_dropdowns = (
@@ -167,7 +168,7 @@ class Database(metaclass=SingletonMeta):
         self, df, rename_from="indicator_name", rename_to="indicator_view"
     ):
         rename_dict = self.get_renaming_dict(rename_from, rename_to)
-        df.rename(columns=rename_dict)
+        df.rename(columns=rename_dict, inplace=True)
         return df
 
     def get_indicator_view(
