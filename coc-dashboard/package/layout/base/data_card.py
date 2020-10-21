@@ -7,7 +7,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 
 # FIXME: For some reason this is not working (even if function is made not private, so I pasted in the functions here for now, but ideally they would be imported)
-# from package.layout.data_story import __get_dropdown_layout, _requires_dropdown
 
 
 class DataCard:
@@ -54,7 +53,7 @@ class DataCard:
 
         # Housekeeping
         # self._data_columns = self._get_all_columns()
-        self._data_columns = ["One"]  # !FIXME
+        self._data_columns = ["One"]  # FIXME
 
         # Callbacks
 

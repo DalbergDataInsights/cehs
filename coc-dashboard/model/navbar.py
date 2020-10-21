@@ -37,7 +37,7 @@ class Navbar:
                 className=active_style if active == "reporting" else "nav-element",
             ),
             html.P(
-                "Overview",
+                "Overview (coming soon)",
                 id="overview",
                 # active_style if active == "overview" else "nav-element",
                 className="nav-element disabled",
@@ -47,8 +47,7 @@ class Navbar:
         return buttons
 
     def get_layout(self):
-        el_layout = [
-            dbc.Row(x.layout, style={"margin": "0"}) for x in self.elements]
+        el_layout = [dbc.Row(x.layout, style={"margin": "0"}) for x in self.elements]
         me_layout = [dbc.Row(x.layout) for x in self.methodology]
 
         html_nav = html.Div(
@@ -60,10 +59,9 @@ class Navbar:
                     [
                         dbc.Button("Controls", id="fade-button"),
                         html.A(
-                            html.Span("cloud_download",
-                                      className="material-icons"),
+                            html.Span("cloud_download", className="material-icons"),
                             className="nav-element",
-                            id = "download",
+                            id="download",
                             href=r"/static/data/cehs.xlsx",
                             download="cehs.xlsx",
                         ),
@@ -96,8 +94,7 @@ class Navbar:
                         dbc.ModalHeader("Methodology"),
                         dbc.ModalBody(me_layout),
                         dbc.ModalFooter(
-                            dbc.Button("Close", id="info-close",
-                                       className="ml-auto")
+                            dbc.Button("Close", id="info-close", className="ml-auto")
                         ),
                     ],
                     id="info-fade",

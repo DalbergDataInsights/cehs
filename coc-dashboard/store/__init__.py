@@ -1,39 +1,26 @@
-from sqlalchemy import create_engine
+import os
 
 from .helpers import *
-from .define_datasets import define_datasets
-from .geopopulation import static, shapefile
-from .read_data import read_data
-from .static_info import *
-import os
-from dropdown import initiate_dropdowns, set_dropdown_defaults
 from store import download_file
+from .dropdown import initiate_dropdowns, set_dropdown_defaults
+from .database import Database
 
 
 # READ FROM DATABASE
 
 DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]
-engine = create_engine(DATABASE_URI)
 
-columns, data_reporting, data_outliers, data_std, data_iqr, indicator_groups = read_data(
-    engine, test=True
-)
+db = Database(DATABASE_URI)
 
-dfs = {
-    "Correct outliers - using standard deviation": data_std,
-    "Correct outliers - using interquartile range": data_iqr,
-    "Keep outliers": data_outliers,
-    "Reporting": data_reporting,
-}
 
-for key, df in dfs.items():
-    df["date"] = pd.to_datetime(df.date, errors="coerce")
-    dfs[key] = df
+# STATIC DATA
+from .static_info import *
+from .geopopulation import shapefile, static
 
-static["indicator_groups"] = indicator_groups
+# static["indicator_groups"] = indicator_groups
 
-if os.path.isfile('./coc-dashboard/package/static/data/cehs.xlsx') == False:
-    download_file(dfs) # write to excel file for download
+if os.path.isfile("./coc-dashboard/package/static/data/cehs.xlsx") == False:
+    download_file(dfs)  # write to excel file for download
 
 # NAVIGATION
 
@@ -44,7 +31,7 @@ if os.path.isfile('./coc-dashboard/package/static/data/cehs.xlsx') == False:
     reference_date,
     target_date,
     district_control_group,
-) = initiate_dropdowns(data_outliers, indicator_groups)
+) = initiate_dropdowns()
 
 set_dropdown_defaults(
     outlier_policy_dropdown_group,
@@ -57,7 +44,6 @@ set_dropdown_defaults(
 CONTROLS = dict(
     outlier=outlier_policy_dropdown_group.dropdown_objects[0].value,
     indicator=indicator_dropdown_group.dropdown_objects[-1].value,
-    # indicator_type=indicator_dropdown_group.dropdown_objects[0].value,
     district=district_control_group.dropdown_objects[0].value,
     target_year=target_date.dropdown_objects[0].value,
     target_month=target_date.dropdown_objects[1].value,
@@ -84,4 +70,6 @@ for x in os.environ:
 
 # GLOBAL DATASET
 
-init_data_set = define_datasets(static=static, dfs=dfs, controls=CONTROLS)
+from .define_datasets import define_datasets
+
+init_data_set = define_datasets(controls=CONTROLS)

@@ -19,23 +19,8 @@ month_order = [
     "Dec",
 ]
 
-index_base_columns = ["id", "date", "year",
-                      "month", "facility_id", "facility_name"]
-
 
 # Filtering methods for data transform functions
-
-
-def filter_df_by_policy(dfs, key):
-    df = dfs.get(key)
-    return df
-
-
-def filter_df_by_indicator(df, indicator, persist_columns=[]):
-    columns_to_keep = persist_columns + [indicator]
-    df = df[columns_to_keep]
-
-    return df
 
 
 def filter_df_by_dates(df, target_year, target_month, reference_year, reference_month):
@@ -132,6 +117,18 @@ def reporting_count_transform(data):
     return data
 
 
+def get_year_and_month_cols(df):
+
+    df = df.reset_index()
+
+    df["year"] = pd.DatetimeIndex(df["date"]).year
+    df["month"] = pd.DatetimeIndex(df["date"]).strftime("%b")
+
+    df = df.set_index(["date", "year", "month"])
+
+    return df
+
+
 # Data cleaning methods for dataset selection and callbacks
 
 
@@ -144,15 +141,14 @@ def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=Fal
     """
 
     # Pick what to grouby and index on : either district level or national level
-
     merge = ["id", "year"]
-    index = ["id", "year", "month", "date"]
+    index = ["id", "date"]
 
     if all_country == True:
         merge = merge[1:]
-        index = index[1:4]
+        index = index[1:]
 
-    ind_type = indicator_group.split('(')[-1][:-1]
+    ind_type = indicator_group.split("(")[-1][:-1]
 
     # Return the data as is, with a simple grouby if we are showing absolute numbers
 
@@ -163,7 +159,7 @@ def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=Fal
 
     elif ind_type == "coverage":
 
-        target = pop_tgt[pop_tgt.indicator == indicator]['cat'].values[0]
+        target = pop_tgt[pop_tgt.indicator == indicator]["cat"].values[0]
         val_col = df.columns[-1]
 
         columns = merge + [target]
@@ -172,8 +168,9 @@ def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=Fal
 
         data_in = df.groupby(index, as_index=False).sum()
 
-        data_in = pd.merge(data_in, pop_in,
-                           how="left", left_on=merge, right_on=merge)
+        data_in = get_year_and_month_cols(data_in).reset_index()
+
+        data_in = pd.merge(data_in, pop_in, how="left", left_on=merge, right_on=merge)
 
         data_in[val_col] = (data_in[val_col] / data_in[target]) * 12
 
@@ -184,9 +181,7 @@ def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=Fal
         return data_out
 
 
-def check_index(
-    df, index=["id", "date", "year", "month", "facility_id", "facility_name"]
-):
+def check_index(df, index=["id", "date", "facility_name"]):
     """
     Check that the dataframe is formatted in the expected way, with expected indexes. Restructure the dataframe (set the indices) if this is not the case.
     """
@@ -198,13 +193,11 @@ def check_index(
 
 
 def get_national_sum(df, indicator):
-    return df.groupby(["date", "year", "month"], as_index=False).agg({indicator: "sum"})
+    return df.groupby("date", as_index=False).agg({indicator: "sum"})
 
 
 def get_district_sum(df, indicator):
-    return df.groupby(["id", "date", "year", "month"], as_index=False).agg(
-        {indicator: "sum"}
-    )
+    return df.groupby(["id", "date"], as_index=False).agg({indicator: "sum"})
 
 
 # Decorators
@@ -226,26 +219,16 @@ def timeit(f):
 
     return timed
 
+
 # Formattimg method
 
 
 def get_perc_description(perc):
     perc_abs = abs(perc)
     if perc >= 0.1:
-        descrip = f'increased by {perc_abs}%'
+        descrip = f"increased by {perc_abs}%"
     elif perc_abs < 0.1:
-        descrip = 'remained stable'
+        descrip = "remained stable"
     elif perc <= 0.1:
-        descrip = f'decreased by {perc_abs}%'
+        descrip = f"decreased by {perc_abs}%"
     return descrip
-
-
-def get_new_indic_name(indicator_group, indicator, indicator_group_select=None):
-    if indicator_group_select:   
-        indicator_view_name = indicator_group[
-            (indicator_group['Choose an indicator'] == indicator) &
-            (indicator_group['Choose an indicator group'] == indicator_group_select)]['View'].values[0]
-    else:
-        indicator_view_name = indicator_group[
-            indicator_group['Choose an indicator'] == indicator]['View'].values[0]
-    return indicator_view_name

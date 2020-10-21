@@ -9,7 +9,7 @@ from pathlib import Path
 
 def download_file(dict_of_st):
     Path("./coc-dashboard/package/static/data").mkdir(parents=True, exist_ok=True)
-    with pd.ExcelWriter('./coc-dashboard/package/static/data/cehs.xlsx') as writer:  
+    with pd.ExcelWriter("./coc-dashboard/package/static/data/cehs.xlsx") as writer:
         for df_name, df in dict_of_st.items():
             if len(df_name) > 31:
                 df_name = df_name[:30]

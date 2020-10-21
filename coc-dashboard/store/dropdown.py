@@ -3,6 +3,7 @@ from model import Navbar
 
 from store.helpers import month_order
 from store.static_info import meth_data
+from .database import Database
 from package.components.nested_dropdown_group import NestedDropdownGroup
 from package.components.methodology_section import MethodologySection
 
@@ -23,32 +24,33 @@ DEFAULTS = {
 }
 
 
-def initiate_dropdowns(data_outliers, indicator_group):
+def initiate_dropdowns():
 
-    # TODO make that sustainable for beyond 2020
+    db = Database()
 
     # Initiate data selection dropdowns
 
-    max_date = data_outliers.date.max()
+    max_date = db.raw_data.get("value_raw").date.max()
     (max_year, max_month_number) = (max_date.year, max_date.month)
-    max_month = month_order[max_month_number-1]
+    max_month = month_order[max_month_number - 1]
 
     years = [2018] * 12 + [2019] * 12 + [2020] * max_month_number
 
-    date_columns = pd.DataFrame({"year": years,
-                                 "month": month_order * 2 + month_order[:max_month_number]})
+    date_columns = pd.DataFrame(
+        {"year": years, "month": month_order * 2 + month_order[:max_month_number]}
+    )
 
     date_columns.year = date_columns.year.astype(str)
 
     date_columns.columns = ["Target Year", "Target Month"]
-    target_date = NestedDropdownGroup(date_columns.copy(),
-                                      title="Select target date",
-                                      vertical=False)
+    target_date = NestedDropdownGroup(
+        date_columns.copy(), title="Select target date", vertical=False
+    )
 
     date_columns.columns = ["Reference Year", "Reference Month"]
-    reference_date = NestedDropdownGroup(date_columns,
-                                         title="Select reference date",
-                                         vertical=False)
+    reference_date = NestedDropdownGroup(
+        date_columns, title="Select reference date", vertical=False
+    )
 
     # Initiate outlier policy dropdown
 
@@ -65,28 +67,17 @@ def initiate_dropdowns(data_outliers, indicator_group):
         title="Select an outlier correction policy",
     )
 
-    # Initiate indicator dropdown
-
     indicator_dropdown_group = NestedDropdownGroup(
-        indicator_group[['Choose an indicator group',
-                         'Choose an indicator']],
-        title="Select an indicator"
+        db.indicator_dropdowns, title="Select an indicator"
     )
 
     district_control_group = NestedDropdownGroup(
-        data_outliers[["id"]].rename(
-            columns={"id": "Please select a district"}),
+        pd.DataFrame({"Select a district": db.districts}),
         title="Select a district",
     )
 
-    # Date of last download
-
-    date_df = pd.read_csv("./coc-dashboard/data/chron_date.csv")
-    date_df["Date"] = pd.to_datetime(date_df.Date).dt.strftime("%B-%d-%Y")
-    meth_date = date_df["Date"].iloc[-1]
-
     methodology_layout = MethodologySection(
-        title="Methodology", data=meth_data(meth_date)
+        title="Methodology", data=meth_data(db.fetch_date)
     )
 
     side_nav = Navbar(
@@ -122,19 +113,16 @@ def set_dropdown_defaults(
     )
 
     target_date.dropdown_objects[0].value = DEFAULTS.get("default_target_year")
-    target_date.dropdown_objects[1].value = DEFAULTS.get(
-        "default_target_month")
+    target_date.dropdown_objects[1].value = DEFAULTS.get("default_target_month")
 
     indicator_dropdown_group.dropdown_objects[0].value = DEFAULTS.get(
-        "default_indicator_group")
+        "default_indicator_group"
+    )
     indicator_dropdown_group.dropdown_objects[1].value = DEFAULTS.get(
         "default_indicator"
     )
 
-    reference_date.dropdown_objects[0].value = DEFAULTS.get(
-        "default_reference_year")
-    reference_date.dropdown_objects[1].value = DEFAULTS.get(
-        "default_reference_month")
+    reference_date.dropdown_objects[0].value = DEFAULTS.get("default_reference_year")
+    reference_date.dropdown_objects[1].value = DEFAULTS.get("default_reference_month")
 
-    district_control_group.dropdown_objects[0].value = DEFAULTS.get(
-        "default_district")
+    district_control_group.dropdown_objects[0].value = DEFAULTS.get("default_district")

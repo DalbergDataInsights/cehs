@@ -8,14 +8,10 @@ from components import (
 )
 from dash.dependencies import Input, Output, State
 from store import (
-    define_datasets,
-    dfs,
     district_control_group,
     indicator_dropdown_group,
-    init_data_set,
     outlier_policy_dropdown_group,
     reference_date,
-    static,
     target_date,
 )
 
@@ -72,7 +68,7 @@ def define_callbacks(ds):
             "inputs": [
                 Input("trends", "n_clicks"),
                 Input("reporting", "n_clicks"),
-                Input("overview", "n_clicks"),
+                # Input("overview", "n_clicks"),
             ],
             "outputs": [
                 Output("ds-paginator", "children"),
