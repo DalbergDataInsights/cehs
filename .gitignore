@@ -3,3 +3,6 @@
 .ipynb_checkpoints
 .env
 .vscode
+coc-dashboard/debug.py
+*.sqlite
+data/*.csv
