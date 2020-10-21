@@ -62,4 +62,4 @@ ds = DataStory(
 app = ds.app
 app.title = "CEHS Uganda"
 
-#auth = dash_auth.BasicAuth(app, credentials)
+auth = dash_auth.BasicAuth(app, credentials)
