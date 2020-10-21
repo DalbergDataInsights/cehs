@@ -180,7 +180,11 @@ def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
     # TODO Reorder such that its the one facility with the on selected data max value that shows
 
     if not facility:
-        facility = df.facility_name[0]
+        facility = (
+            df.sort_values(df.columns[-1], ascending=False)
+            .reset_index()
+            .facility_name[0]
+        )
 
     df = df[df.facility_name == facility].reset_index(drop=True)
 
