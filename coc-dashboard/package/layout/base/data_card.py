@@ -97,6 +97,7 @@ class DataCard:
             coloraxis=dict(colorbar_len=1),
             showlegend=True,
         )
+        fig.update_yaxes(rangemode="tozero")
         self.__figure = fig
 
     @property
