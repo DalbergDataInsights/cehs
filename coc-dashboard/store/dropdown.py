@@ -30,7 +30,7 @@ def initiate_dropdowns():
 
     # Initiate data selection dropdowns
 
-    max_date = db.raw_data.get("value_raw").date.max()
+    max_date = db.raw_data.date.max()
     (max_year, max_month_number) = (max_date.year, max_date.month)
     max_month = month_order[max_month_number - 1]
 

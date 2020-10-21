@@ -39,7 +39,7 @@ class Database(metaclass=SingletonMeta):
     """
 
     fetch_data_query = """SELECT * FROM {}"""
-    repos = ["value_raw", "value_rep", "value_std", "value_iqr"]
+    active_repo = "value_std"
 
     data_types = {
         "district_name": str,
@@ -52,85 +52,35 @@ class Database(metaclass=SingletonMeta):
     index_columns = ["id", "facility_name", "date"]
 
     datasets = {}
-    raw_data = {}
+    raw_data = None
+    rep_data = None
 
     init = False
 
     def __init__(self, bind_string=None):
         if bind_string:
+            # Set SQLAlchemy
             self.engine = create_engine(bind_string)
             self.Session = sessionmaker(bind=self.engine)
             self.init = True
-
+            # Get the supporting data
             self.set_indicator_groups_and_view()
+            # Get init data
+            self.raw_data = self.get_repository(self.active_repo)
+            self.rep_data = self.get_repository("value_rep")
 
-            print("Fetching data")
-            for repo in self.repos:
-                self.raw_data[repo] = self.get_repository(repo)
-            self.districts = self.raw_data["value_raw"].id.unique()
-            self.districts.sort()
+            self.set_districts()
+
         assert self.init, "You must pass a DB bind string to use Database first!"
 
-    @timeit
-    def get_repository(self, repo_name):
-
-        __dataframe = pd.read_sql(
-            self.fetch_data_query.format(repo_name), con=self.engine
-        )
-
-        for col in __dataframe.columns:
-            try:
-                __dataframe[col] = __dataframe[col].astype(
-                    self.data_types.get(col, self.data_types.get("*"))
-                )
-            except:
-                print(f"Was not able to convert {col}")
-
-        __dataframe.rename(columns={"district_name": "id"}, inplace=True)
-        __dataframe.rename(
-            columns=self.get_renaming_dict(rename_to="indicator_name"), inplace=True
-        )
-
-        return __dataframe
-
     @property
-    def fetch_date(self):
-        session = self.Session()
-        date = session.query(FetchDate).one()
-        session.close()
-        return date.serialize()
+    def indicator_dropdowns(self):
+        return self.__indicator_dropdowns
 
-    def filter_by_indicator(self, df, indicator):
-        df = df.reset_index()
-        try:
-            df = df[self.index_columns + [indicator]]
-        except Exception as e:
-            print(e)
-            print("No such column is present in the dataframe")
-        return df
-
-    def include_dataset(self, key, df):
-        self.datasets[key] = df
-
-    def fetch_dataset(self, key):
-        return self.datasets.get(key)
-
-    def get_serialized_obj(self, sqlalchemy_obj):
-        session = self.Session()
-        objects = session.query(sqlalchemy_obj).all()
-        serialized = [obj.serialize() for obj in objects]
-        session.close()
-        return serialized
-
-    def get_serialized_into_df(self, sqlalchemy_obj):
-        df = pd.DataFrame(self.get_serialized_obj(sqlalchemy_obj))
-        return df
-
-    def get_population_data(self):
-        return self.get_serialized_into_df(Population)
-
-    def get_population_target(self):
-        return self.get_serialized_into_df(PopulationTarget)
+    # Initialization methods
+    def set_districts(self):
+        self.districts = self.raw_data.id.unique()
+        self.districts.sort()
 
     def set_indicator_groups_and_view(self):
         serialized_groups = self.get_serialized_obj(Indicator)
@@ -142,19 +92,87 @@ class Database(metaclass=SingletonMeta):
             .reset_index(drop=True)
         )
 
+    # Fetching data, DB adapter
+    @timeit
+    def get_repository(self, repo_name):
+        print(f"Fetching data from {repo_name}")
+
+        __dataframe = pd.read_sql(
+            self.fetch_data_query.format(repo_name), con=self.engine
+        )
+
+        for col in __dataframe.columns:
+            try:
+                __dataframe[col] = __dataframe[col].astype(
+                    self.data_types.get(col, self.data_types.get("*"))
+                )
+            except:
+                pass
+
+        __dataframe.rename(columns={"district_name": "id"}, inplace=True)
+        __dataframe.rename(
+            columns=self.get_renaming_dict(rename_to="indicator_name"), inplace=True
+        )
+
+        return __dataframe
+
+    def get_serialized_into_df(self, sqlalchemy_obj):
+        df = pd.DataFrame(self.get_serialized_obj(sqlalchemy_obj))
+        return df
+
+    def get_population_data(self):
+        return self.get_serialized_into_df(Population)
+
+    def get_population_target(self):
+        return self.get_serialized_into_df(PopulationTarget)
+
+    @property
+    def fetch_date(self):
+        session = self.Session()
+        date = session.query(FetchDate).one()
+        session.close()
+        return date.serialize()
+
+    def get_serialized_obj(self, sqlalchemy_obj):
+        session = self.Session()
+        objects = session.query(sqlalchemy_obj).all()
+        serialized = [obj.serialize() for obj in objects]
+        session.close()
+        return serialized
+
+    # Active raw data management
     def filter_by_policy(self, policy):
         dropdown_filters = {
             "Correct outliers - using standard deviation": "value_std",
             "Correct outliers - using interquartile range": "value_iqr",
             "Keep outliers": "value_raw",
-            "Reporting": "value_rep",
         }
-        return self.raw_data.get(dropdown_filters.get(policy)).copy()
+        new_repo = dropdown_filters.get(policy)
+        if self.active_repo == new_repo:
+            return self.raw_data
+        self.active_repo = new_repo
+        self.raw_data = None
+        self.raw_data = self.get_repository(self.active_repo)
+        return self.raw_data
 
-    @property
-    def indicator_dropdowns(self):
-        return self.__indicator_dropdowns
+    # Active dataset management
+    def include_dataset(self, key, df):
+        self.datasets[key] = df
 
+    def fetch_dataset(self, key):
+        return self.datasets.get(key)
+
+    # Data filters
+    def filter_by_indicator(self, df, indicator):
+        df = df.reset_index()
+        try:
+            df = df[self.index_columns + [indicator]]
+        except Exception as e:
+            print(e)
+            print("No such column is present in the dataframe")
+        return df
+
+    # Labels
     def get_renaming_dict(
         self,
         rename_from="indicator_id",
@@ -163,13 +181,6 @@ class Database(metaclass=SingletonMeta):
         return {
             x.get(rename_from): x.get(rename_to) for x in self.__indicator_serialized
         }
-
-    def rename_df_columns(
-        self, df, rename_from="indicator_name", rename_to="indicator_view"
-    ):
-        rename_dict = self.get_renaming_dict(rename_from, rename_to)
-        df.rename(columns=rename_dict, inplace=True)
-        return df
 
     def get_indicator_view(
         self, indicator, rename_from="name", rename_to="view", indicator_group=None
@@ -186,3 +197,10 @@ class Database(metaclass=SingletonMeta):
                 rename_from=f"indicator_{rename_from}",
                 rename_to=f"indicator_{rename_to}",
             ).get(indicator)
+
+    def rename_df_columns(
+        self, df, rename_from="indicator_name", rename_to="indicator_view"
+    ):
+        rename_dict = self.get_renaming_dict(rename_from, rename_to)
+        df.rename(columns=rename_dict, inplace=True)
+        return df

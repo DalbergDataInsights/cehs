@@ -22,7 +22,7 @@ def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
 
     db = Database()
 
-    df = db.filter_by_policy(outlier)
+    df = db.raw_data
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -57,7 +57,7 @@ def map_bar_country_dated_data(
 
     db = Database()
 
-    df = db.filter_by_policy(outlier)
+    df = db.raw_data
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -114,7 +114,7 @@ def scatter_district_data(*, outlier, indicator, indicator_group, district, **kw
 
     db = Database()
 
-    df = db.filter_by_policy(outlier)
+    df = db.raw_data
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -150,7 +150,7 @@ def tree_map_district_dated_data(
 
     db = Database()
 
-    df = db.filter_by_policy(outlier)
+    df = db.raw_data
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -171,7 +171,7 @@ def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
 
     db = Database()
 
-    df = db.filter_by_policy(outlier)
+    df = db.raw_data
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -192,11 +192,11 @@ def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
 # CARD 5
 
 
-def bar_reporting_country_data(*, indicator, **kwargs):
+def bar_reporting_country_data(*, outlier, indicator, **kwargs):
 
     db = Database()
 
-    df = db.raw_data.get("value_rep")  # FIXME
+    df = db.rep_data
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -210,6 +210,7 @@ def bar_reporting_country_data(*, indicator, **kwargs):
 
 def map_reporting_dated_data(
     *,
+    outlier,
     indicator,
     target_year,
     target_month,
@@ -220,7 +221,7 @@ def map_reporting_dated_data(
 
     db = Database()
 
-    df = db.raw_data.get("value_rep")  # FIXME
+    df = db.rep_data
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -236,11 +237,11 @@ def map_reporting_dated_data(
 # CARD 7
 
 
-def scatter_reporting_district_data(*, indicator, district, **kwargs):
+def scatter_reporting_district_data(*, outlier, indicator, district, **kwargs):
 
     db = Database()
 
-    df = db.raw_data.get("value_rep")  # FIXME
+    df = db.rep_data
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -254,11 +255,11 @@ def scatter_reporting_district_data(*, indicator, district, **kwargs):
 # Indicator group grid
 
 
-def indicator_group(*, indicator_group, outlier, **kwargs):
+def indicator_group(*, outlier, indicator_group, **kwargs):
 
     db = Database()
 
-    df = db.filter_by_policy(outlier)
+    df = db.raw_data
 
     # FIXME when mutations and store are decoupled! !IMPORTANT
 

@@ -1,7 +1,5 @@
 from datetime import datetime
 
-from numpy.lib.shape_base import dsplit
-
 from components import (
     country_overview_scatter,
     district_overview_scatter,
@@ -24,17 +22,31 @@ from store import (
 from view import ds
 
 
+def united_story_callback(*inputs):
+    """This function gatheres previously callbacks with same input and different outputs in a single entrypoint"""
+
+    outlier = inputs[0]
+    db = Database()
+    db.filter_by_policy(outlier)
+
+    # Calling callbacks with the same input
+    global_story_callback_output = global_story_callback(*inputs)
+    title_outputs = change_titles(*inputs)
+
+    return global_story_callback_output + title_outputs
+
+
 @timeit
 def global_story_callback(*inputs):
 
     outlier = inputs[0]
-    indicator = inputs[1]
-    reference_year = inputs[2]
-    reference_month = inputs[3]
-    target_year = inputs[4]
-    target_month = inputs[5]
-    district = inputs[6]
-    indicator_group = inputs[7]
+    indicator_group = inputs[1]
+    indicator = inputs[2]
+    reference_year = inputs[3]
+    reference_month = inputs[4]
+    target_year = inputs[5]
+    target_month = inputs[6]
+    district = inputs[7]
 
     global LAST_CONTROLS
     LAST_CONTROLS = CONTROLS.copy()
@@ -58,21 +70,19 @@ def global_story_callback(*inputs):
 @timeit
 def change_titles(*inputs):
 
-    outlier = inputs[0]
-    indicator = inputs[1]
-    reference_year = inputs[2]
-    reference_month = inputs[3]
-    target_year = inputs[4]
-    target_month = inputs[5]
-    district = inputs[6]
-    indicator_group_select = inputs[7]
+    indicator_group = inputs[1]
+    indicator = inputs[2]
+    reference_year = inputs[3]
+    reference_month = inputs[4]
+    target_year = inputs[5]
+    target_month = inputs[6]
+    district = inputs[7]
 
     # Data card 1
-
     db = Database()
 
     indicator_view_name = db.get_indicator_view(
-        indicator, indicator_group=indicator_group_select
+        indicator, indicator_group=indicator_group
     )
 
     try:
