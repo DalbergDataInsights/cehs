@@ -168,3 +168,7 @@ body {
     background-color: #ddd;
     color: black;
 }
+
+.fade:not(.show) {
+    pointer-events: none;
+}
