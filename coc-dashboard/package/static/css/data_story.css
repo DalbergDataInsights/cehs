@@ -139,6 +139,19 @@ body {
     font-size: 17px;
 }
 
+.h1, h1 {
+    font-size: calc(0.8vw + 0.8vh + 0.8vmin);
+}
+
+.h3, h3 {
+    font-size: calc(0.5vw + 0.5vh + 0.5vmin);
+}
+
+.h5, h5 {
+    font-size: calc(0.4vw + 0.4vh + 0.4vmin);
+}
+
+
 /* Change the color of links on hover */
 .nav-element:hover {
     background-color: #ddd;
