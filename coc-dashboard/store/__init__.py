@@ -1,7 +1,7 @@
 import os
 
 from .helpers import *
-from store import download_file
+from .static_info import download_file
 from .dropdown import initiate_dropdowns, set_dropdown_defaults
 from .database import Database
 
@@ -20,7 +20,7 @@ from .geopopulation import shapefile, static
 # static["indicator_groups"] = indicator_groups
 
 if os.path.isfile("./coc-dashboard/package/static/data/cehs.xlsx") == False:
-    download_file(dfs)  # write to excel file for download
+    download_file(db.raw_data)  # write to excel file for download
 
 # NAVIGATION
 
