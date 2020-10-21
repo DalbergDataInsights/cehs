@@ -142,22 +142,17 @@ class Database(metaclass=SingletonMeta):
 
     # Active raw data management
     def filter_by_policy(self, policy):
-        print("Fetching new policy")
         dropdown_filters = {
             "Correct outliers - using standard deviation": "value_std",
             "Correct outliers - using interquartile range": "value_iqr",
             "Keep outliers": "value_raw",
         }
         new_repo = dropdown_filters.get(policy)
-        print(
-            f"New policy {new_repo}, old policy {self.active_repo}, {new_repo == self.active_repo}"
-        )
         if self.active_repo == new_repo:
-            print("The policy is the same, returning the same dataset")
             return self.raw_data
         self.active_repo = new_repo
+        self.raw_data = None
         self.raw_data = self.get_repository(self.active_repo)
-        print("New policy set")
         return self.raw_data
 
     # Active dataset management
