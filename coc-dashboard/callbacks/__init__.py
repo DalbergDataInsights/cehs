@@ -82,6 +82,8 @@ def define_callbacks(ds):
                 Output("ds-container", "children"),
                 Output(f"{country_overview_scatter.my_name}_title", "children"),
                 Output(f"{district_overview_scatter.my_name}_title", "children"),
+                Output(
+                    f"{stacked_bar_reporting_country.my_name}_title", "children"),
                 Output(f"{tree_map_district.my_name}_title", "children"),
             ],
             "function": united_story_callback,

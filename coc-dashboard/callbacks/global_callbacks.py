@@ -182,7 +182,7 @@ def change_titles(*inputs):
     return [
         country_overview_scatter.title,
         district_overview_scatter.title,
-        # stacked_bar_reporting_country.title,
+        stacked_bar_reporting_country.title,
         tree_map_district.title,
     ]
 
@@ -203,7 +203,8 @@ def update_on_click(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         facility_scatter.data = ds
-        facility_scatter.figure = facility_scatter._get_figure(facility_scatter.data)
+        facility_scatter.figure = facility_scatter._get_figure(
+            facility_scatter.data)
         facility_scatter.figure_title = (
             f"Evolution of $label$ in {label} (click on the graph above to filter)"
         )
