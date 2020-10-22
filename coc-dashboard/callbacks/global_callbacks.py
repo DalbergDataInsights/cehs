@@ -22,22 +22,10 @@ from store import (
 from view import ds
 
 
-def united_story_callback(*inputs):
-    """This function gatheres previously callbacks with same input and different outputs in a single entrypoint"""
-
-    outlier = inputs[0]
-    db = Database()
-    db.filter_by_policy(outlier)
-
-    # Calling callbacks with the same input
-    global_story_callback_output = global_story_callback(*inputs)
-    title_outputs = change_titles(*inputs)
-
-    return global_story_callback_output + title_outputs
-
-
 @timeit
 def global_story_callback(*inputs):
+
+    db = Database()
 
     outlier = inputs[0]
     indicator_group = inputs[1]
@@ -60,6 +48,8 @@ def global_story_callback(*inputs):
     CONTROLS["reference_month"] = reference_month
     CONTROLS["indicator_group"] = indicator_group
 
+    db.filter_by_policy(CONTROLS["outlier"])
+
     df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
     ds.switch_data_set(df)
@@ -68,7 +58,68 @@ def global_story_callback(*inputs):
 
 
 @timeit
-def change_titles(*inputs):
+def change_titles_reporting(*inputs):
+
+    db = Database()
+
+    indicator_group = inputs[0]
+    indicator = inputs[1]
+    target_year = inputs[2]
+    target_month = inputs[3]
+
+    indicator_view_name = db.get_indicator_view(
+        indicator, indicator_group=indicator_group
+    )
+
+    try:
+        data_reporting = stacked_bar_reporting_country.data
+
+        date_reporting = datetime(
+            int(target_year), month_order.index(target_month) + 1, 1
+        )
+
+        try:
+            reported_positive = data_reporting.get("Reported a positive number").loc[
+                date_reporting
+            ][0]
+        except Exception:
+            reported_positive = 0
+        try:
+            did_not_report = data_reporting.get(
+                "Did not report on their 105:1 form"
+            ).loc[date_reporting][0]
+        except Exception:
+            did_not_report = 0
+        try:
+            reported_negative = data_reporting.get(
+                "Did not report a positive number"
+            ).loc[date_reporting][0]
+        except Exception:
+            reported_negative = 0
+
+        reported_perc = round(
+            (
+                (reported_positive + reported_negative)
+                / (reported_positive + did_not_report + reported_negative)
+            )
+            * 100
+        )
+        reported_positive = round(
+            (reported_positive / (reported_positive + reported_negative)) * 100
+        )
+    except Exception:
+        reported_perc = "?"
+        reported_positive = "?"
+
+    stacked_bar_reporting_country.title = (
+        f"Reporting: On {target_month}-{target_year}, around {reported_perc}% of facilities reported on their 105:1 form, and, out of those, {reported_positive}% reported for {indicator_view_name}",
+    )
+
+    return [stacked_bar_reporting_country.title]
+
+
+@timeit
+def change_titles_trends(*inputs):
 
     indicator_group = inputs[1]
     indicator = inputs[2]
@@ -133,56 +184,11 @@ def change_titles(*inputs):
 
     district_overview_scatter.title = f"Deep-dive in {district} district: the {indicator_view_name} {descrip} between {reference_month}-{reference_year} and {target_month}-{target_year}"
 
-    try:
-        data_reporting = stacked_bar_reporting_country.data
-
-        date_reporting = datetime(
-            int(target_year), month_order.index(target_month) + 1, 1
-        )
-
-        try:
-            reported_positive = data_reporting.get("Reported a positive number").loc[
-                date_reporting
-            ][0]
-        except Exception:
-            reported_positive = 0
-        try:
-            did_not_report = data_reporting.get(
-                "Did not report on their 105:1 form"
-            ).loc[date_reporting][0]
-        except Exception:
-            did_not_report = 0
-        try:
-            reported_negative = data_reporting.get(
-                "Did not report a positive number"
-            ).loc[date_reporting][0]
-        except Exception:
-            reported_negative = 0
-
-        reported_perc = round(
-            (
-                (reported_positive + reported_negative)
-                / (reported_positive + did_not_report + reported_negative)
-            )
-            * 100
-        )
-        reported_positive = round(
-            (reported_positive / (reported_positive + reported_negative)) * 100
-        )
-    except Exception:
-        reported_perc = "?"
-        reported_positive = "?"
-
-    stacked_bar_reporting_country.title = (
-        f"Reporting: On {target_month}-{target_year}, around {reported_perc}% of facilities reported on their 105:1 form, and, out of those, {reported_positive}% reported for {indicator_view_name}",
-    )
-
     tree_map_district.title = f"Contribution of individual facilities in {district} district to the {indicator_view_name} on {target_month}-{target_year}"
 
     return [
         country_overview_scatter.title,
         district_overview_scatter.title,
-        # stacked_bar_reporting_country.title,
         tree_map_district.title,
     ]
 
@@ -203,7 +209,8 @@ def update_on_click(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         facility_scatter.data = ds
-        facility_scatter.figure = facility_scatter._get_figure(facility_scatter.data)
+        facility_scatter.figure = facility_scatter._get_figure(
+            facility_scatter.data)
         facility_scatter.figure_title = (
             f"Evolution of $label$ in {label} (click on the graph above to filter)"
         )

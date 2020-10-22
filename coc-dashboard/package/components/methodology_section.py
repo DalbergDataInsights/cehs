@@ -16,11 +16,23 @@ class MethodologySection:
             dbc.Row(
                 dbc.Col(
                     [
-                        html.Div(html.H6(html.B(x["sub_title"]))),
-                        html.Div(html.H6(x["body"], style={"font-size": "14px"})),
+                        html.H6(
+                            html.B(
+                                x["sub_title"],
+                                style={"font-size": "1rem", "text-align": "left"},
+                            )
+                        ),
+                        html.P(
+                            x["body"],
+                            style={"font-size": "0.8rem", "text-align": "left"},
+                        ),
                         html.Div(
                             [
-                                html.Li(d, style={"font-size": "14px"})
+                                html.P(
+                                    d,
+                                    style={"font-size": "0.8rem", "text-align": "left"},
+                                    className="mb-1",
+                                )
                                 for d in x["list_data"]
                             ]
                         ),

@@ -17,7 +17,7 @@ def scatter_reporting_district_plot(data):
 stacked_bar_district = ChartDataCard(
     data=init_data_set,
     data_transform=scatter_reporting_district_plot,
-    fig_title="Total number of facilities reporting on their 105:1 form and reporting on $label$",
+    fig_title="Total number of facilities reporting on their 105:1 form and reporting on $label$ in selected district",
     fig_object="Bar",  # Relies on the 'overlay' layout barmode parameter for stacking
 )
 
