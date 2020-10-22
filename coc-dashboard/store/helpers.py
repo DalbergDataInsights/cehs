@@ -148,13 +148,15 @@ def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=Fal
         merge = merge[1:]
         index = index[1:]
 
-    ind_type = indicator.split("(")[-1][:-1]
+    ind_type = indicator_group.split("(")[-1][:-1]
 
     # TODO find a way to refer to those original indicators I should be using if I end up anchoring on indicator name
 
     # get target population, merge it and calculate percentage
 
-    if ind_type == "coverage" or ind_type == "per capita":
+    exceptions = ["coverage", 'per 1000', 'per 100 000']
+
+    if ind_type in exceptions:
 
         target = pop_tgt[pop_tgt.indicator == indicator]["cat"].values[0]
         val_col = df.columns[-1]
@@ -170,9 +172,9 @@ def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=Fal
         data_in = pd.merge(data_in, pop_in, how="left",
                            left_on=merge, right_on=merge)
 
-        if ind_type == "coverage":
+        if ind_type == exceptions[0]:
             x = 12
-        elif ind_type == "per capita":
+        elif ind_type in exceptions[1:2]:
             x = 1
 
         data_in[val_col] = (data_in[val_col] / data_in[target]) * x
