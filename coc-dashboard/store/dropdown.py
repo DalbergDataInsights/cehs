@@ -37,7 +37,8 @@ def initiate_dropdowns():
     years = [2018] * 12 + [2019] * 12 + [2020] * max_month_number
 
     date_columns = pd.DataFrame(
-        {"year": years, "month": month_order * 2 + month_order[:max_month_number]}
+        {"year": years, "month": month_order *
+            2 + month_order[:max_month_number]}
     )
 
     date_columns.year = date_columns.year.astype(str)
@@ -77,7 +78,7 @@ def initiate_dropdowns():
     )
 
     methodology_layout = MethodologySection(
-        title="Methodology", data=meth_data(db.fetch_date)
+        data=meth_data(db.fetch_date)
     )
 
     side_nav = Navbar(
@@ -113,7 +114,8 @@ def set_dropdown_defaults(
     )
 
     target_date.dropdown_objects[0].value = DEFAULTS.get("default_target_year")
-    target_date.dropdown_objects[1].value = DEFAULTS.get("default_target_month")
+    target_date.dropdown_objects[1].value = DEFAULTS.get(
+        "default_target_month")
 
     indicator_dropdown_group.dropdown_objects[0].value = DEFAULTS.get(
         "default_indicator_group"
@@ -122,7 +124,10 @@ def set_dropdown_defaults(
         "default_indicator"
     )
 
-    reference_date.dropdown_objects[0].value = DEFAULTS.get("default_reference_year")
-    reference_date.dropdown_objects[1].value = DEFAULTS.get("default_reference_month")
+    reference_date.dropdown_objects[0].value = DEFAULTS.get(
+        "default_reference_year")
+    reference_date.dropdown_objects[1].value = DEFAULTS.get(
+        "default_reference_month")
 
-    district_control_group.dropdown_objects[0].value = DEFAULTS.get("default_district")
+    district_control_group.dropdown_objects[0].value = DEFAULTS.get(
+        "default_district")

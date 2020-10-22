@@ -17,7 +17,12 @@ from store import (
 
 from pprint import pprint as print
 
-from .global_callbacks import united_story_callback, update_on_click
+from .global_callbacks import (
+    global_story_callback,
+    change_titles_reporting,
+    update_on_click,
+    change_titles_trends,
+)
 from .user_interface import (
     change_page,
     download_data,
@@ -31,8 +36,8 @@ callback_ids = {
     indicator_dropdown_group.dropdown_ids[-1]: "value",  # Indicator
     reference_date.dropdown_ids[0]: "value",  # Reference date year
     reference_date.dropdown_ids[-1]: "value",  # Reference date month
-    target_date.dropdown_ids[0]: "value",  # Reference date year
-    target_date.dropdown_ids[-1]: "value",  # Reference date month
+    target_date.dropdown_ids[0]: "value",  # Target date year
+    target_date.dropdown_ids[-1]: "value",  # Target date month
     district_control_group.dropdown_ids[-1]: "value",  # District
 }
 
@@ -78,13 +83,31 @@ def define_callbacks(ds):
         # Global callbacks
         {
             "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
+            "outputs": [Output("ds-container", "children")],
+            "function": global_story_callback,
+        },
+        {
+            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
             "outputs": [
-                Output("ds-container", "children"),
                 Output(f"{country_overview_scatter.my_name}_title", "children"),
                 Output(f"{district_overview_scatter.my_name}_title", "children"),
                 Output(f"{tree_map_district.my_name}_title", "children"),
             ],
-            "function": united_story_callback,
+            "function": change_titles_trends,
+        },
+        {
+            "inputs": [
+                Input(
+                    indicator_dropdown_group.dropdown_ids[0], "value"
+                ),  # Indicator group
+                Input(indicator_dropdown_group.dropdown_ids[-1], "value"),  # Indicator
+                Input(target_date.dropdown_ids[0], "value"),
+                Input(target_date.dropdown_ids[-1], "value"),
+            ],
+            "outputs": [
+                Output(f"{stacked_bar_reporting_country.my_name}_title", "children"),
+            ],
+            "function": change_titles_reporting,
         },
         {
             "inputs": [Input(f"{tree_map_district.my_name}_figure", "clickData")],
@@ -97,9 +120,9 @@ def define_callbacks(ds):
     ]
 
     # {
-    #         "inputs": ,
-    #         "outputs": ,
-    #         "function": ,
+    # "inputs": ,
+    # "outputs": ,
+    # "function": ,
     # },
 
     print("==Registering callbacks==")
