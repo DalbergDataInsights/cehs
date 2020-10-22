@@ -23,7 +23,10 @@ class Dashboard:
         if mode == "jupyter":
             self.app = JupyterDash(external_stylesheets=external_stylesheets)
         else:
-            self.app = Dash(external_stylesheets=external_stylesheets)
+            self.app = Dash(
+                external_stylesheets=external_stylesheets,
+                prevent_initial_callbacks=True,
+            )
 
         app = self.app  # For referencing with the decorator (see line below)
         app.title = "CEHS Uganda"
