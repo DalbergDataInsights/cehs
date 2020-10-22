@@ -25,6 +25,8 @@ from view import ds
 @timeit
 def global_story_callback(*inputs):
 
+    db = Database()
+
     outlier = inputs[0]
     indicator_group = inputs[1]
     indicator = inputs[2]
@@ -45,6 +47,8 @@ def global_story_callback(*inputs):
     CONTROLS["reference_year"] = reference_year
     CONTROLS["reference_month"] = reference_month
     CONTROLS["indicator_group"] = indicator_group
+
+    db.filter_by_policy(CONTROLS["outlier"])
 
     df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
@@ -205,7 +209,8 @@ def update_on_click(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         facility_scatter.data = ds
-        facility_scatter.figure = facility_scatter._get_figure(facility_scatter.data)
+        facility_scatter.figure = facility_scatter._get_figure(
+            facility_scatter.data)
         facility_scatter.figure_title = (
             f"Evolution of $label$ in {label} (click on the graph above to filter)"
         )
