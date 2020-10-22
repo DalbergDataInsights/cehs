@@ -24,6 +24,8 @@ class Population(Base):
     u5 = Column(Integer)
     u15 = Column(Integer)
     suspect_tb = Column(Integer)
+    per_thousand = Column(Integer)
+    per_hundred_thousand = Column(Integer)
 
     def serialize(self):
         return {
@@ -39,6 +41,8 @@ class Population(Base):
             "u5": self.u5,
             "u15": self.u15,
             "suspect_tb": self.suspect_tb,
+            "per_thousand": self.per_thousand,
+            "per_hundred_thousand": self.per_hundred_thousand,
         }
 
 
