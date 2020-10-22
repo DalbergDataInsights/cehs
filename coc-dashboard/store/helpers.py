@@ -174,7 +174,7 @@ def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=Fal
 
         if ind_type == exceptions[0]:
             x = 12
-        elif ind_type in exceptions[1:2]:
+        elif ind_type in exceptions[1:3]:
             x = 1
 
         data_in[val_col] = (data_in[val_col] / data_in[target]) * x
