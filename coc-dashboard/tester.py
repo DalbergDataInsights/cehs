@@ -1,53 +1,39 @@
 import pandas as pd
 import numpy as np
+import plotly.graph_objects as go
+import geopandas as gpd
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
 
-month_order = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-]
+app = dash.Dash()
+
+districts = ['ABIM', 'ADJUMANI', 'AGAGO', 'ALEBTONG', 'AMOLATAR',
+             'AMUDAT', 'AMURIA', 'AMURU', 'APAC', 'ARUA', 'BUDAKA']
+mock_data = [-1, -0.5, -0.6, -0.3, 0, 1, 2, 6, 9, 45, 55]
+df = pd.DataFrame(index=districts, data=mock_data).reset_index()
+shapefile = gpd.read_file("./coc-dashboard/data/shapefiles/shapefile.shp")
 
 
-def get_year_and_month_cols(df):
+choropleth_map = go.Choroplethmapbox(
+    z=df[df.columns[0]],
+    geojson=shapefile,
+    locations=df['index'],
+    hovertemplate="%{location} <br>"
+    + df.columns[0]
+    + ": %{z}"
+    + "<extra></extra>",
+    marker_opacity=1,
+    marker_line_width=1,
+    colorscale='Viridis',
+    zauto=True,
+    zmid=0,
+)
 
-    df = df.reset_index()
+fig = go.Figure(choropleth_map)
 
-    df["year"] = pd.DatetimeIndex(df["date"]).year
-    df["month"] = pd.DatetimeIndex(df["date"]).strftime("%b")
+app.layout = html.Div([
+    dcc.Graph(figure=fig)
+])
 
-    df = df.set_index(["date", "year", "month"])
-
-    return df
-
-
-def get_sub_dfs(df, select_index, values, new_index, order=None):
-    """
-    Extract and return a dictionary of dictionaries splitting each original dictionary df entry into traces based on values
-    """
-
-    traces = {}
-    for value in values:
-        sub_df = df[df.index.get_level_values(select_index) == value]
-        sub_df = sub_df.groupby(new_index).sum()
-        if order:
-            sub_df = sub_df.reindex(order)
-        traces[value] = sub_df
-
-    return traces
-
-
-rng = pd.date_range(start="2019-04-01", end="2020-04-01", periods=12)
-df = pd.DataFrame({"date": rng, "val": np.random.randn(len(rng))})
-
-df1 = get_year_and_month_cols(df)
-
-df2 = get_sub_dfs(df1, "year", [2018, 2019, 2020], "month", month_order)
+app.run_server(debug=True, use_reloader=False)
