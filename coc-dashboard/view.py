@@ -10,10 +10,7 @@ import pandas as pd
 
 import store
 
-from store import (
-    credentials,
-    side_nav,
-)
+from store import credentials, side_nav, top_nav
 
 from components import (
     country_overview,
@@ -37,15 +34,15 @@ ds = DataStory(
         tree_map_district,
         facility_scatter,
     ],
-    ind_elements=[side_nav],
+    ind_elements=[side_nav, top_nav],
     footer_image="/static/images/UNICEF-MOH-bottom-resized.jpg",
     title="Continuity of Essential Health Services",
     sub_title="Overview of country, district and health facility-level health services in Uganda",
-    text_section='''
-    This tool is used to identify data trends, from the national level to the facility level. 
-    If you notice any surprising trends, make sure to check the effect of a more stringent outlier exclusion policy on that trend, 
-    and explore the reporting tool to better understand whether a reporting issue could explain that trend. 
-    For more details, click on the information button on the top right.''',
+    text_section="""
+    This tool is used to identify data trends, from the national level to the facility level.
+    If you notice any surprising trends, make sure to check the effect of a more stringent outlier exclusion policy on that trend,
+    and explore the reporting tool to better understand whether a reporting issue could explain that trend.
+    For more details, click on the information button on the top right.""",
     footer_text=dcc.Link(
         children="Dalberg Data Insights - Contact Us",
         href="mailto:ddi_support@dalberg.com",

@@ -4,7 +4,6 @@ from .helpers import *
 from .dropdown import initiate_dropdowns, set_dropdown_defaults
 from .database import Database
 
-
 # READ FROM DATABASE
 
 DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]
@@ -22,12 +21,14 @@ from .geopopulation import shapefile, static
 
 (
     side_nav,
+    top_nav,
     outlier_policy_dropdown_group,
     indicator_dropdown_group,
     reference_date,
     target_date,
     district_control_group,
 ) = initiate_dropdowns()
+
 
 set_dropdown_defaults(
     outlier_policy_dropdown_group,
