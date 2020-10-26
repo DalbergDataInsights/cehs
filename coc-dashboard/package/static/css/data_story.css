@@ -19,9 +19,8 @@ body {
 #ds-wrapper {
     max-width: 100em;
     text-align: left;
-    margin-left: auto;
+    /* margin-left: auto; */
     margin-right: auto;
-    margin-top: 2em;
     overflow: auto;
 }
 
@@ -102,24 +101,6 @@ body {
 }
 
 
-/* Add a black background color to the top navigation */
-#topnav-container {
-    width: 100vw;
-    z-index: 999;
-    position: fixed;
-    background-color: #333;
-    top:0;
-    left:0;
-}
-
-.topnav {
-    position: relative;
-    max-width: 1200px;
-    margin: 0 auto;
-    overflow: hidden;
-    height: 3.4em;
-}
-
 /* Style the links inside the navigation bar */
 .nav-element {
     float: left;
@@ -172,4 +153,8 @@ body {
 
 .fade:not(.show) {
     pointer-events: none;
+}
+
+.m-l-20vw {
+    margin-left: 20vw;
 }

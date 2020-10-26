@@ -16,6 +16,20 @@ from components import (
 
 
 @timeit
+def menu_toggle_button(n_clicks):
+    """When button is pressed, update the 3 bars of the menu button, update style of the side navbar and update the ds-container margin"""
+    if n_clicks:
+        side_nav.switch_button_state()
+    class_name = "m-l-20vw" if side_nav.is_open else ""
+    return (
+        [side_nav.menu_button.get_style()]
+        + side_nav.menu_button.get_menu_button_style()
+        + [side_nav.get_style()]
+        + [class_name]
+    )
+
+
+@timeit
 def toggle_fade_controls(n, is_in):
     if not n:
         # Button has never been clicked

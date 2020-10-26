@@ -28,6 +28,7 @@ from .user_interface import (
     download_data,
     toggle_fade_controls,
     toggle_fade_info,
+    menu_toggle_button,
 )
 
 callback_ids = {
@@ -49,11 +50,23 @@ def define_callbacks(ds):
     callbacks = [
         # User interface
         {
-            "inputs": [Input("fade-button", "n_clicks")],
-            "outputs": [Output("fade-controls", "is_in")],
-            "function": toggle_fade_controls,
-            "states": [State("fade-controls", "is_in")],
+            "inputs": [Input("side-nav__menu-button", "n_clicks")],
+            "outputs": [
+                Output("side-nav__menu-button", "style"),
+                Output("side-nav__menu-button__bar1", "style"),
+                Output("side-nav__menu-button__bar2", "style"),
+                Output("side-nav__menu-button__bar3", "style"),
+                Output("side-nav", "style"),
+                Output("ds-wrapper", "className"),
+            ],
+            "function": menu_toggle_button,
         },
+        # {
+        #     "inputs": [Input("fade-button", "n_clicks")],
+        #     "outputs": [Output("fade-controls", "is_in")],
+        #     "function": toggle_fade_controls,
+        #     "states": [State("fade-controls", "is_in")],
+        # },
         {
             "inputs": [
                 Input("info-button", "n_clicks"),
@@ -68,18 +81,18 @@ def define_callbacks(ds):
         #     "outputs": [Output("download-excel", "href")],
         #     "function": download_data,
         # },
-        {
-            "inputs": [
-                Input("trends", "n_clicks"),
-                Input("reporting", "n_clicks"),
-                # Input("overview", "n_clicks"),
-            ],
-            "outputs": [
-                Output("ds-paginator", "children"),
-                Output("nav-buttons", "children"),
-            ],
-            "function": change_page,
-        },
+        # {
+        #     "inputs": [
+        #         Input("trends", "n_clicks"),
+        #         Input("reporting", "n_clicks"),
+        #         # Input("overview", "n_clicks"),
+        #     ],
+        #     "outputs": [
+        #         Output("ds-paginator", "children"),
+        #         Output("nav-buttons", "children"),
+        #     ],
+        #     "function": change_page,
+        # },
         # Global callbacks
         {
             "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
