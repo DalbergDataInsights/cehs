@@ -46,7 +46,7 @@ class DataStory(Dashboard):
         return layout
 
     def get_container(self):
-        return dbc.Container(self.get_layout(), id="ds-container")
+        return dbc.Container(self.get_layout(), id="ds-container", fluid=True)
 
     def _set_layout(self):
         layout = html.Div(

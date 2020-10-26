@@ -17,7 +17,7 @@ body {
 }
 
 #ds-wrapper {
-    max-width: 100em;
+    width: 100%;
     text-align: left;
     /* margin-left: auto; */
     margin-right: auto;
@@ -28,20 +28,17 @@ body {
     width: 100%;
     overflow: visible;
     margin: 0px 0px 50px 0px;
+    height: auto;
 }
-
-/* .data-card:nth-child(odd) {
-    background: #d9d6d6;
-}
-.data-card:nth-child(even) {
-    background: #ffffff;
-} */
-
 
 .data-card__header-container {
     padding: 12px 0px 12px 0px;
     margin: 12px 0 12px 0;
     background: #d9d6d6;
+}
+
+.data-card__figure {
+    height: 60vh;
 }
 
 .text-section {

@@ -186,6 +186,7 @@ class DataCard:
                             figure=self.figure,
                             config={"displayModeBar": False},
                             id=f"{self.my_name}_figure",
+                            className="data-card__figure",
                         )
                     )
                 ),
