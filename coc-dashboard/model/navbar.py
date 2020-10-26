@@ -13,13 +13,13 @@ class MenuButton:
         "cursor": "pointer",
         "display": "inline-block",
         "transition": "0.5s",
-        "z-index": 1,
+        "z-index": "2",
     }
 
     bar_style = {
         "width": "35px",
         "height": "5px",
-        "background-color": "black",
+        "background-color": "#ddd",
         "margin": "6px 0",
         "transition": "0.5s",
     }
@@ -76,38 +76,38 @@ class MenuButton:
         return layout
 
 
-class Methodology:
-    def __init__(self, elements):
-        self.me_layout = [dbc.Row(x.layout) for x in elements]
+# class Methodology:
+#     def __init__(self, elements):
+#         self.me_layout = [dbc.Row(x.layout) for x in elements]
 
-    def get_layout(self):
-        button = html.P(
-            html.Span(
-                "info",
-                className="material-icons",
-                style={"color": "black", "font-size": "45px"},
-            ),
-            id="info-button",
-        )
+#     def get_layout(self):
+#         button = html.P(
+#             html.Span(
+#                 "info",
+#                 className="material-icons",
+#                 style={"color": "black", "font-size": "45px"},
+#             ),
+#             id="info-button",
+#         )
 
-        modal = dbc.Modal(
-            [
-                dbc.ModalHeader("Methodology"),
-                dbc.ModalBody(self.me_layout),
-                dbc.ModalFooter(
-                    dbc.Button("Close", id="info-close", className="ml-auto")
-                ),
-            ],
-            id="info-fade",
-            centered=True,
-        )
+#         modal = dbc.Modal(
+#             [
+#                 dbc.ModalHeader("Methodology"),
+#                 dbc.ModalBody(self.me_layout),
+#                 dbc.ModalFooter(
+#                     dbc.Button("Close", id="info-close", className="ml-auto")
+#                 ),
+#             ],
+#             id="info-fade",
+#             centered=True,
+#         )
 
-        layout = html.Div(
-            [button, modal],
-            style={"position": "fixed", "bottom": "5px", "right": "0.5vw"},
-        )
+#         layout = html.Div(
+#             [button, modal],
+#             style={"position": "fixed", "bottom": "5px", "right": "0.5vw"},
+#         )
 
-        return layout
+#         return layout
 
 
 class Controls:
@@ -119,29 +119,78 @@ class Controls:
         return layout
 
 
-class Navbar:
-    def __init__(self, elements, methodology=None):
+# class NavButtons:
+#     def __init__(self):
+#         self.active = "trends"
+
+#     @property
+#     def layout(self):
+#         return self.get_nav_buttons()
+
+#     def get_nav_buttons(self, active="trends"):
+#         self.active = active
+
+#         active_style = "nav-element active"
+
+#         buttons = dbc.Row(
+#             [
+#                 # dbc.Col(
+#                 #     html.P(
+#                 #         "Overview (coming soon)",
+#                 #         id="overview",
+#                 #         # active_style if active == "overview" else "nav-element",
+#                 #         className="nav-element disabled",
+#                 #     )
+#                 # ),
+#                 dbc.Col(
+#                     html.P(
+#                         "Trends",
+#                         id="trends",
+#                         className=active_style if active == "trends" else "nav-element",
+#                     )
+#                 ),
+#                 dbc.Col(
+#                     html.P(
+#                         "Reporting",
+#                         id="reporting",
+#                         className=active_style
+#                         if active == "reporting"
+#                         else "nav-element",
+#                     )
+#                 ),
+#             ],
+#             style={"position": "fixed", "top": "0", "width": "20vw", "left": "40vw"},
+#         )
+
+#         return buttons
+
+#     def _requires_dropdown(self):
+#         return False
+
+
+class SideNav:
+
+    style = {
+        "height": "100%",
+        "width": "0",
+        "position": "fixed",
+        "z-index": "1",
+        "top": "0",
+        "left": "0",
+        "background-color": "rgb(217, 214, 214)",
+        "overflow-x": "hidden",
+        "padding-top": "14px",
+        "transition": "0.5s",
+    }
+
+    def __init__(self, elements):
         self.elements = elements
         self.active = "trends"
         self.callbacks = []
         self.is_open = False
 
-        self.menu_button = MenuButton()
-        self.methodology_modal = Methodology(methodology)
         self.controls = Controls(elements)
-
-        self.style = {
-            "height": "100%",
-            "width": "0",
-            "position": "fixed",
-            "z-index": "1",
-            "top": "0",
-            "left": "0",
-            "background-color": "rgb(217, 214, 214)",
-            "overflow-x": "hidden",
-            "padding-top": "60px",
-            "transition": "0.5s",
-        }
+        self.menu_button = MenuButton()
 
         for els in elements:
             self.callbacks.extend(els.callbacks)
@@ -149,11 +198,7 @@ class Navbar:
     @property
     def layout(self):
         layout = html.Div(
-            [
-                self.get_layout(),
-                self.menu_button.get_layout(),
-                self.methodology_modal.get_layout(),
-            ],
+            [self.get_layout(), self.menu_button.get_layout()],
             id="side-nav__container",
         )
 
@@ -169,6 +214,35 @@ class Navbar:
     def switch_button_state(self):
         self.menu_button.is_open = not self.menu_button.is_open
         self.is_open = not self.is_open
+
+    def get_layout(self):
+
+        side_nav = html.Div(
+            [dbc.Row(self.controls.get_layout())],
+            style=self.get_style(),
+            id="side-nav",
+            className="shadow-sm",
+        )
+
+        return side_nav
+
+    def _requires_dropdown(self):
+        return True
+
+
+class TopNav:
+    def __init__(self, methodology):
+
+        self.active = "trends"
+        self.methodology = methodology
+
+        # self.methodology_modal = Methodology(methodology)
+
+    @property
+    def layout(self):
+        layout = html.Div(self.get_layout(), id="topnav-container")
+
+        return layout
 
     def get_nav_buttons(self, active="trends"):
         self.active = active
@@ -197,15 +271,44 @@ class Navbar:
         return buttons
 
     def get_layout(self):
+        me_layout = [dbc.Row(x.layout) for x in self.methodology]
 
-        side_nav = html.Div(
-            dbc.Row(self.controls.get_layout()),
-            style=self.get_style(),
-            id="side-nav",
-            className="shadow-sm",
+        html_nav = html.Div(
+            [
+                html.Div(
+                    self.get_nav_buttons(), className="topnav-left", id="nav-buttons"
+                ),
+                html.Div(
+                    [
+                        html.P(
+                            html.Span("cloud_download", className="material-icons"),
+                            className="nav-element",
+                        ),
+                        html.P(
+                            html.Span("info", className="material-icons"),
+                            # html.I(className="fas fa-info-circle"),
+                            className="nav-element",
+                            id="info-button",
+                        ),
+                    ],
+                    className="topnav-right",
+                ),
+                dbc.Modal(
+                    [
+                        dbc.ModalHeader("Methodology"),
+                        dbc.ModalBody(me_layout),
+                        dbc.ModalFooter(
+                            dbc.Button("Close", id="info-close", className="ml-auto")
+                        ),
+                    ],
+                    id="info-fade",
+                    centered=True,
+                ),
+            ],
+            className="topnav",
         )
 
-        return side_nav
+        return html_nav
 
     def _requires_dropdown(self):
-        return True
+        return False

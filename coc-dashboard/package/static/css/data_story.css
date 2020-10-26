@@ -17,11 +17,18 @@ body {
 }
 
 #ds-wrapper {
-    width: 100%;
     text-align: left;
-    /* margin-left: auto; */
-    margin-right: auto;
     overflow: auto;
+    transition: 0.5s;
+}
+
+#ds-paginator {
+    width: 80vw;
+    margin-left: auto;
+    margin-right: auto;
+    transition: margin-left .5s;
+    transition: margin-right .5s;
+    margin-top: 20px;
 }
 
 .data-card {
@@ -97,27 +104,6 @@ body {
     background: #cad9e5;
 }
 
-
-/* Style the links inside the navigation bar */
-.nav-element {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 17px;
-    cursor: pointer;
-}
-
-.topnav button {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    margin: 0.35em auto;
-    text-decoration: none;
-    font-size: 17px;
-}
-
 .h1, h1 {
     font-size: calc(0.8vw + 0.8vh + 0.8vmin);
 }
@@ -131,10 +117,40 @@ body {
 }
 
 
+/* Style the links inside the navigation bar */
+.nav-element {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    cursor: pointer;
+}
+
+
 /* Change the color of links on hover */
 .nav-element:hover {
     background-color: #ddd;
     color: black;
+}
+
+#topnav-container {
+    width: 100vw;
+    z-index: 1;
+    position: fixed;
+    background-color: #333;
+    top:0;
+    left:0;
+    transition: 0.5s;
+}
+
+.topnav {
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+    overflow: hidden;
+    height: 3.4em;
 }
 
 
@@ -153,5 +169,5 @@ body {
 }
 
 .m-l-20vw {
-    margin-left: 20vw;
+    margin-left: 20vw !important;
 }

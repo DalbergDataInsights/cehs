@@ -1,6 +1,6 @@
 from dash import callback_context
 from store import download_file, timeit
-from view import ds, side_nav
+from view import ds, side_nav, top_nav
 from components import (
     country_overview_scatter,
     country_overview,
@@ -25,17 +25,8 @@ def menu_toggle_button(n_clicks):
         [side_nav.menu_button.get_style()]
         + side_nav.menu_button.get_menu_button_style()
         + [side_nav.get_style()]
-        + [class_name]
+        + [class_name, class_name]
     )
-
-
-@timeit
-def toggle_fade_controls(n, is_in):
-    if not n:
-        # Button has never been clicked
-        is_in = True
-    out = not is_in
-    return [out]
 
 
 @timeit
@@ -83,4 +74,4 @@ def change_page(*inputs):
     #     ds.data_cards = [statistics, grid]
     #     clicked = "overview"
 
-    return [ds.get_container(), side_nav.get_nav_buttons(clicked)]
+    return [ds.get_container(), top_nav.get_nav_buttons(clicked)]
