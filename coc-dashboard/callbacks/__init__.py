@@ -57,7 +57,6 @@ def define_callbacks(ds):
                 Output("side-nav__menu-button__bar3", "style"),
                 Output("side-nav", "style"),
                 Output("ds-wrapper", "className"),
-                Output("topnav-container", "className"),
             ],
             "function": menu_toggle_button,
         },

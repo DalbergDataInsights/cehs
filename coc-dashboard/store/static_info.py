@@ -36,19 +36,6 @@ def meth_data(date):
             "list_data": [],
         },
         {
-            "sub_title": "Choice of Indicators",
-            "body": "We focus on a key set of indicators as advised by experts and described in WHO's list of priority indicators. For simplicity of interpretation and time comparison, we focus on absolute numbers rather than calculated indicators. ",
-            "list_data": [],
-        },
-        {
-            "sub_title": "Outlier Exclusion",
-            "body": "We exclude outliers at facility level - for a given facility and indicator, we look at all data points available since January 2018 and replace all data points identified as outliers by the sample's median. We give two options for outlier exclusion: ",
-            "list_data": [
-                "A standard deviation-based approach, where all points more than three standard deviations away from the mean are considered outliers. This approach is best suited for 'cleaner', normally distributed data.",
-                "An interquartile range-based approach, using Tukey's fences method with k=3, which fits a broader range of data distributions but is also more stringent, and hence best suited for 'messier' data.",
-            ],
-        },
-        {
             "sub_title": "Reporting Rates ",
             "body": "We provide two layers of information on reporting rate:",
             "list_data": [

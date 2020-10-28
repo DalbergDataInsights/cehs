@@ -1,6 +1,6 @@
 from dash import callback_context
 from store import download_file, timeit
-from view import ds, side_nav, top_nav
+from view import ds, side_nav
 from components import (
     country_overview_scatter,
     country_overview,
@@ -20,12 +20,12 @@ def menu_toggle_button(n_clicks):
     """When button is pressed, update the 3 bars of the menu button, update style of the side navbar and update the ds-container margin"""
     if n_clicks:
         side_nav.switch_button_state()
-    class_name = "m-l-20vw" if side_nav.is_open else ""
+    class_name = "m-l-25vw" if side_nav.is_open else ""
     return (
         [side_nav.menu_button.get_style()]
         + side_nav.menu_button.get_menu_button_style()
         + [side_nav.get_style()]
-        + [class_name, class_name]
+        + [class_name]
     )
 
 
@@ -74,4 +74,4 @@ def change_page(*inputs):
     #     ds.data_cards = [statistics, grid]
     #     clicked = "overview"
 
-    return [ds.get_container(), top_nav.get_nav_buttons(clicked)]
+    return [ds.get_container(), side_nav.get_nav_buttons(clicked)]

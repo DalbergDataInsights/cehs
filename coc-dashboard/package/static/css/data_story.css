@@ -13,7 +13,7 @@ body {
     text-align: center;
     min-width: 740px;
     overflow: auto;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Lato-Light', sans-serif;
 }
 
 #ds-wrapper {
@@ -23,12 +23,16 @@ body {
 }
 
 #ds-paginator {
-    width: 80vw;
+    width: 75vw;
     margin-left: auto;
     margin-right: auto;
     transition: margin-left .5s;
     transition: margin-right .5s;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    padding: 3%;
 }
 
 .data-card {
@@ -45,7 +49,7 @@ body {
 }
 
 .data-card__figure {
-    height: 60vh;
+    height: 25vw;
 }
 
 .text-section {
@@ -119,55 +123,56 @@ body {
 
 /* Style the links inside the navigation bar */
 .nav-element {
-    float: left;
-    color: #f2f2f2;
+    color: white;
     text-align: center;
-    padding: 14px 16px;
+    padding: 0 10px;
     text-decoration: none;
     font-size: 17px;
     cursor: pointer;
+    width: 80%;
+    margin: 0 auto;
+    border: 2px solid transparent;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 7px;
+    padding-bottom: 7px;
 }
-
 
 /* Change the color of links on hover */
 .nav-element:hover {
-    background-color: #ddd;
-    color: black;
-}
-
-#topnav-container {
-    width: 100vw;
-    z-index: 1;
-    position: fixed;
-    background-color: #333;
-    top:0;
-    left:0;
-    transition: 0.5s;
-}
-
-.topnav {
-    position: relative;
-    max-width: 1200px;
-    margin: 0 auto;
-    overflow: hidden;
-    height: 3.4em;
-}
-
-
-/* Right-aligned section inside the top navigation */
-.topnav-right {
-    float: right;
+    border: 2px solid rgb(34, 94, 140);
+    font-weight: bold;
 }
 
 .nav-element.active {
-    background-color: #ddd;
-    color: black;
+    border: 2px solid rgb(34, 94, 140);
+    font-weight: bold;
 }
 
 .fade:not(.show) {
     pointer-events: none;
 }
 
-.m-l-20vw {
+.m-l-25vw {
     margin-left: 20vw !important;
+}
+
+
+/* Styling dash components */
+.Select-control {
+    background-color: rgb(19, 52, 78) !important;
+    border: none !important;
+}
+
+.Select-value-label {
+    color: white !important;
+}
+
+.Select-menu-outer {
+    background-color: rgb(19, 52, 78) !important;
+    color: white !important;
+}
+
+.Select-arrow {
+    color: white !important;
 }

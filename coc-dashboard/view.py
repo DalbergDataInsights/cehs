@@ -10,7 +10,7 @@ import pandas as pd
 
 import store
 
-from store import credentials, side_nav, top_nav
+from store import credentials, side_nav
 
 from components import (
     country_overview,
@@ -34,7 +34,7 @@ ds = DataStory(
         tree_map_district,
         facility_scatter,
     ],
-    ind_elements=[side_nav, top_nav],
+    ind_elements=[side_nav],
     footer_image="/static/images/UNICEF-MOH-bottom-resized.jpg",
     title="Continuity of Essential Health Services",
     sub_title="Overview of country, district and health facility-level health services in Uganda",

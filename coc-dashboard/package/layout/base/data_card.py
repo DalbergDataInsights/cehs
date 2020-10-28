@@ -200,7 +200,7 @@ class DataCard:
         formated_fig_title = self.__format_string(self.__figure_title, data)
 
         fig_title = html.H5(
-            html.B(formated_fig_title),
+            formated_fig_title,
             style={
                 "color": self.colors["subtitle"],
                 "text-align": "center",
