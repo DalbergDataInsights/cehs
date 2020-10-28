@@ -1,3 +1,5 @@
+import base64
+import io
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
@@ -57,7 +59,11 @@ class DataCard:
 
         # Callbacks
 
-        self.callbacks = []
+        self.callbacks = [
+            {"func": self.__download_graph_data,
+            "input": [(f'{self.my_name}_download', 'n_clicks')],
+            "output": [(f'{self.my_name}_download', 'href')]}
+        ]
         # self.callbacks = [
         #     {'func': self.__update_figure,
         #      'input': [(f'{self.my_name}_dropdown', 'value')],
@@ -189,6 +195,7 @@ class DataCard:
                         )
                     )
                 ),
+                dbc.Row(self.__get_link_layout())
             ],
         )
         return layout
@@ -284,6 +291,22 @@ class DataCard:
         )
 
         return text_section_layout
+
+
+    def __get_link_layout(self):
+        text_section_layout = dbc.Col(
+            [
+            html.A(
+                html.Span("cloud_download", className="material-icons"),
+                #className="nav-element",
+                id=f"{self.my_name}_download",
+                href="",
+                download="cehs.xlsx",
+            ),
+         ],
+         width={"size": 1, "offset": 11})
+        return text_section_layout
+
 
     def __unwrap_section_and_points(self, section, points):
         layout = html.Div(
@@ -414,6 +437,7 @@ class DataCard:
         return list(all_columns)
 
     def _requires_dropdown(self):
+        return True
         return len(self._get_all_columns()) > 1
 
     def __update_figure(self, value):
@@ -423,3 +447,23 @@ class DataCard:
         self.figure = self._get_figure(data_dict)
         self.figure_title = self._get_figure_title(data_dict)
         return [self.figure, self.figure_title]
+
+    def __download_graph_data(self, *inputs):
+        """Download data associated with a figure"""
+        print("Download callback fired")
+        print(inputs)
+
+        xlsx_io = io.BytesIO()
+        writer = pd.ExcelWriter(xlsx_io, engine="xlsxwriter")
+        # {"trace_name":  df}
+        df = pd.concat(self.data.values()).reset_index()
+        df.to_excel(writer)
+        writer.save()
+        xlsx_io.seek(0)
+        print(self.data)
+
+        media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        data = base64.b64encode(xlsx_io.read()).decode("utf-8")
+        href_data_downloadable = f"data:{media_type};base64,{data}"
+       
+        return [href_data_downloadable]
