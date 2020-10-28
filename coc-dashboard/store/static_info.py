@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # Data csv download links
 
 import xlsxwriter
@@ -15,6 +16,8 @@ def download_file(dict_of_st):
                 df_name = df_name[:30]
             df.to_excel(writer, sheet_name=df_name)
 
+=======
+>>>>>>> Stashed changes
 
 # Methodology section
 

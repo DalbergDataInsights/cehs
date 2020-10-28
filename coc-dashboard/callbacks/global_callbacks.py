@@ -1,4 +1,7 @@
 from datetime import datetime
+import base64
+import io
+import pandas as pd 
 
 from numpy.lib.shape_base import dsplit
 
@@ -53,6 +56,7 @@ def global_story_callback(*inputs):
     ds.switch_data_set(df)
 
     return [ds.get_layout()]
+
 
 
 @timeit
@@ -202,3 +206,5 @@ def update_on_click(*inputs):
         print(e)
 
     return [facility_scatter.figure, facility_scatter.figure_title]
+
+

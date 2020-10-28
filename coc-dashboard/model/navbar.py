@@ -62,7 +62,11 @@ class Navbar:
                             html.Span("cloud_download", className="material-icons"),
                             className="nav-element",
                             id="download",
+<<<<<<< Updated upstream
                             href=r"/static/data/cehs.xlsx",
+=======
+                            href="",
+>>>>>>> Stashed changes
                             download="cehs.xlsx",
                         ),
                         html.P(

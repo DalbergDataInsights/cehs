@@ -1,3 +1,7 @@
+import base64
+import io
+from pathlib import Path
+
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
@@ -5,6 +9,7 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import xlsxwriter
 
 # FIXME: For some reason this is not working (even if function is made not private, so I pasted in the functions here for now, but ideally they would be imported)
 
@@ -57,7 +62,11 @@ class DataCard:
 
         # Callbacks
 
-        self.callbacks = []
+        self.callbacks = [
+            {"func": self.__download_graph_data,
+            "input": [(f'{self.my_name}_download', 'n_clicks')],
+            "output": [(f'{self.my_name}_download', 'href')]}
+        ]
         # self.callbacks = [
         #     {'func': self.__update_figure,
         #      'input': [(f'{self.my_name}_dropdown', 'value')],
@@ -135,7 +144,8 @@ class DataCard:
         """Get the static plotly layout of a data card"""
         els = [
             self.__get_figure_layout() if self.data or self.figure else None,
-            self.__get_text_layout(self.key_points) if self.key_points else None,
+            self.__get_text_layout(self.key_points) if self.key_points else None
+    
         ]
 
         layout = dbc.Col(
@@ -188,6 +198,7 @@ class DataCard:
                         )
                     )
                 ),
+                dbc.Row(self.__get_link_layout())
             ],
         )
         return layout
@@ -283,6 +294,22 @@ class DataCard:
         )
 
         return text_section_layout
+
+
+    def __get_link_layout(self):
+        text_section_layout = dbc.Col(
+            [
+            html.A(
+                html.Span("cloud_download", className="material-icons"),
+                #className="nav-element",
+                id=f"{self.my_name}_download",
+                href="",
+                download="cehs.xlsx",
+            ),
+         ],
+         width={"size": 1, "offset": 11})
+        return text_section_layout
+
 
     def __unwrap_section_and_points(self, section, points):
         layout = html.Div(
@@ -413,6 +440,7 @@ class DataCard:
         return list(all_columns)
 
     def _requires_dropdown(self):
+        return True
         return len(self._get_all_columns()) > 1
 
     def __update_figure(self, value):
@@ -422,3 +450,23 @@ class DataCard:
         self.figure = self._get_figure(data_dict)
         self.figure_title = self._get_figure_title(data_dict)
         return [self.figure, self.figure_title]
+
+    def __download_graph_data(self, *inputs):
+        """Download data associated with a figure"""
+        print("Download callback fired")
+        print(inputs)
+
+        xlsx_io = io.BytesIO()
+        writer = pd.ExcelWriter(xlsx_io, engine="xlsxwriter")
+        # {"trace_name":  df}
+        df = pd.concat(self.data.values()).reset_index()
+        df.to_excel(writer)
+        writer.save()
+        xlsx_io.seek(0)
+        print(self.data)
+
+        media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        data = base64.b64encode(xlsx_io.read()).decode("utf-8")
+        href_data_downloadable = f"data:{media_type};base64,{data}"
+        print(href_data_downloadable)
+        return [href_data_downloadable]

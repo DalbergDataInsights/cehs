@@ -17,10 +17,18 @@ from store import (
 
 from pprint import pprint as print
 
+<<<<<<< Updated upstream
 from .global_callbacks import change_titles, global_story_callback, update_on_click
+=======
+from .global_callbacks import (
+    global_story_callback,
+    change_titles_reporting,
+    update_on_click,
+    change_titles_trends
+)
+>>>>>>> Stashed changes
 from .user_interface import (
     change_page,
-    download_data,
     toggle_fade_controls,
     toggle_fade_info,
 )
@@ -37,10 +45,17 @@ callback_ids = {
     # indicator_dropdown_group.dropdown_ids[1]: "value", #DELDIS
 }
 
+callback_ = {
+    outlier_policy_dropdown_group.dropdown_ids[-1]: "value",  # Outlier policy
+    indicator_dropdown_group.dropdown_ids[-1]: "value",  # Indicator
+}
+
+
 
 def define_callbacks(ds):
 
     app = ds.app
+    
 
     callbacks = [
         # User interface
@@ -59,11 +74,14 @@ def define_callbacks(ds):
             "function": toggle_fade_info,
             "states": [State("info-fade", "is_open")],
         },
+<<<<<<< Updated upstream
          #{
             # "inputs": [Input("download", "n_clicks")],
             # "outputs": [Output("download", "href")],
             # "function": download_data,
         #},
+=======
+>>>>>>> Stashed changes
         {
             "inputs": [
                 Input("trends", "n_clicks"),

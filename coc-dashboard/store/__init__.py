@@ -9,8 +9,11 @@ from .database import Database
 # READ FROM DATABASE
 
 DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]
-
 db = Database(DATABASE_URI)
+
+#print(db.raw_data)
+#if os.path.isfile("./coc-dashboard/package/static/data/cehs.xlsx") == False:
+#download_file(db.raw_data)  # write to excel file for download
 
 
 # STATIC DATA
