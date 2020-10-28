@@ -2,11 +2,7 @@ from store import (
     filter_df_by_dates,
     filter_by_district,
     get_district_sum,
-    get_national_sum,
     get_percentage,
-    get_sub_dfs,
-    month_order,
-    timeit,
     Database,
     static,
 )
@@ -84,7 +80,8 @@ def map_bar_country_dated_data(
 
     data_in = data_in[mask]
 
-    data_in = data_in.groupby(by=["id", "date"], as_index=False).agg({indicator: "sum"})
+    data_in = data_in.groupby(
+        by=["id", "date"], as_index=False).agg({indicator: "sum"})
 
     data_in["year"] = data_in.date.apply(lambda x: x.year)
 
