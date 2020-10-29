@@ -1,5 +1,4 @@
 import os
-
 from .helpers import *
 from .dropdown import initiate_dropdowns, set_dropdown_defaults
 from .database import Database
@@ -21,7 +20,6 @@ from .geopopulation import shapefile, static
 
 (
     side_nav,
-    top_nav,
     outlier_policy_dropdown_group,
     indicator_dropdown_group,
     reference_date,

@@ -1,6 +1,6 @@
 from dash import callback_context
 from store import download_file, timeit
-from view import ds, side_nav, top_nav
+from view import ds, side_nav
 from components import (
     country_overview_scatter,
     country_overview,
@@ -10,6 +10,7 @@ from components import (
     stacked_bar_reporting_country,
     tree_map_district,
     reporting_map,
+    title,
     # grid,
     # statistics,
 )
@@ -20,12 +21,12 @@ def menu_toggle_button(n_clicks):
     """When button is pressed, update the 3 bars of the menu button, update style of the side navbar and update the ds-container margin"""
     if n_clicks:
         side_nav.switch_button_state()
-    class_name = "m-l-20vw" if side_nav.is_open else ""
+    class_name = "m-l-25vw" if side_nav.is_open else ""
     return (
         [side_nav.menu_button.get_style()]
         + side_nav.menu_button.get_menu_button_style()
         + [side_nav.get_style()]
-        + [class_name, class_name]
+        + [class_name]
     )
 
 
@@ -56,6 +57,7 @@ def change_page(*inputs):
 
     if "trends" in changed_id:
         ds.data_cards = [
+            title,
             country_overview_scatter,
             country_overview,
             district_overview_scatter,
@@ -65,13 +67,15 @@ def change_page(*inputs):
         clicked = "trends"
     elif "reporting" in changed_id:
         ds.data_cards = [
+            title,
             stacked_bar_reporting_country,
             reporting_map,
             stacked_bar_district,
         ]
         clicked = "reporting"
+    title.dash = clicked
     # elif "overview" in changed_id:
     #     ds.data_cards = [statistics, grid]
     #     clicked = "overview"
 
-    return [ds.get_container(), top_nav.get_nav_buttons(clicked)]
+    return [ds.get_container(), side_nav.get_nav_buttons(clicked), title.get_layout()]

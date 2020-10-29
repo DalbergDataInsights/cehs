@@ -57,19 +57,18 @@ def define_callbacks(ds):
                 Output("side-nav__menu-button__bar3", "style"),
                 Output("side-nav", "style"),
                 Output("ds-wrapper", "className"),
-                Output("topnav-container", "className"),
             ],
             "function": menu_toggle_button,
         },
-        {
-            "inputs": [
-                Input("info-button", "n_clicks"),
-                Input("info-close", "n_clicks"),
-            ],
-            "outputs": [Output("info-fade", "is_open")],
-            "function": toggle_fade_info,
-            "states": [State("info-fade", "is_open")],
-        },
+        # {
+        #     "inputs": [
+        #         Input("info-button", "n_clicks"),
+        #         Input("info-close", "n_clicks"),
+        #     ],
+        #     "outputs": [Output("info-fade", "is_open")],
+        #     "function": toggle_fade_info,
+        #     "states": [State("info-fade", "is_open")],
+        # },
         # {
         #     "inputs": [Input("download-excel", "n_clicks")],
         #     "outputs": [Output("download-excel", "href")],
@@ -84,6 +83,7 @@ def define_callbacks(ds):
             "outputs": [
                 Output("ds-paginator", "children"),
                 Output("nav-buttons", "children"),
+                Output("dash-title", "children"),
             ],
             "function": change_page,
         },

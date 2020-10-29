@@ -82,14 +82,6 @@ class DataStory(Dashboard):
                 [
                     dbc.Row(
                         dbc.Col(
-                            html.Img(
-                                src="/static/images/UNICEF-MOH-header-resized.jpg",  # TODO automatic placement
-                                className="ds-header__logo m-top-24",
-                            )
-                        )
-                    ),
-                    dbc.Row(
-                        dbc.Col(
                             [
                                 html.Div(
                                     html.H1(self.title, className="text-center"),

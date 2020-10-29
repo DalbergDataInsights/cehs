@@ -1,8 +1,7 @@
 import pandas as pd
-from model import SideNav, TopNav
+from model import SideNav
 
 from store.helpers import month_order
-from store.static_info import meth_data
 from .database import Database
 from package.components.nested_dropdown_group import NestedDropdownGroup
 from package.components.methodology_section import MethodologySection
@@ -44,12 +43,12 @@ def initiate_dropdowns():
 
     date_columns.columns = ["Target Year", "Target Month"]
     target_date = NestedDropdownGroup(
-        date_columns.copy(), title="Select target date", vertical=False
+        date_columns.copy(), title="SELECT AN ANALYSIS TIMEFRAME", vertical=False
     )
 
     date_columns.columns = ["Reference Year", "Reference Month"]
     reference_date = NestedDropdownGroup(
-        date_columns, title="Select reference date", vertical=False
+        date_columns, title="SELECT AN ANALYSIS TIMEFRAME", vertical=False
     )
 
     # Initiate outlier policy dropdown
@@ -57,42 +56,53 @@ def initiate_dropdowns():
     outlier_policy_dropdown_group = NestedDropdownGroup(
         pd.DataFrame(
             {
-                "Select an outlier correction policy": [
+                "SELECT AN OUTLIER POLICY": [
                     "Keep outliers",
                     "Correct outliers - using standard deviation",
                     "Correct outliers - using interquartile range",
                 ]
             }
         ),
-        title="Select an outlier correction policy",
+        title="SELECT AN OUTLIER POLICY",
+        info="""We exclude outliers at facility level - for a given facility and indicator, we look at all data points available since January
+        2018 and replace all data points identified as outliers by the sample's median. We give two options for outlier exclusion. \n
+        A standard deviation-based approach, where all points more than three standard deviations away from the mean are considered outliers.
+        This approach is best suited for 'cleaner', normally distributed data. An interquartile range-based approach, using Tukey's fences method with k=3,
+        which fits a broader range of data distributions but is also more stringent, and hence best suited for 'messier' data.""",
     )
 
     indicator_dropdown_group = NestedDropdownGroup(
-        db.indicator_dropdowns, title="Select an indicator"
+        db.indicator_dropdowns,
+        title="SELECT AN INDICATOR",
+        info="We focus on a key set of indicators as advised by experts and described in WHO's list of priority indicators. For simplicity of interpretation and time comparison, we focus on absolute numbers rather than calculated indicators. ",
     )
 
     district_control_group = NestedDropdownGroup(
-        pd.DataFrame({"Select a district": db.districts}),
-        title="Select a district",
+        pd.DataFrame({"SELECT A DISTRICT": db.districts}),
+        title="SELECT A DISTRICT",
     )
-
-    methodology_layout = MethodologySection(data=meth_data(db.fetch_date))
 
     side_nav = SideNav(
         elements=[
-            outlier_policy_dropdown_group,
             indicator_dropdown_group,
+            district_control_group,
             reference_date,
             target_date,
-            district_control_group,
+            outlier_policy_dropdown_group,
         ],
-    )
+        info=f"""
+        The data shown here was last fetched from DHIS2 on {db.fetch_date}.
 
-    top_nav = TopNav(methodology=[methodology_layout])
+        We provide two layers of information on reporting rate: \n A form-specific indicator -
+        the percentage of facilities that reported on their 105:1 form out of those expected to report.
+        This is similar to the reporting rates displayed on the DHIS2 system. An indicator-specific
+        indicator - the percentage of facilities that reported a positive number for the selected
+        indicator out of all facilities that have submitted their 105:1 form. This provides added
+        information on how otherwise reporting facilities report on this specific indicator.""",
+    )
 
     return (
         side_nav,
-        top_nav,
         outlier_policy_dropdown_group,
         indicator_dropdown_group,
         reference_date,
