@@ -20,7 +20,7 @@ class MenuButton:
     bar_style = {
         "width": "35px",
         "height": "5px",
-        "background-color": "#ddd",
+        "background-color": "rgb(34, 94, 140)",
         "margin": "6px 0",
         "transition": "0.5s",
     }

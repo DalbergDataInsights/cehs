@@ -10,6 +10,7 @@ from components import (
     stacked_bar_reporting_country,
     tree_map_district,
     reporting_map,
+    title,
     # grid,
     # statistics,
 )
@@ -56,6 +57,7 @@ def change_page(*inputs):
 
     if "trends" in changed_id:
         ds.data_cards = [
+            title,
             country_overview_scatter,
             country_overview,
             district_overview_scatter,
@@ -65,13 +67,15 @@ def change_page(*inputs):
         clicked = "trends"
     elif "reporting" in changed_id:
         ds.data_cards = [
+            title,
             stacked_bar_reporting_country,
             reporting_map,
             stacked_bar_district,
         ]
         clicked = "reporting"
+    title.dash = clicked
     # elif "overview" in changed_id:
     #     ds.data_cards = [statistics, grid]
     #     clicked = "overview"
 
-    return [ds.get_container(), side_nav.get_nav_buttons(clicked)]
+    return [ds.get_container(), side_nav.get_nav_buttons(clicked), title.get_layout()]
