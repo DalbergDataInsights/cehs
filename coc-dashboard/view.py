@@ -37,7 +37,6 @@ ds = DataStory(
         facility_scatter,
     ],
     ind_elements=[side_nav],
-    footer_image="/static/images/UNICEF-MOH-bottom-resized.jpg",
     footer_text=dcc.Link(
         children="Dalberg Data Insights - Contact Us",
         href="mailto:ddi_support@dalberg.com",
