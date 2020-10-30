@@ -13,7 +13,7 @@ def scatter_country_plot(df):
 
     df_country = df.get("country")
 
-    df_country = df_country[df_country[df_country.columns[0]] > 0]
+    df_country = df_country[df_country[df_country.columns[-1]] > 0]
 
     df_country = get_year_and_month_cols(df_country)
 

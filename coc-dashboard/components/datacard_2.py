@@ -20,7 +20,7 @@ def bar_country_dated_plot(data):
 
     data = data.get("dated")
 
-    data[data.columns[0]] = data[data.columns[0]] / 100
+    data[data.columns[-1]] = data[data.columns[-1]] / 100
 
     data["rank"] = data.rank(ascending=True)
     data = data[data["rank"] < 11].sort_values(by="rank")

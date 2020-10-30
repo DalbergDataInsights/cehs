@@ -12,7 +12,7 @@ def scatter_district_plot(df):
 
     df_district = df.get("district")
 
-    df_district = df_district[df_district[df_district.columns[0]] > 0]
+    df_district = df_district[df_district[df_district.columns[-1]] > 0]
 
     df_district = get_year_and_month_cols(df_district)
 

@@ -13,10 +13,9 @@ db = Database(DATABASE_URI)
 
 
 # STATIC DATA
-from .static_info import *
-from .geopopulation import shapefile, static
+from .static_info import *  # NOQA: E402
+from .geopopulation import shapefile  # NOQA: E402
 
-# static["indicator_groups"] = indicator_groups
 
 # NAVIGATION
 
@@ -66,6 +65,6 @@ for x in os.environ:
 
 # GLOBAL DATASET
 
-from .define_datasets import define_datasets
+from .define_datasets import define_datasets  # NOQA: E402
 
 init_data_set = define_datasets(controls=CONTROLS)

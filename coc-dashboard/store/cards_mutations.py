@@ -1,15 +1,15 @@
 from store import (
     filter_df_by_dates,
     filter_by_district,
-    get_district_sum,
-    get_percentage,
+    get_ratio,
     Database,
-    static,
 )
 
 import pandas as pd
 
 # CARD 1
+
+# FIXME Try and run without teh outlier parameter, see if it breaks anything
 
 
 def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
@@ -22,14 +22,9 @@ def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
 
     df = db.filter_by_indicator(df, indicator)
 
-    df = get_percentage(
-        df,
-        static.get("population data"),
-        static.get("target population type"),
-        indicator_group,
-        indicator,
-        all_country=True,
-    )
+    df, index = get_ratio(df, indicator, agg_level='country')
+
+    df = df.set_index(index)
 
     df = db.rename_df_columns(df)
 
@@ -57,19 +52,11 @@ def map_bar_country_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
+    df, index = get_ratio(df, indicator, agg_level='district')
+
     data_in = filter_df_by_dates(
         df, target_year, target_month, reference_year, reference_month
     )
-
-    data_in = get_percentage(
-        data_in,
-        static.get("population data"),
-        static.get("target population type"),
-        indicator_group,
-        indicator,
-    )
-
-    data_in.reset_index(inplace=True)
 
     # TODO updat teh filter by data function so that this step is no longer needed
 
@@ -116,14 +103,10 @@ def scatter_district_data(*, outlier, indicator, indicator_group, district, **kw
     df = db.filter_by_indicator(df, indicator)
 
     df_district = filter_by_district(df, district)
-    df_district = get_district_sum(df_district, indicator)
-    df_district = get_percentage(
-        df_district,
-        static.get("population data"),
-        static.get("target population type"),
-        indicator_group,
-        indicator,
-    )
+
+    df, index = get_ratio(df, indicator, agg_level='district')
+
+    df = df.set_index(index)
 
     df_district = db.rename_df_columns(df_district)
 
@@ -151,6 +134,8 @@ def tree_map_district_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
+    df, index = get_ratio(df, indicator, agg_level='facility')
+
     # TODO check how the date function works such that it shows only target date
 
     df_district_dated = filter_df_by_dates(
@@ -174,6 +159,8 @@ def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
 
     df = filter_by_district(df, district)
 
+    df, index = get_ratio(df, indicator, agg_level='facility')
+
     # TODO Reorder such that its the one facility with the on selected data max value that shows
 
     if not facility:
@@ -186,6 +173,8 @@ def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
     df = df[df.facility_name == facility].reset_index(drop=True)
 
     df = db.rename_df_columns(df)
+
+    df = df.set_index(index)
 
     return df
 

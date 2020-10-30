@@ -132,7 +132,47 @@ def get_year_and_month_cols(df):
 # Data cleaning methods for dataset selection and callbacks
 
 
-# def parse_target_pop(df, indicator):
+def vet_granularity(indicator):
+
+    exceptions = ["coverage", 'per 10']
+
+    pop_dependant = False
+    if any(ext in indicator for ext in exceptions):
+        pop_dependant = True
+
+    # Here can do fuzzy matching or custom solution to per capita and coverage
+
+    pass
+
+
+def get_ratio(df, indicator, agg_level):
+    """
+    Aggregates the ratio properly using weights
+
+    """
+    # NEEDS TO EMCPOASS NATIONAL, DISTRICT, AND FACILITY
+    # Grouby, then divide
+
+    # TODO Link to the index_colmns used in the DB object
+
+    index = ["date", "id", "facility_name"]
+    col_count = len(set(df.columns).difference(set(index)))
+
+    if agg_level == 'country':
+        index = index[0]
+
+    if agg_level == 'district':
+        index = index[:2]
+
+    df.groupby(index, as_index=False).sum()
+
+    if col_count == 2:
+        df[indicator] = df[f'{indicator}__weighted_ratio'] / \
+            df[f'{indicator}__weight']
+        df = df.drop(
+            columns=[f'{indicator}__weighted_ratio', f'{indicator}__weight'])
+
+    return df, index
 
 
 def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=False):

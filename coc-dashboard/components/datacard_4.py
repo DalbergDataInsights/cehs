@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from store import check_index, timeit, get_sub_dfs, init_data_set, month_order, get_year_and_month_cols
+from store import timeit, get_sub_dfs, init_data_set, month_order, get_year_and_month_cols
 from package.layout.area_card import AreaDataCard
 from package.layout.chart_card import ChartDataCard
 
@@ -9,8 +9,7 @@ from package.layout.chart_card import ChartDataCard
 def tree_map_district_dated_plot(data):
 
     data_in = data.get("district_dated")
-    data_in = check_index(data_in)
-    val_col = data_in.columns[0]
+    val_col = data_in.columns[-1]
     data_in[val_col] = data_in[val_col].apply(
         lambda x: int(x) if pd.notna(x) else 0)
     data_in = data_in.reset_index()
@@ -27,8 +26,7 @@ def tree_map_district_dated_plot(data):
 def scatter_facility_plot(data):
     data = data.get("facility")
 
-    data = check_index(data)
-    data = data[data[data.columns[0]] > 0]
+    data = data[data[data.columns[-1]] > 0]
 
     data = get_year_and_month_cols(data)
 
