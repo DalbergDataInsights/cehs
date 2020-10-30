@@ -164,7 +164,7 @@ def get_ratio(df, indicator, agg_level):
     if agg_level == 'district':
         index = index[:2]
 
-    df.groupby(index, as_index=False).sum()
+    df = df.groupby(index, as_index=False).sum()
 
     if col_count == 2:
         df[indicator] = df[f'{indicator}__weighted_ratio'] / \

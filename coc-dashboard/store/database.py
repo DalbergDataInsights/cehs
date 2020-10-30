@@ -48,7 +48,7 @@ class Database(metaclass=SingletonMeta):
         "facility_name": str,
         "date": "datetime64[ns]",
         "indicator_name": str,
-        "*": int,
+        "*": float,
     }
 
     index_columns = ["id", "facility_name", "date"]
