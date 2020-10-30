@@ -164,11 +164,13 @@ body {
 
 .Select-value-label {
     color: white !important;
+    font-size: 1.2vh;
 }
 
 .Select-menu-outer {
     background-color: rgb(19, 52, 78) !important;
     color: white !important;
+    font-size: 1.2vh !important;
 }
 
 .Select-arrow {
