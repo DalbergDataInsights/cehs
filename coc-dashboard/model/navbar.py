@@ -175,10 +175,14 @@ class SideNav:
                                     ),
                                 ],
                                 align="center",
-                            )
+                            ),
+                        html.A(
+                            html.Span("cloud_download", className="material-icons"),
+                            className="nav-element",
+                            id="download",
+
                         ),
                         dbc.Row(self.get_nav_buttons(), id="nav-buttons"),
-                    ],
                     style={
                         "background-color": "rgb(19, 52, 78)",
                         "padding-top": "2vh",

@@ -21,11 +21,12 @@ from .global_callbacks import (
     global_story_callback,
     change_titles_reporting,
     update_on_click,
-    change_titles_trends,
 )
+
+
 from .user_interface import (
     change_page,
-    download_data,
+    toggle_fade_controls,
     toggle_fade_info,
     menu_toggle_button,
 )
@@ -39,6 +40,11 @@ callback_ids = {
     target_date.dropdown_ids[0]: "value",  # Target date year
     target_date.dropdown_ids[-1]: "value",  # Target date month
     district_control_group.dropdown_ids[-1]: "value",  # District
+}
+
+callback_ = {
+    outlier_policy_dropdown_group.dropdown_ids[-1]: "value",  # Outlier policy
+    indicator_dropdown_group.dropdown_ids[-1]: "value",  # Indicator
 }
 
 

@@ -1,29 +1,23 @@
+<<<<<<< Updated upstream
 # Data csv download links
 
 import xlsxwriter
 import pandas as pd
 import base64
 import io
+from pathlib import Path
 
 
 def download_file(dict_of_st):
+    Path("./coc-dashboard/package/static/data").mkdir(parents=True, exist_ok=True)
+    with pd.ExcelWriter("./coc-dashboard/package/static/data/cehs.xlsx") as writer:
+        for df_name, df in dict_of_st.items():
+            if len(df_name) > 31:
+                df_name = df_name[:30]
+            df.to_excel(writer, sheet_name=df_name)
 
-    xlsx_io = io.BytesIO()
-    writer = pd.ExcelWriter(xlsx_io, engine="xlsxwriter")
-
-    for df_name, df in dict_of_st.items():
-        if len(df_name) > 31:
-            df_name = df_name[:30]
-
-        df.to_excel(writer, sheet_name=df_name)
-    writer.save()
-    xlsx_io.seek(0)
-
-    media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    data = base64.b64encode(xlsx_io.read()).decode("utf-8")
-    href_data_downloadable = f"data:{media_type};base64,{data}"
-    return href_data_downloadable
-
+=======
+>>>>>>> Stashed changes
 
 # Methodology section
 

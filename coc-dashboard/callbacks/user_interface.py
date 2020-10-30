@@ -1,5 +1,5 @@
 from dash import callback_context
-from store import download_file, timeit
+from store import timeit
 from view import ds, side_nav
 from components import (
     country_overview_scatter,
@@ -14,6 +14,13 @@ from components import (
     # grid,
     # statistics,
 )
+import os
+from store.database import Database
+from store import CONTROLS 
+
+DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]
+
+db = Database(DATABASE_URI)
 
 
 @timeit
@@ -36,17 +43,21 @@ def toggle_fade_info(n1, n2, is_open):
         # Button has never been clicked
         return [not is_open]
     return [is_open]
+<<<<<<< Updated upstream
 
 
 @timeit
 def download_data(n_clicks):
     if n_clicks:
-        print("Yes")
+        print("yes")
         href_data = download_file(dfs)
-
+        print(href_data)
         return [href_data]
     else:
         return [None]
+=======
+   
+>>>>>>> Stashed changes
 
 
 @timeit
