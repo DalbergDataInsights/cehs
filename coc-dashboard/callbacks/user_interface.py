@@ -70,10 +70,6 @@ def change_page(*inputs):
             reporting_map,
             stacked_bar_district,
         ]
-        global init
-        if not init:
-            ds._define_callbacks()
-            init = True
 
         clicked = "reporting"
     title.dash = clicked

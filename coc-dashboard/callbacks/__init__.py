@@ -41,12 +41,51 @@ callback_ids = {
     district_control_group.dropdown_ids[-1]: "value",  # District
 }
 
+from components import (
+    stacked_bar_district,
+    reporting_map,
+    stacked_bar_reporting_country,
+)
+
 
 def define_callbacks(ds):
 
     app = ds.app
 
     callbacks = [
+        # Data cards
+        {
+            "inputs": [
+                Input(id, prop)
+                for id, prop in stacked_bar_district.callbacks[0].get("input")
+            ],
+            "outputs": [
+                Output(id, prop)
+                for id, prop in stacked_bar_district.callbacks[0].get("output")
+            ],
+            "function": stacked_bar_district.callbacks[0].get("func"),
+        },
+        {
+            "inputs": [
+                Input(id, prop) for id, prop in reporting_map.callbacks[0].get("input")
+            ],
+            "outputs": [
+                Output(id, prop)
+                for id, prop in reporting_map.callbacks[0].get("output")
+            ],
+            "function": reporting_map.callbacks[0].get("func"),
+        },
+        {
+            "inputs": [
+                Input(id, prop)
+                for id, prop in stacked_bar_reporting_country.callbacks[0].get("input")
+            ],
+            "outputs": [
+                Output(id, prop)
+                for id, prop in stacked_bar_reporting_country.callbacks[0].get("output")
+            ],
+            "function": stacked_bar_reporting_country.callbacks[0].get("func"),
+        },
         # User interface
         {
             "inputs": [Input("side-nav__menu-button", "n_clicks")],

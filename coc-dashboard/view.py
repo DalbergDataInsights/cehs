@@ -36,8 +36,10 @@ ds = DataStory(
         tree_map_district,
         facility_scatter,
     ],
-    ind_elements=[side_nav]
+    ind_elements=[side_nav],
 )
+
+ds.init = False
 
 app = ds.app
 app.title = "CEHS Uganda"
