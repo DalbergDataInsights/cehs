@@ -21,8 +21,8 @@ import csv
 class DataCard:
 
     default_colors = {
-        "title": "#3c6792",
-        "subtitle": "#555555",
+        "title": "white",
+        "subtitle": "rgb(34, 94, 140)",
         "text": "#363638",
         "fig": ["#b00d3b", "#f77665", "#e2d5d1", "#96c0e0", "#3c6792"],
     }

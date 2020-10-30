@@ -45,7 +45,7 @@ body {
 .data-card__header-container {
     padding: 12px 0px 12px 0px;
     margin: 12px 0 12px 0;
-    background: #d9d6d6;
+    background: rgb(19, 52, 78);
 }
 
 .data-card__figure {
