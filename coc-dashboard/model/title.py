@@ -5,7 +5,7 @@ import dash_bootstrap_components as dbc
 class Title:
 
     icon_class = "material-icons align-middle"
-    icon_style = {"color": "rgb(19, 52, 78)", "font-size": "6rem"}
+    icon_style = {"color": "rgb(19, 52, 78)", "font-size": "5vw"}
 
     def __init__(self, title, subtitles, icons=None, active_dash="trends"):
 
