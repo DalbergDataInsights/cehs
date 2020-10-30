@@ -33,7 +33,11 @@ class DataStory(Dashboard):
     def get_layout(self):
 
         layout = (
-            [self.__get_header()]
+            [
+                self.__get_header()
+                if (self.title != "" or self.sub_title != "" or self.text_section != "")
+                else None
+            ]
             + [
                 dbc.Row(
                     x.layout, className="data-card shadow-sm p-3 mb-5 rounded m-top-24"

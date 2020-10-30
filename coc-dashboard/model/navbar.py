@@ -186,6 +186,24 @@ class SideNav:
                     },
                 ),
                 dbc.Row(self.controls.get_layout()),
+                dbc.Row(
+                    dbc.Col(
+                        dcc.Link(
+                            children="Dalberg Data Insights - Contact Us",
+                            href="mailto:ddi_support@dalberg.com",
+                            style={"color": "white"},
+                        ),
+                        style={
+                            "text-align": "center",
+                        },
+                    ),
+                    style={
+                        "position": "absolute",
+                        "bottom": "5px",
+                        "right": "5px",
+                        "width": "100%",
+                    },
+                ),
             ],
             style=self.get_style(),
             id="side-nav",

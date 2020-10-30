@@ -1,7 +1,7 @@
 from datetime import datetime
 import base64
 import io
-import pandas as pd 
+import pandas as pd
 
 from components import (
     country_overview_scatter,
@@ -58,7 +58,6 @@ def global_story_callback(*inputs):
     ds.switch_data_set(df)
 
     return [ds.get_layout()]
-
 
 
 @timeit
@@ -213,8 +212,7 @@ def update_on_click(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         facility_scatter.data = ds
-        facility_scatter.figure = facility_scatter._get_figure(
-            facility_scatter.data)
+        facility_scatter.figure = facility_scatter._get_figure(facility_scatter.data)
         facility_scatter.figure_title = (
             f"Evolution of $label$ in {label} (click on the graph above to filter)"
         )
@@ -223,5 +221,3 @@ def update_on_click(*inputs):
         print(e)
 
     return [facility_scatter.figure, facility_scatter.figure_title]
-
-

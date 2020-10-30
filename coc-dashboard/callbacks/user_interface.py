@@ -22,6 +22,8 @@ DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]
 
 db = Database(DATABASE_URI)
 
+init = False
+
 
 @timeit
 def menu_toggle_button(n_clicks):
@@ -68,6 +70,11 @@ def change_page(*inputs):
             reporting_map,
             stacked_bar_district,
         ]
+        global init
+        if not init:
+            ds._define_callbacks()
+            init = True
+
         clicked = "reporting"
     title.dash = clicked
     # elif "overview" in changed_id:

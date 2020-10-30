@@ -111,6 +111,7 @@ python-dotenv = "*"
 xlsxwriter = "*"
 pep8 = "*"
 black = "*"
+dash-extensions = "*"
 
 [requires]
 python_version = "3.7"

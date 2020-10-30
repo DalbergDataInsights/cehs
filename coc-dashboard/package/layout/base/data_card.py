@@ -5,11 +5,15 @@ from pathlib import Path
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
+from dash_extensions import Download
+from dash_extensions.snippets import send_data_frame
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import xlsxwriter
+import csv
+
 
 # FIXME: For some reason this is not working (even if function is made not private, so I pasted in the functions here for now, but ideally they would be imported)
 
@@ -65,8 +69,8 @@ class DataCard:
         self.callbacks = [
             {
                 "func": self.__download_graph_data,
-                "input": [(f"{self.my_name}_download", "n_clicks")],
-                "output": [(f"{self.my_name}_download", "href")],
+                "input": [(f"{self.my_name}_download_button", "n_clicks")],
+                "output": [(f"{self.my_name}_download_data", "data")],
             }
         ]
         # self.callbacks = [
@@ -302,12 +306,13 @@ class DataCard:
         text_section_layout = dbc.Col(
             [
                 html.A(
-                    html.Span("cloud_download", className="material-icons"),
+                    html.Span(
+                        "cloud_download", className="material-icons align-middle"
+                    ),
                     className="data-card__download-button",
-                    id=f"{self.my_name}_download",
-                    href="",
-                    download="cehs.xlsx",
+                    id=f"{self.my_name}_download_button",
                 ),
+                Download(id=f"{self.my_name}_download_data"),
             ],
             width={"size": 1, "offset": 11},
         )
@@ -458,17 +463,7 @@ class DataCard:
         print("Download callback fired")
         print(inputs)
 
-        xlsx_io = io.BytesIO()
-        writer = pd.ExcelWriter(xlsx_io, engine="xlsxwriter")
-        # {"trace_name":  df}
+        # prep data file
         df = pd.concat(self.data.values()).reset_index()
-        df.to_excel(writer)
-        writer.save()
-        xlsx_io.seek(0)
-        print(self.data)
 
-        media_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        data = base64.b64encode(xlsx_io.read()).decode("utf-8")
-        href_data_downloadable = f"data:{media_type};base64,{data}"
-        print(href_data_downloadable)
-        return [href_data_downloadable]
+        return [send_data_frame(df.to_excel, f"{df.columns[-1]}.xlsx")]

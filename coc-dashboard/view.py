@@ -36,11 +36,7 @@ ds = DataStory(
         tree_map_district,
         facility_scatter,
     ],
-    ind_elements=[side_nav],
-    footer_text=dcc.Link(
-        children="Dalberg Data Insights - Contact Us",
-        href="mailto:ddi_support@dalberg.com",
-    ),
+    ind_elements=[side_nav]
 )
 
 app = ds.app
