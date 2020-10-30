@@ -127,15 +127,13 @@ body {
     text-align: center;
     padding: 0 10px;
     text-decoration: none;
-    font-size: 17px;
+    font-size: 1rem;
     cursor: pointer;
     width: 80%;
     margin: 0 auto;
     border: 2px solid transparent;
     margin-top: 2px;
     margin-bottom: 2px;
-    padding-top: 7px;
-    padding-bottom: 7px;
 }
 
 /* Change the color of links on hover */
