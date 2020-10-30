@@ -24,7 +24,7 @@ class Title:
 
         layout = html.P(
             sub,
-            style={"font-size": "2rem", "margin-bottom": "0", "font-weight": "bold"},
+            style={"font-size": "1.7vw", "margin-bottom": "0", "font-weight": "bold"},
         )
 
         return dbc.Col(layout)
@@ -54,7 +54,7 @@ class Title:
                                     html.P(
                                         self.title,
                                         style={
-                                            "font-size": "2rem",
+                                            "font-size": "1.5vw",
                                             "margin-bottom": "0",
                                         },
                                     )

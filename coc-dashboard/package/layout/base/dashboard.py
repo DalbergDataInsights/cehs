@@ -104,7 +104,7 @@ class Dashboard:
         return callback_wrapper
 
     def __define_callback_set(
-        self, output_elements_id_prop: [(str, str)], input_element_id_prop: [(str, str)]
+        self, output_elements_id_prop: list, input_element_id_prop: list
     ):
 
         callback_set_outputs = [

@@ -62,6 +62,10 @@ class DataStory(Dashboard):
                             href="https://fonts.googleapis.com/icon?family=Material+Icons",
                             rel="stylesheet",
                         ),
+                        html.Meta(
+                            name="viewport",
+                            content="width=device-width, initial-scale=1.0",
+                        ),
                         dcc.Location(id="url", refresh=False),
                     ],
                     id="meta",

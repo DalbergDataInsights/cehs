@@ -71,7 +71,7 @@ class NestedDropdownGroup:
                     className="material-icons align-middle",
                     style={
                         "color": "white",
-                        "font-size": "24px",
+                        "font-size": "1.2rem",
                         "float": "right",
                         "cursor": "help",
                     },
@@ -100,6 +100,7 @@ class NestedDropdownGroup:
                                 "margin-right": "5px",
                                 "margin-bottom": "3px",
                                 "color": "white",
+                                "font-size": "1.6vh",
                             },
                         ),
                         style={

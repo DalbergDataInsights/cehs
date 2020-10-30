@@ -89,7 +89,7 @@ class Controls:
 class SideNav:
 
     icon_class = "material-icons align-middle"
-    icon_style = {"color": "white", "font-size": "36px"}
+    icon_style = {"color": "white", "font-size": "1.5rem"}
 
     style = {
         "height": "100%",
@@ -165,7 +165,7 @@ class SideNav:
                                         ["CEHS APP DASHBOARDS "] + tooltip,
                                         style={
                                             "color": "white",
-                                            "font-size": "1.5rem",
+                                            "font-size": "1.9vh",
                                             "font-weight": "100",
                                             "width": "80%",
                                             "height": "4vh",
