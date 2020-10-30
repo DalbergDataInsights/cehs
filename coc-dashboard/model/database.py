@@ -24,11 +24,8 @@ class Population(Base):
     u5 = Column(Integer)
     u15 = Column(Integer)
     suspect_tb = Column(Integer)
-<<<<<<< Updated upstream
-=======
-    #per_thousand = Column(Integer)
-    #per_hundred_thousand = Column(Integer)
->>>>>>> Stashed changes
+    # per_thousand = Column(Integer)
+    # per_hundred_thousand = Column(Integer)
 
     def serialize(self):
         return {
@@ -44,11 +41,8 @@ class Population(Base):
             "u5": self.u5,
             "u15": self.u15,
             "suspect_tb": self.suspect_tb,
-<<<<<<< Updated upstream
-=======
-            #"per_thousand": self.per_thousand,
-            #"per_hundred_thousand": self.per_hundred_thousand,
->>>>>>> Stashed changes
+            # "per_thousand": self.per_thousand,
+            # "per_hundred_thousand": self.per_hundred_thousand,
         }
 
 

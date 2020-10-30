@@ -63,9 +63,11 @@ class DataCard:
         # Callbacks
 
         self.callbacks = [
-            {"func": self.__download_graph_data,
-            "input": [(f'{self.my_name}_download', 'n_clicks')],
-            "output": [(f'{self.my_name}_download', 'href')]}
+            {
+                "func": self.__download_graph_data,
+                "input": [(f"{self.my_name}_download", "n_clicks")],
+                "output": [(f"{self.my_name}_download", "href")],
+            }
         ]
         # self.callbacks = [
         #     {'func': self.__update_figure,
@@ -145,8 +147,7 @@ class DataCard:
         """Get the static plotly layout of a data card"""
         els = [
             self.__get_figure_layout() if self.data or self.figure else None,
-            self.__get_text_layout(self.key_points) if self.key_points else None
-    
+            self.__get_text_layout(self.key_points) if self.key_points else None,
         ]
 
         layout = dbc.Col(
@@ -200,7 +201,7 @@ class DataCard:
                         )
                     )
                 ),
-                dbc.Row(self.__get_link_layout())
+                dbc.Row(self.__get_link_layout()),
             ],
         )
         return layout
@@ -297,21 +298,20 @@ class DataCard:
 
         return text_section_layout
 
-
     def __get_link_layout(self):
         text_section_layout = dbc.Col(
             [
-            html.A(
-                html.Span("cloud_download", className="material-icons"),
-                #className="nav-element",
-                id=f"{self.my_name}_download",
-                href="",
-                download="cehs.xlsx",
-            ),
-         ],
-         width={"size": 1, "offset": 11})
+                html.A(
+                    html.Span("cloud_download", className="material-icons"),
+                    className="data-card__download-button",
+                    id=f"{self.my_name}_download",
+                    href="",
+                    download="cehs.xlsx",
+                ),
+            ],
+            width={"size": 1, "offset": 11},
+        )
         return text_section_layout
-
 
     def __unwrap_section_and_points(self, section, points):
         layout = html.Div(

@@ -16,7 +16,7 @@ from components import (
 )
 import os
 from store.database import Database
-from store import CONTROLS 
+from store import CONTROLS
 
 DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]
 
@@ -43,21 +43,6 @@ def toggle_fade_info(n1, n2, is_open):
         # Button has never been clicked
         return [not is_open]
     return [is_open]
-<<<<<<< Updated upstream
-
-
-@timeit
-def download_data(n_clicks):
-    if n_clicks:
-        print("yes")
-        href_data = download_file(dfs)
-        print(href_data)
-        return [href_data]
-    else:
-        return [None]
-=======
-   
->>>>>>> Stashed changes
 
 
 @timeit

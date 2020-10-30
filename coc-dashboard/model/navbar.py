@@ -18,7 +18,7 @@ class MenuButton:
     }
 
     bar_style = {
-        "width": "35px",
+        "width": "1.7vw",
         "height": "5px",
         "background-color": "rgb(34, 94, 140)",
         "margin": "6px 0",
@@ -175,14 +175,10 @@ class SideNav:
                                     ),
                                 ],
                                 align="center",
-                            ),
-                        html.A(
-                            html.Span("cloud_download", className="material-icons"),
-                            className="nav-element",
-                            id="download",
-
+                            )
                         ),
                         dbc.Row(self.get_nav_buttons(), id="nav-buttons"),
+                    ],
                     style={
                         "background-color": "rgb(19, 52, 78)",
                         "padding-top": "2vh",
@@ -272,87 +268,3 @@ class SideNav:
         layout = dbc.Col(buttons, align="center")
 
         return layout
-
-
-# class TopNav:
-#     def __init__(self, methodology):
-
-#         self.active = "trends"
-#         self.methodology = methodology
-
-#         # self.methodology_modal = Methodology(methodology)
-
-#     @property
-#     def layout(self):
-#         layout = html.Div(self.get_layout(), id="topnav-container")
-
-#         return layout
-
-#     def get_nav_buttons(self, active="trends"):
-#         self.active = active
-
-#         active_style = "nav-element active"
-
-#         buttons = [
-#             # html.P(
-#             #     "Overview (coming soon)",
-#             #     id="overview",
-#             #     # active_style if active == "overview" else "nav-element",
-#             #     className="nav-element disabled",
-#             # ),
-#             html.P(
-#                 "Trends",
-#                 id="trends",
-#                 className=active_style if active == "trends" else "nav-element",
-#             ),
-#             html.P(
-#                 "Reporting",
-#                 id="reporting",
-#                 className=active_style if active == "reporting" else "nav-element",
-#             ),
-#         ]
-
-#         return buttons
-
-#     def get_layout(self):
-#         me_layout = [dbc.Row(x.layout) for x in self.methodology]
-
-#         html_nav = html.Div(
-#             [
-#                 html.Div(
-#                     self.get_nav_buttons(), className="topnav-left", id="nav-buttons"
-#                 ),
-#                 html.Div(
-#                     [
-#                         html.P(
-#                             html.Span("cloud_download", className="material-icons"),
-#                             className="nav-element",
-#                         ),
-#                         html.P(
-#                             html.Span("info", className="material-icons"),
-#                             # html.I(className="fas fa-info-circle"),
-#                             className="nav-element",
-#                             id="info-button",
-#                         ),
-#                     ],
-#                     className="topnav-right",
-#                 ),
-#                 dbc.Modal(
-#                     [
-#                         dbc.ModalHeader("Methodology"),
-#                         dbc.ModalBody(me_layout),
-#                         dbc.ModalFooter(
-#                             dbc.Button("Close", id="info-close", className="ml-auto")
-#                         ),
-#                     ],
-#                     id="info-fade",
-#                     centered=True,
-#                 ),
-#             ],
-#             className="topnav",
-#         )
-
-#         return html_nav
-
-#     def _requires_dropdown(self):
-#         return False
