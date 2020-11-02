@@ -1,5 +1,7 @@
 import pandas as pd
-from model import SideNav
+from model import SideNav, DateDropdownLayout
+import calendar
+from datetime import datetime
 
 from store.helpers import month_order
 from .database import Database
@@ -27,29 +29,20 @@ def initiate_dropdowns():
 
     db = Database()
 
-    # Initiate data selection dropdowns
+    # Initiate type of aggregation dropdown
 
-    max_date = db.raw_data.date.max()
-    (max_year, max_month_number) = (max_date.year, max_date.month)
-    max_month = month_order[max_month_number - 1]
+    entries = pd.DataFrame({"aggregation_type": ["Difference between periods"]})
 
-    years = [2018] * 12 + [2019] * 12 + [2020] * max_month_number
-
-    date_columns = pd.DataFrame(
-        {"year": years, "month": month_order * 2 + month_order[:max_month_number]}
+    aggregation_type = NestedDropdownGroup(
+        entries, title="SELECT AN ANALYSIS TIMEFRAME"
     )
 
-    date_columns.year = date_columns.year.astype(str)
+    # Initiate date dropdown layout
 
-    date_columns.columns = ["Target Year", "Target Month"]
-    target_date = NestedDropdownGroup(
-        date_columns.copy(), title="SELECT AN ANALYSIS TIMEFRAME", vertical=False
-    )
+    dates = list(pd.to_datetime(db.raw_data.date.unique()))
+    dates = [x.strftime("%b %Y") for x in dates]
 
-    date_columns.columns = ["Reference Year", "Reference Month"]
-    reference_date = NestedDropdownGroup(
-        date_columns, title="SELECT AN ANALYSIS TIMEFRAME", vertical=False
-    )
+    date_dropdowns = DateDropdownLayout(options=dates)
 
     # Initiate outlier policy dropdown
 
@@ -86,8 +79,8 @@ def initiate_dropdowns():
         elements=[
             indicator_dropdown_group,
             district_control_group,
-            reference_date,
-            target_date,
+            aggregation_type,
+            date_dropdowns,
             outlier_policy_dropdown_group,
         ],
         info=f"""
@@ -105,16 +98,16 @@ def initiate_dropdowns():
         side_nav,
         outlier_policy_dropdown_group,
         indicator_dropdown_group,
-        reference_date,
-        target_date,
+        aggregation_type,
+        date_dropdowns,
         district_control_group,
     )
 
 
 def set_dropdown_defaults(
     outlier_policy_dropdown_group,
-    target_date,
-    reference_date,
+    aggregation_type,
+    date_dropdowns,
     indicator_dropdown_group,
     district_control_group,
 ):
@@ -122,8 +115,11 @@ def set_dropdown_defaults(
         "default_outlier"
     )
 
-    target_date.dropdown_objects[0].value = DEFAULTS.get("default_target_year")
-    target_date.dropdown_objects[1].value = DEFAULTS.get("default_target_month")
+    date_dropdowns.from_date.value = (
+        DEFAULTS.get("default_reference_month")
+        + " "
+        + DEFAULTS.get("default_reference_year")
+    )
 
     indicator_dropdown_group.dropdown_objects[0].value = DEFAULTS.get(
         "default_indicator_group"
@@ -132,7 +128,8 @@ def set_dropdown_defaults(
         "default_indicator"
     )
 
-    reference_date.dropdown_objects[0].value = DEFAULTS.get("default_reference_year")
-    reference_date.dropdown_objects[1].value = DEFAULTS.get("default_reference_month")
+    date_dropdowns.from_date.value = (
+        DEFAULTS.get("default_target_month") + " " + DEFAULTS.get("default_target_year")
+    )
 
     district_control_group.dropdown_objects[0].value = DEFAULTS.get("default_district")
