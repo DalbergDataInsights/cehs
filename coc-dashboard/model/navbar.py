@@ -145,13 +145,13 @@ class SideNav:
                 "info",
                 className=self.icon_class,
                 style={**self.icon_style, "float": "right", "cursor": "help"},
-                id=f"{id}-info",
+                id=f"{id}",
             )
             if icon
             else None,
             dbc.Tooltip(
                 info,
-                target=f"{id}-info",
+                target=f"{id}",
                 placement="right",
             ),
         ]
@@ -168,7 +168,7 @@ class SideNav:
                                 [
                                     html.P(
                                         ["CEHS APP DASHBOARDS "]
-                                        + self.get_tooltip(self.info, "main"),
+                                        + self.get_tooltip(self.info, "main-info"),
                                         style={
                                             "color": "white",
                                             "font-size": "1.9vh",
@@ -244,7 +244,7 @@ class SideNav:
                             " Overview of the 20",
                         ]
                         + self.get_tooltip(self.overview_info, "overview", icon=False),
-                        id="overview-info",
+                        id="overview",
                         className=active_style
                         if active == "overview"
                         else passive_style,
@@ -264,7 +264,7 @@ class SideNav:
                             " Trends",
                         ]
                         + self.get_tooltip(self.trends_info, "trends", icon=False),
-                        id="trends-info",
+                        id="trends",
                         className=active_style if active == "trends" else passive_style,
                     ),
                     style=wrapper_style,
@@ -282,7 +282,7 @@ class SideNav:
                             " Data quality",
                         ]
                         + self.get_tooltip(self.datarep_info, "reporting", icon=False),
-                        id="reporting-info",
+                        id="reporting",
                         className=active_style
                         if active == "reporting"
                         else passive_style,
