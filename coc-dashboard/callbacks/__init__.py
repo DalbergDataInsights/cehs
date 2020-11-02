@@ -23,11 +23,11 @@ from .global_callbacks import (
     update_on_click,
     change_titles_trends,
 )
+
+
 from .user_interface import (
     change_page,
-    download_data,
-    toggle_fade_controls,
-    toggle_fade_info,
+    menu_toggle_button,
 )
 
 callback_ids = {
@@ -41,33 +41,64 @@ callback_ids = {
     district_control_group.dropdown_ids[-1]: "value",  # District
 }
 
+from components import (
+    stacked_bar_district,
+    reporting_map,
+    stacked_bar_reporting_country,
+)
+
 
 def define_callbacks(ds):
 
     app = ds.app
 
     callbacks = [
-        # User interface
+        # Data cards
         {
-            "inputs": [Input("fade-button", "n_clicks")],
-            "outputs": [Output("fade-controls", "is_in")],
-            "function": toggle_fade_controls,
-            "states": [State("fade-controls", "is_in")],
+            "inputs": [
+                Input(id, prop)
+                for id, prop in stacked_bar_district.callbacks[0].get("input")
+            ],
+            "outputs": [
+                Output(id, prop)
+                for id, prop in stacked_bar_district.callbacks[0].get("output")
+            ],
+            "function": stacked_bar_district.callbacks[0].get("func"),
         },
         {
             "inputs": [
-                Input("info-button", "n_clicks"),
-                Input("info-close", "n_clicks"),
+                Input(id, prop) for id, prop in reporting_map.callbacks[0].get("input")
             ],
-            "outputs": [Output("info-fade", "is_open")],
-            "function": toggle_fade_info,
-            "states": [State("info-fade", "is_open")],
+            "outputs": [
+                Output(id, prop)
+                for id, prop in reporting_map.callbacks[0].get("output")
+            ],
+            "function": reporting_map.callbacks[0].get("func"),
         },
-        # {
-        #     "inputs": [Input("download-excel", "n_clicks")],
-        #     "outputs": [Output("download-excel", "href")],
-        #     "function": download_data,
-        # },
+        {
+            "inputs": [
+                Input(id, prop)
+                for id, prop in stacked_bar_reporting_country.callbacks[0].get("input")
+            ],
+            "outputs": [
+                Output(id, prop)
+                for id, prop in stacked_bar_reporting_country.callbacks[0].get("output")
+            ],
+            "function": stacked_bar_reporting_country.callbacks[0].get("func"),
+        },
+        # User interface
+        {
+            "inputs": [Input("side-nav__menu-button", "n_clicks")],
+            "outputs": [
+                Output("side-nav__menu-button", "style"),
+                Output("side-nav__menu-button__bar1", "style"),
+                Output("side-nav__menu-button__bar2", "style"),
+                Output("side-nav__menu-button__bar3", "style"),
+                Output("side-nav", "style"),
+                Output("ds-wrapper", "className"),
+            ],
+            "function": menu_toggle_button,
+        },
         {
             "inputs": [
                 Input("trends", "n_clicks"),
@@ -77,6 +108,7 @@ def define_callbacks(ds):
             "outputs": [
                 Output("ds-paginator", "children"),
                 Output("nav-buttons", "children"),
+                Output("dash-title", "children"),
             ],
             "function": change_page,
         },

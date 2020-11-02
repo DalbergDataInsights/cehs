@@ -30,7 +30,7 @@ class CardLayout:
                     [
                         html.Div(
                             html.H5(
-                                html.B(self.__format_string(self.title, self.data)),
+                                self.__format_string(self.title, self.data),
                                 style={
                                     "color": "#555555",
                                     "text-align": "center",

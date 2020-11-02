@@ -1,11 +1,13 @@
 import pandas as pd
 from package.layout.chart_card import ChartDataCard
 
-from store import (get_sub_dfs,
-                   timeit,
-                   month_order,
-                   init_data_set,
-                   get_year_and_month_cols)
+from store import (
+    get_sub_dfs,
+    timeit,
+    month_order,
+    init_data_set,
+    get_year_and_month_cols,
+)
 
 
 @timeit
@@ -41,6 +43,8 @@ country_overview_scatter.set_colors(
             2018: "rgb(185, 221, 241)",
             2019: "rgb(106, 155, 195)",
             2020: "rgb(200, 19, 60)",
-        }
+        },
+        "title": "white",
+        "subtitle": "rgb(34, 94, 140)",
     }
 )

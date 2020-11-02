@@ -1,10 +1,19 @@
+import base64
+import io
+from pathlib import Path
+
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
+from dash_extensions import Download
+from dash_extensions.snippets import send_data_frame
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import xlsxwriter
+import csv
+
 
 # FIXME: For some reason this is not working (even if function is made not private, so I pasted in the functions here for now, but ideally they would be imported)
 
@@ -12,8 +21,8 @@ import plotly.graph_objects as go
 class DataCard:
 
     default_colors = {
-        "title": "#3c6792",
-        "subtitle": "#555555",
+        "title": "white",
+        "subtitle": "rgb(34, 94, 140)",
         "text": "#363638",
         "fig": ["#b00d3b", "#f77665", "#e2d5d1", "#96c0e0", "#3c6792"],
     }
@@ -57,7 +66,13 @@ class DataCard:
 
         # Callbacks
 
-        self.callbacks = []
+        self.callbacks = [
+            {
+                "func": self.__download_graph_data,
+                "input": [(f"{self.my_name}_download_button", "n_clicks")],
+                "output": [(f"{self.my_name}_download_data", "data")],
+            }
+        ]
         # self.callbacks = [
         #     {'func': self.__update_figure,
         #      'input': [(f'{self.my_name}_dropdown', 'value')],
@@ -186,9 +201,11 @@ class DataCard:
                             figure=self.figure,
                             config={"displayModeBar": False},
                             id=f"{self.my_name}_figure",
+                            className="data-card__figure",
                         )
                     )
                 ),
+                dbc.Row(self.__get_link_layout()),
             ],
         )
         return layout
@@ -199,7 +216,7 @@ class DataCard:
         formated_fig_title = self.__format_string(self.__figure_title, data)
 
         fig_title = html.H5(
-            html.B(formated_fig_title),
+            formated_fig_title,
             style={
                 "color": self.colors["subtitle"],
                 "text-align": "center",
@@ -283,6 +300,22 @@ class DataCard:
             ],
         )
 
+        return text_section_layout
+
+    def __get_link_layout(self):
+        text_section_layout = dbc.Col(
+            [
+                html.A(
+                    html.Span(
+                        "cloud_download", className="material-icons align-middle"
+                    ),
+                    className="data-card__download-button",
+                    id=f"{self.my_name}_download_button",
+                ),
+                Download(id=f"{self.my_name}_download_data"),
+            ],
+            width={"size": 1, "offset": 11},
+        )
         return text_section_layout
 
     def __unwrap_section_and_points(self, section, points):
@@ -414,6 +447,7 @@ class DataCard:
         return list(all_columns)
 
     def _requires_dropdown(self):
+        return True
         return len(self._get_all_columns()) > 1
 
     def __update_figure(self, value):
@@ -423,3 +457,13 @@ class DataCard:
         self.figure = self._get_figure(data_dict)
         self.figure_title = self._get_figure_title(data_dict)
         return [self.figure, self.figure_title]
+
+    def __download_graph_data(self, *inputs):
+        """Download data associated with a figure"""
+        print("Download callback fired")
+        print(inputs)
+
+        # prep data file
+        df = pd.concat(self.data.values()).reset_index()
+
+        return [send_data_frame(df.to_excel, f"{df.columns[-1]}.xlsx")]

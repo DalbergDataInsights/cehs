@@ -1,16 +1,12 @@
 import os
-
 from .helpers import *
 from .dropdown import initiate_dropdowns, set_dropdown_defaults
 from .database import Database
 
-
 # READ FROM DATABASE
 
 DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]
-
 db = Database(DATABASE_URI)
-
 
 # STATIC DATA
 from .static_info import *  # NOQA: E402
@@ -27,6 +23,7 @@ from .geopopulation import shapefile  # NOQA: E402
     target_date,
     district_control_group,
 ) = initiate_dropdowns()
+
 
 set_dropdown_defaults(
     outlier_policy_dropdown_group,

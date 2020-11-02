@@ -20,6 +20,7 @@ from .cards_mutations import (
 
 # TODO find a smart way to iterate through imports rather than repeatthe list manually
 
+
 FUNC_DICT = {
     "country": scatter_country_data,
     "dated": map_bar_country_dated_data,
