@@ -2,10 +2,6 @@
 *__pycache__*
 .ipynb_checkpoints
 .vscode
-coc-dashboard/data/iqr.csv
-coc-dashboard/data/outliers.csv
-coc-dashboard/data/reporting.csv
-coc-dashboard/data/std.csv
 .env
 .vscode
 coc-dashboard/debug.py
