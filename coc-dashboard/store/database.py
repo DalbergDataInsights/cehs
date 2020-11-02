@@ -53,6 +53,8 @@ class Database(metaclass=SingletonMeta):
 
     index_columns = ["id", "facility_name", "date"]
 
+    ratio_markers = ["coverage", 'per 10']
+
     datasets = {}
     raw_data = None
     rep_data = None
@@ -157,13 +159,30 @@ class Database(metaclass=SingletonMeta):
 
     # Data filters
     def filter_by_indicator(self, df, indicator):
-        df = df.reset_index()
-        filter_col = [col for col in df if col.startswith(indicator)]
-        try:
-            df = df[list(self.index_columns) + filter_col]
-        except Exception as e:
-            print(e)
-            print("No such column is present in the dataframe")
+
+        is_ratio = any(map(indicator.__contains__, self.ratio_markers))
+
+        if is_ratio == False:
+            try:
+                df = df[list(self.index_columns) + [indicator]]
+            except Exception as e:
+                print(e)
+                print("No such column is present in the dataframe")
+
+        else:
+            select_col = [col for col in df if col.startswith(indicator)]
+
+            # TODO This is a camouflaged 'assert' statement, so write it explicitely as one
+
+            filter_col = [x for x in select_col
+                          if ((x.endswith('__weighted_ratio')
+                               or (x.endswith('__weight'))))]
+            try:
+                df = df[list(self.index_columns) + filter_col]
+            except Exception as e:
+                print(e)
+                print("No such columns are present in the dataframe")
+
         return df
 
     # Labels

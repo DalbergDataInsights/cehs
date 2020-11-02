@@ -156,15 +156,16 @@ def get_ratio(df, indicator, agg_level):
     # TODO Link to the index_colmns used in the DB object
 
     index = ["date", "id", "facility_name"]
-    col_count = len(set(df.columns).difference(set(index)))
 
     if agg_level == 'country':
-        index = index[0]
+        index = [index[0]]
 
     if agg_level == 'district':
         index = index[:2]
 
     df = df.groupby(index, as_index=False).sum()
+
+    col_count = len(set(df.columns).difference(set(index)))
 
     if col_count == 2:
         df[indicator] = df[f'{indicator}__weighted_ratio'] / \
@@ -173,63 +174,6 @@ def get_ratio(df, indicator, agg_level):
             columns=[f'{indicator}__weighted_ratio', f'{indicator}__weight'])
 
     return df, index
-
-
-def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=False):
-    """
-    Transforms the data using percentage of a target population, and group it by district or country
-    """
-
-    # Pick what to grouby and index on : either district level or national level
-    merge = ["id", "year"]
-    index = ["id", "date"]
-
-    if all_country == True:
-        merge = merge[1:]
-        index = index[1:]
-
-    ind_type = indicator_group.split("(")[-1][:-1]
-
-    # TODO find a way to refer to those original indicators I should be using if I end up anchoring on indicator name
-
-    # get target population, merge it and calculate percentage
-
-    exceptions = ["coverage", 'per 1000', 'per 100 000']
-
-    if ind_type in exceptions:
-
-        target = pop_tgt[pop_tgt.indicator == indicator]["cat"].values[0]
-        val_col = df.columns[-1]
-
-        columns = merge + [target]
-
-        pop_in = pop[columns].groupby(merge, as_index=False).sum()
-
-        data_in = df.groupby(index, as_index=False).sum()
-
-        data_in = get_year_and_month_cols(data_in).reset_index()
-
-        data_in = pd.merge(data_in, pop_in, how="left",
-                           left_on=merge, right_on=merge)
-
-        if ind_type == exceptions[0]:
-            x = 12
-        elif ind_type in exceptions[1:3]:
-            x = 1
-
-        data_in[val_col] = (data_in[val_col] / data_in[target]) * x
-
-        data_in.replace(np.inf, np.nan, inplace=True)
-
-        data_out = data_in.set_index(index)[[val_col]]
-
-        return data_out
-
-    # Return the data as is, with a simple grouby if we are showing absolute numbers
-
-    else:
-
-        return df.groupby(index).agg({indicator: "sum"})
 
 
 def check_index(df, index=["id", "date", "facility_name"]):
@@ -241,14 +185,6 @@ def check_index(df, index=["id", "date", "facility_name"]):
         # Set the indices
         df = df.reset_index(drop=True).set_index(index)
     return df
-
-
-def get_national_sum(df, indicator):
-    return df.groupby("date", as_index=False).agg({indicator: "sum"})
-
-
-def get_district_sum(df, indicator):
-    return df.groupby(["id", "date"], as_index=False).agg({indicator: "sum"})
 
 
 # Decorators

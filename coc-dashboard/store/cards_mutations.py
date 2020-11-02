@@ -12,7 +12,7 @@ import pandas as pd
 # FIXME Try and run without teh outlier parameter, see if it breaks anything
 
 
-def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
+def scatter_country_data(*, indicator, **kwargs):
 
     # dfs, static,
 
@@ -67,8 +67,8 @@ def map_bar_country_dated_data(
 
     data_in = data_in[mask]
 
-    data_in = data_in.groupby(
-        by=["id", "date"], as_index=False).agg({indicator: "sum"})
+    # data_in = data_in.groupby(
+    #     by=["id", "date"], as_index=False).agg({indicator: "sum"})
 
     data_in["year"] = data_in.date.apply(lambda x: x.year)
 
@@ -82,7 +82,7 @@ def map_bar_country_dated_data(
     data_in[indicator] = data_in[indicator].apply(lambda x: round(x, 2))
 
     data_in = data_in[[indicator]].reset_index()
-    data_in["id"] = data_in["id"].astype(str)
+    # data_in["id"] = data_in["id"].astype(str)
     data_in = data_in.set_index("id")
     data_out = data_in[~pd.isna(data_in[indicator])]
 
@@ -102,15 +102,15 @@ def scatter_district_data(*, outlier, indicator, indicator_group, district, **kw
 
     df = db.filter_by_indicator(df, indicator)
 
-    df_district = filter_by_district(df, district)
+    df = filter_by_district(df, district)
 
     df, index = get_ratio(df, indicator, agg_level='district')
 
     df = df.set_index(index)
 
-    df_district = db.rename_df_columns(df_district)
+    df = db.rename_df_columns(df)
 
-    return df_district
+    return df
 
 
 # CARD 4
