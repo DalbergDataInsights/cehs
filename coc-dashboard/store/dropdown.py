@@ -40,6 +40,7 @@ def initiate_dropdowns():
     # Initiate date dropdown layout
 
     dates = list(pd.to_datetime(db.raw_data.date.unique()))
+    dates.sort()
     dates = [x.strftime("%b %Y") for x in dates]
 
     date_dropdowns = DateDropdownLayout(options=dates)

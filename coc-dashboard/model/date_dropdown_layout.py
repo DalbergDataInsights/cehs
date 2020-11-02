@@ -23,7 +23,7 @@ class DateDropdownLayout:
             [
                 self.from_date.get_layout(),
                 dbc.Col(
-                    html.P("to", className="text-center", style={"color": "white"}),
+                    html.Div("to", className="text-center", style={"color": "white"}),
                     style={
                         "display": "flex",
                         "justify-content": "center",
