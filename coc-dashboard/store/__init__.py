@@ -9,7 +9,7 @@ DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]
 db = Database(DATABASE_URI)
 
 # STATIC DATA
-from .static_info import *  # NOQA: E402
+
 from .geopopulation import shapefile  # NOQA: E402
 
 

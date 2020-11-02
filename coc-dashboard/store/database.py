@@ -41,7 +41,7 @@ class Database(metaclass=SingletonMeta):
     """
 
     fetch_data_query = """SELECT * FROM {}"""
-    active_repo = "std"
+    active_repo = "out"
 
     data_types = {
         "district_name": str,
