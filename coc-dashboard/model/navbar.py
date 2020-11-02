@@ -112,6 +112,10 @@ class SideNav:
         self.controls = Controls(elements)
         self.menu_button = MenuButton()
 
+        self.trends_info = ""
+        self.datarep_info = ""
+        self.overview_info = ""
+
         for els in elements:
             self.callbacks.extend(els.callbacks)
 
@@ -135,24 +139,25 @@ class SideNav:
         self.menu_button.is_open = not self.menu_button.is_open
         self.is_open = not self.is_open
 
+    def get_tooltip(self, info, id, icon=True):
+        tooltip = [
+            html.Span(
+                "info",
+                className=self.icon_class,
+                style={**self.icon_style, "float": "right", "cursor": "help"},
+                id=f"{id}-info",
+            )
+            if icon
+            else None,
+            dbc.Tooltip(
+                info,
+                target=f"{id}-info",
+                placement="right",
+            ),
+        ]
+        return tooltip
+
     def get_layout(self):
-        tooltip = (
-            [
-                html.Span(
-                    "info",
-                    className=self.icon_class,
-                    style={**self.icon_style, "float": "right", "cursor": "help"},
-                    id="sidenav-info",
-                ),
-                dbc.Tooltip(
-                    self.info,
-                    target=f"sidenav-info",
-                    placement="right",
-                ),
-            ]
-            if self.info
-            else []
-        )
 
         side_nav = html.Div(
             [
@@ -162,7 +167,8 @@ class SideNav:
                             dbc.Col(
                                 [
                                     html.P(
-                                        ["CEHS APP DASHBOARDS "] + tooltip,
+                                        ["CEHS APP DASHBOARDS "]
+                                        + self.get_tooltip(self.info, "main"),
                                         style={
                                             "color": "white",
                                             "font-size": "1.9vh",
@@ -236,8 +242,9 @@ class SideNav:
                                 style=self.icon_style,
                             ),
                             " Overview of the 20",
-                        ],
-                        id="overview",
+                        ]
+                        + self.get_tooltip(self.overview_info, "overview", icon=False),
+                        id="overview-info",
                         className=active_style
                         if active == "overview"
                         else passive_style,
@@ -255,8 +262,9 @@ class SideNav:
                                 style=self.icon_style,
                             ),
                             " Trends",
-                        ],
-                        id="trends",
+                        ]
+                        + self.get_tooltip(self.trends_info, "trends", icon=False),
+                        id="trends-info",
                         className=active_style if active == "trends" else passive_style,
                     ),
                     style=wrapper_style,
@@ -272,8 +280,9 @@ class SideNav:
                                 style=self.icon_style,
                             ),
                             " Data quality",
-                        ],
-                        id="reporting",
+                        ]
+                        + self.get_tooltip(self.datarep_info, "reporting", icon=False),
+                        id="reporting-info",
                         className=active_style
                         if active == "reporting"
                         else passive_style,

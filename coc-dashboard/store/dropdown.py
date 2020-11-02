@@ -31,7 +31,7 @@ def initiate_dropdowns():
 
     # Initiate type of aggregation dropdown
 
-    entries = pd.DataFrame({"aggregation_type": ["Difference between periods"]})
+    entries = pd.DataFrame({"aggregation_type": ["Compare two months"]})
 
     aggregation_type = NestedDropdownGroup(
         entries, title="SELECT AN ANALYSIS TIMEFRAME"
@@ -84,15 +84,19 @@ def initiate_dropdowns():
             outlier_policy_dropdown_group,
         ],
         info=f"""
-        The data shown here was last fetched from DHIS2 on {db.fetch_date}.
+        The data shown here was last fetched from DHIS2 on {db.fetch_date}.""",
+    )
 
-        We provide two layers of information on reporting rate: \n A form-specific indicator -
+    side_nav.trends_info = """Identify data trends, from the national level to the facility level.
+    If you notice any surprising trends, make sure to check the effect of a more stringent outlier exclusion policy on that trend,
+    and explore the reporting tool to better understand whether a reporting issue could explain that trend."""
+
+    side_nav.datarep_info = """We provide two layers of information on reporting rate: \n A form-specific indicator -
         the percentage of facilities that reported on their 105:1 form out of those expected to report.
         This is similar to the reporting rates displayed on the DHIS2 system. An indicator-specific
         indicator - the percentage of facilities that reported a positive number for the selected
         indicator out of all facilities that have submitted their 105:1 form. This provides added
-        information on how otherwise reporting facilities report on this specific indicator.""",
-    )
+        information on how otherwise reporting facilities report on this specific indicator."""
 
     return (
         side_nav,
