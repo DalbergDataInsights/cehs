@@ -33,11 +33,11 @@ def global_story_callback(*inputs):
     outlier = inputs[0]
     indicator_group = inputs[1]
     indicator = inputs[2]
-    reference_year = inputs[3]
-    reference_month = inputs[4]
-    target_year = inputs[5]
-    target_month = inputs[6]
-    district = inputs[7]
+    reference_year = inputs[3].split(" ")[1]
+    reference_month = inputs[3].split(" ")[0]
+    target_year = inputs[4].split(" ")[1]
+    target_month = inputs[4].split(" ")[0]
+    district = inputs[5]
 
     global LAST_CONTROLS
     LAST_CONTROLS = CONTROLS.copy()
@@ -67,8 +67,8 @@ def change_titles_reporting(*inputs):
 
     indicator_group = inputs[0]
     indicator = inputs[1]
-    target_year = inputs[2]
-    target_month = inputs[3]
+    target_year = inputs[2].split(" ")[1]
+    target_month = inputs[2].split(" ")[0]
 
     indicator_view_name = db.get_indicator_view(
         indicator, indicator_group=indicator_group
@@ -126,11 +126,11 @@ def change_titles_trends(*inputs):
 
     indicator_group = inputs[1]
     indicator = inputs[2]
-    reference_year = inputs[3]
-    reference_month = inputs[4]
-    target_year = inputs[5]
-    target_month = inputs[6]
-    district = inputs[7]
+    reference_year = inputs[3].split(" ")[1]
+    reference_month = inputs[3].split(" ")[0]
+    target_year = inputs[4].split(" ")[1]
+    target_month = inputs[4].split(" ")[0]
+    district = inputs[5]
 
     # Data card 1
     db = Database()

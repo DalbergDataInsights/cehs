@@ -17,6 +17,7 @@ class ChartDataCard(DataCard):
         fig = go.Figure()
 
         FigType = getattr(go, self.fig_object)
+        figure_colors = self.colors.get("fig")
 
         for name, df in data.items():
             fig.add_trace(
@@ -24,13 +25,20 @@ class ChartDataCard(DataCard):
                     x=df.index,
                     y=df[df.columns[0]],
                     name=name,
-                    marker_color=self.colors.get("fig").get(name),
+                    marker_color=figure_colors.get(
+                        name, next(iter(figure_colors.values()))
+                    ),
                     hoverinfo="x+y",
                 )
             )
             if self.bar_mode == "overlay":
                 fig.update_traces(
-                    marker_color="rgb(211, 41, 61)",
+                    marker={
+                        "color": df[df.columns[0]],
+                        "colorscale": figure_colors.get(
+                            name, next(iter(figure_colors.values()))
+                        ),
+                    },
                     textposition="inside",
                     texttemplate="%{x:%}",
                     orientation="h",

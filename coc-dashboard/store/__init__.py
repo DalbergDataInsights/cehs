@@ -19,16 +19,16 @@ from .geopopulation import shapefile  # NOQA: E402
     side_nav,
     outlier_policy_dropdown_group,
     indicator_dropdown_group,
-    reference_date,
-    target_date,
+    aggregation_type,
+    date_dropdowns,
     district_control_group,
 ) = initiate_dropdowns()
 
 
 set_dropdown_defaults(
     outlier_policy_dropdown_group,
-    target_date,
-    reference_date,
+    aggregation_type,
+    date_dropdowns,
     indicator_dropdown_group,
     district_control_group,
 )
@@ -37,10 +37,10 @@ CONTROLS = dict(
     outlier=outlier_policy_dropdown_group.dropdown_objects[0].value,
     indicator=indicator_dropdown_group.dropdown_objects[-1].value,
     district=district_control_group.dropdown_objects[0].value,
-    target_year=target_date.dropdown_objects[0].value,
-    target_month=target_date.dropdown_objects[1].value,
-    reference_year=reference_date.dropdown_objects[0].value,
-    reference_month=reference_date.dropdown_objects[1].value,
+    target_year=date_dropdowns.from_date.value.split(" ")[1],
+    target_month=date_dropdowns.from_date.value.split(" ")[0],
+    reference_year=date_dropdowns.from_date.value.split(" ")[1],
+    reference_month=date_dropdowns.from_date.value.split(" ")[0],
     facility=None,
     indicator_group=indicator_dropdown_group.dropdown_objects[0].value,
 )
