@@ -139,6 +139,12 @@ def change_titles_trends(*inputs):
         indicator, indicator_group=indicator_group
     )
 
+    indicator_vetted = db.vet_indic_for_pop_dependency(indicator)
+
+    indicator_view_name_vetted = db.get_indicator_view(indicator_vetted,
+                                                       indicator_group=indicator_group
+                                                       )
+
     try:
 
         data = country_overview_scatter.data
@@ -187,7 +193,7 @@ def change_titles_trends(*inputs):
 
     district_overview_scatter.title = f"Deep-dive in {district} district: the {indicator_view_name} {descrip} between {reference_month}-{reference_year} and {target_month}-{target_year}"
 
-    tree_map_district.title = f"Contribution of individual facilities in {district} district to the {indicator_view_name} on {target_month}-{target_year}"
+    tree_map_district.title = f"Contribution of individual facilities in {district} district to the {indicator_view_name_vetted} on {target_month}-{target_year}"
 
     return [
         country_overview_scatter.title,
@@ -212,7 +218,8 @@ def update_on_click(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         facility_scatter.data = ds
-        facility_scatter.figure = facility_scatter._get_figure(facility_scatter.data)
+        facility_scatter.figure = facility_scatter._get_figure(
+            facility_scatter.data)
         facility_scatter.figure_title = (
             f"Evolution of $label$ in {label} (click on the graph above to filter)"
         )

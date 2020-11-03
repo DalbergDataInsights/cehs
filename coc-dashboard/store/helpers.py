@@ -132,28 +132,12 @@ def get_year_and_month_cols(df):
 # Data cleaning methods for dataset selection and callbacks
 
 
-def vet_granularity(indicator):
-
-    exceptions = ["coverage", 'per 10']
-
-    pop_dependant = False
-    if any(ext in indicator for ext in exceptions):
-        pop_dependant = True
-
-    # Here can do fuzzy matching or custom solution to per capita and coverage
-
-    pass
-
-
 def get_ratio(df, indicator, agg_level):
     """
     Aggregates the ratio properly using weights
 
     """
-    # NEEDS TO EMCPOASS NATIONAL, DISTRICT, AND FACILITY
-    # Grouby, then divide
-
-    # TODO Link to the index_colmns used in the DB object
+    # TODO Link to the index_columns defined in the database object
 
     index = ["date", "id", "facility_name"]
 
@@ -181,8 +165,7 @@ def check_index(df, index=["id", "date", "facility_name"]):
     Check that the dataframe is formatted in the expected way, with expected indexes. Restructure the dataframe (set the indices) if this is not the case.
     """
     if df.index.values != index:
-        # print('Checking index')
-        # Set the indices
+
         df = df.reset_index(drop=True).set_index(index)
     return df
 

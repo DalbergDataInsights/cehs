@@ -36,9 +36,7 @@ def scatter_country_data(*, indicator, **kwargs):
 
 def map_bar_country_dated_data(
     *,
-    outlier,
     indicator,
-    indicator_group,
     target_year,
     target_month,
     reference_year,
@@ -52,7 +50,7 @@ def map_bar_country_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
-    df, index = get_ratio(df, indicator, agg_level='district')
+    df = get_ratio(df, indicator, agg_level='district')[0]
 
     data_in = filter_df_by_dates(
         df, target_year, target_month, reference_year, reference_month
@@ -67,9 +65,6 @@ def map_bar_country_dated_data(
 
     data_in = data_in[mask]
 
-    # data_in = data_in.groupby(
-    #     by=["id", "date"], as_index=False).agg({indicator: "sum"})
-
     data_in["year"] = data_in.date.apply(lambda x: x.year)
 
     data_in = data_in.pivot_table(columns="year", values=indicator, index="id")
@@ -82,7 +77,6 @@ def map_bar_country_dated_data(
     data_in[indicator] = data_in[indicator].apply(lambda x: round(x, 2))
 
     data_in = data_in[[indicator]].reset_index()
-    # data_in["id"] = data_in["id"].astype(str)
     data_in = data_in.set_index("id")
     data_out = data_in[~pd.isna(data_in[indicator])]
 
@@ -94,7 +88,7 @@ def map_bar_country_dated_data(
 # CARD 3
 
 
-def scatter_district_data(*, outlier, indicator, indicator_group, district, **kwargs):
+def scatter_district_data(*,  indicator, district, **kwargs):
 
     db = Database()
 
@@ -118,7 +112,6 @@ def scatter_district_data(*, outlier, indicator, indicator_group, district, **kw
 
 def tree_map_district_dated_data(
     *,
-    outlier,
     indicator,
     district,
     target_year,
@@ -132,9 +125,11 @@ def tree_map_district_dated_data(
 
     df = db.raw_data
 
+    indicator = db.vet_indic_for_pop_dependency(indicator)
+
     df = db.filter_by_indicator(df, indicator)
 
-    df, index = get_ratio(df, indicator, agg_level='facility')
+    df = get_ratio(df, indicator, agg_level='facility')[0]
 
     # TODO check how the date function works such that it shows only target date
 
@@ -149,11 +144,13 @@ def tree_map_district_dated_data(
     return df_district_dated
 
 
-def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
+def scatter_facility_data(*, indicator, district, facility, **kwargs):
 
     db = Database()
 
     df = db.raw_data
+
+    indicator = db.vet_indic_for_pop_dependency(indicator)
 
     df = db.filter_by_indicator(df, indicator)
 

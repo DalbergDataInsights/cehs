@@ -53,7 +53,7 @@ class Database(metaclass=SingletonMeta):
 
     index_columns = ["id", "facility_name", "date"]
 
-    ratio_markers = ["coverage", 'per 10']
+    pop_markers = ["coverage", '(per ']
 
     datasets = {}
     raw_data = None
@@ -158,9 +158,16 @@ class Database(metaclass=SingletonMeta):
         return self.datasets.get(key)
 
     # Data filters
+
+    def get_is_ratio(self, indicator):
+        ratio_list = [x.get("config_indicator")
+                      for x in self.__indicator_serialized
+                      if x.get("config_function") == 'ratio']
+        return indicator in ratio_list
+
     def filter_by_indicator(self, df, indicator):
 
-        is_ratio = any(map(indicator.__contains__, self.ratio_markers))
+        is_ratio = self.get_is_ratio(indicator)
 
         if is_ratio == False:
             try:
@@ -184,6 +191,16 @@ class Database(metaclass=SingletonMeta):
                 print("No such columns are present in the dataframe")
 
         return df
+
+    def vet_indic_for_pop_dependency(self, indicator):
+
+        is_pop_dependant = any(map(indicator.__contains__, self.pop_markers))
+
+        if is_pop_dependant:
+            new_indic = indicator.split(' (')[0]
+            return new_indic
+        else:
+            return indicator
 
     # Labels
 
