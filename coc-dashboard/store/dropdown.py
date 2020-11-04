@@ -3,7 +3,6 @@ from model import SideNav, DateDropdownLayout
 import calendar
 from datetime import datetime
 
-from store.helpers import month_order
 from .database import Database
 from package.components.nested_dropdown_group import NestedDropdownGroup
 from package.components.methodology_section import MethodologySection
@@ -34,7 +33,9 @@ def initiate_dropdowns():
     entries = pd.DataFrame({"aggregation_type": ["Compare two months"]})
 
     aggregation_type = NestedDropdownGroup(
-        entries, title="SELECT AN ANALYSIS TIMEFRAME"
+        entries,
+        title="SELECT AN ANALYSIS TIMEFRAME",
+        defaults={"aggregation_type": "Compare two months"},
     )
 
     # Initiate date dropdown layout
@@ -43,7 +44,15 @@ def initiate_dropdowns():
     dates.sort()
     dates = [x.strftime("%b %Y") for x in dates]
 
-    date_dropdowns = DateDropdownLayout(options=dates)
+    date_dropdowns = DateDropdownLayout(
+        options=dates,
+        from_default=DEFAULTS.get("default_reference_month")
+        + " "
+        + DEFAULTS.get("default_reference_year"),
+        to_default=DEFAULTS.get("default_target_month")
+        + " "
+        + DEFAULTS.get("default_target_year"),
+    )
 
     # Initiate outlier policy dropdown
 
@@ -63,17 +72,25 @@ def initiate_dropdowns():
         A standard deviation-based approach, where all points more than three standard deviations away from the mean are considered outliers.
         This approach is best suited for 'cleaner', normally distributed data. An interquartile range-based approach, using Tukey's fences method with k=3,
         which fits a broader range of data distributions but is also more stringent, and hence best suited for 'messier' data.""",
+        defaults={
+            "SELECT AN OUTLIER POLICY": DEFAULTS.get("default_outlier"),
+        },
     )
 
     indicator_dropdown_group = NestedDropdownGroup(
         db.indicator_dropdowns,
         title="SELECT AN INDICATOR",
         info="We focus on a key set of indicators as advised by experts and described in WHO's list of priority indicators. For simplicity of interpretation and time comparison, we focus on absolute numbers rather than calculated indicators. ",
+        defaults={
+            "indicator_group": DEFAULTS.get("default_indicator_group"),
+            "indicator_name": DEFAULTS.get("default_indicator"),
+        },
     )
 
     district_control_group = NestedDropdownGroup(
         pd.DataFrame({"SELECT A DISTRICT": db.districts}),
         title="SELECT A DISTRICT",
+        defaults={"SELECT A DISTRICT": DEFAULTS.get("default_district")},
     )
 
     side_nav = SideNav(
@@ -98,6 +115,8 @@ def initiate_dropdowns():
         indicator - the percentage of facilities that reported a positive number for the selected
         indicator out of all facilities that have submitted their 105:1 form. This provides added
         information on how otherwise reporting facilities report on this specific indicator."""
+
+    side_nav.overview_info = """Here we offer a quick overview of the WHO's 20 CEHS indicators. We provide both absolute value and the percentage change compared to the first date in the chosen time frame."""
 
     return (
         side_nav,
@@ -133,7 +152,7 @@ def set_dropdown_defaults(
         "default_indicator"
     )
 
-    date_dropdowns.from_date.value = (
+    date_dropdowns.to_date.value = (
         DEFAULTS.get("default_target_month") + " " + DEFAULTS.get("default_target_year")
     )
 

@@ -99,7 +99,7 @@ def define_callbacks(ds):
             "inputs": [
                 Input("trends", "n_clicks"),
                 Input("reporting", "n_clicks"),
-                # Input("overview", "n_clicks"),
+                Input("overview", "n_clicks"),
             ],
             "outputs": [
                 Output("ds-paginator", "children"),

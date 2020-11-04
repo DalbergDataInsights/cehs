@@ -5,7 +5,6 @@ from store import (
     get_national_sum,
     get_percentage,
     get_sub_dfs,
-    month_order,
     timeit,
     Database,
     static,
@@ -41,6 +40,26 @@ def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
 
 
 # CARD 2
+
+
+def apply_date_filter(
+    *,
+    outlier,
+    target_year,
+    target_month,
+    reference_year,
+    reference_month,
+    **kwargs,
+):
+    db = Database()
+
+    df = db.raw_data
+
+    df = filter_df_by_dates(
+        df, target_year, target_month, reference_year, reference_month
+    )
+
+    return df
 
 
 def map_bar_country_dated_data(

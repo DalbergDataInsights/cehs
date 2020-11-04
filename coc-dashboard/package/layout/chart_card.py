@@ -34,10 +34,9 @@ class ChartDataCard(DataCard):
             if self.bar_mode == "overlay":
                 fig.update_traces(
                     marker={
-                        "color": df[df.columns[0]],
-                        "colorscale": figure_colors.get(
-                            name, next(iter(figure_colors.values()))
-                        ),
+                        "color": "rgb(211, 41, 61)"
+                        # "color": df[df.columns[0]],
+                        # "colorscale": figure_colors.get(name),
                     },
                     textposition="inside",
                     texttemplate="%{x:%}",

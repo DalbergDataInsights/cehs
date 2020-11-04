@@ -11,6 +11,7 @@ from components import (
     tree_map_district,
     reporting_map,
     title,
+    overview,
     # grid,
     # statistics,
 )
@@ -72,9 +73,9 @@ def change_page(*inputs):
         ]
 
         clicked = "reporting"
+    elif "overview" in changed_id:
+        ds.data_cards = [title, overview]
+        clicked = "overview"
     title.dash = clicked
-    # elif "overview" in changed_id:
-    #     ds.data_cards = [statistics, grid]
-    #     clicked = "overview"
 
     return [ds.get_container(), side_nav.get_nav_buttons(clicked), title.get_layout()]

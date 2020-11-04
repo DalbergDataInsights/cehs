@@ -106,13 +106,14 @@ class DataCard:
 
     @figure.setter
     def figure(self, fig):
-        assert type(fig) == go.Figure, "Figure should be plotly Graph Object Figure"
-        fig.update_layout(
-            margin={"r": 0, "t": 20, "l": 0, "b": 20},
-            coloraxis=dict(colorbar_len=1),
-            showlegend=True,
-        )
-        fig.update_yaxes(rangemode="tozero")
+        # assert type(fig) == go.Figure, "Figure should be plotly Graph Object Figure"
+        if type(fig) == go.Figure:
+            fig.update_layout(
+                margin={"r": 0, "t": 20, "l": 0, "b": 20},
+                coloraxis=dict(colorbar_len=1),
+                showlegend=True,
+            )
+            fig.update_yaxes(rangemode="tozero")
         self.__figure = fig
 
     @property
