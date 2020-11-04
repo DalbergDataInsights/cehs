@@ -1,5 +1,7 @@
 import pandas as pd
-from model import SideNav
+from model import SideNav, DateDropdownLayout
+import calendar
+from datetime import datetime
 
 from store.helpers import month_order
 from .database import Database
@@ -27,29 +29,21 @@ def initiate_dropdowns():
 
     db = Database()
 
-    # Initiate data selection dropdowns
+    # Initiate type of aggregation dropdown
 
-    max_date = db.raw_data.date.max()
-    (max_year, max_month_number) = (max_date.year, max_date.month)
-    max_month = month_order[max_month_number - 1]
+    entries = pd.DataFrame({"aggregation_type": ["Compare two months"]})
 
-    years = [2018] * 12 + [2019] * 12 + [2020] * max_month_number
-
-    date_columns = pd.DataFrame(
-        {"year": years, "month": month_order * 2 + month_order[:max_month_number]}
+    aggregation_type = NestedDropdownGroup(
+        entries, title="SELECT AN ANALYSIS TIMEFRAME"
     )
 
-    date_columns.year = date_columns.year.astype(str)
+    # Initiate date dropdown layout
 
-    date_columns.columns = ["Target Year", "Target Month"]
-    target_date = NestedDropdownGroup(
-        date_columns.copy(), title="SELECT AN ANALYSIS TIMEFRAME", vertical=False
-    )
+    dates = list(pd.to_datetime(db.raw_data.date.unique()))
+    dates.sort()
+    dates = [x.strftime("%b %Y") for x in dates]
 
-    date_columns.columns = ["Reference Year", "Reference Month"]
-    reference_date = NestedDropdownGroup(
-        date_columns, title="SELECT AN ANALYSIS TIMEFRAME", vertical=False
-    )
+    date_dropdowns = DateDropdownLayout(options=dates)
 
     # Initiate outlier policy dropdown
 
@@ -86,35 +80,39 @@ def initiate_dropdowns():
         elements=[
             indicator_dropdown_group,
             district_control_group,
-            reference_date,
-            target_date,
+            aggregation_type,
+            date_dropdowns,
             outlier_policy_dropdown_group,
         ],
         info=f"""
-        The data shown here was last fetched from DHIS2 on {db.fetch_date}.
+        The data shown here was last fetched from DHIS2 on {db.fetch_date}.""",
+    )
 
-        We provide two layers of information on reporting rate: \n A form-specific indicator -
+    side_nav.trends_info = """Identify data trends, from the national level to the facility level.
+    If you notice any surprising trends, make sure to check the effect of a more stringent outlier exclusion policy on that trend,
+    and explore the reporting tool to better understand whether a reporting issue could explain that trend."""
+
+    side_nav.datarep_info = """We provide two layers of information on reporting rate: \n A form-specific indicator -
         the percentage of facilities that reported on their 105:1 form out of those expected to report.
         This is similar to the reporting rates displayed on the DHIS2 system. An indicator-specific
         indicator - the percentage of facilities that reported a positive number for the selected
         indicator out of all facilities that have submitted their 105:1 form. This provides added
-        information on how otherwise reporting facilities report on this specific indicator.""",
-    )
+        information on how otherwise reporting facilities report on this specific indicator."""
 
     return (
         side_nav,
         outlier_policy_dropdown_group,
         indicator_dropdown_group,
-        reference_date,
-        target_date,
+        aggregation_type,
+        date_dropdowns,
         district_control_group,
     )
 
 
 def set_dropdown_defaults(
     outlier_policy_dropdown_group,
-    target_date,
-    reference_date,
+    aggregation_type,
+    date_dropdowns,
     indicator_dropdown_group,
     district_control_group,
 ):
@@ -122,8 +120,11 @@ def set_dropdown_defaults(
         "default_outlier"
     )
 
-    target_date.dropdown_objects[0].value = DEFAULTS.get("default_target_year")
-    target_date.dropdown_objects[1].value = DEFAULTS.get("default_target_month")
+    date_dropdowns.from_date.value = (
+        DEFAULTS.get("default_reference_month")
+        + " "
+        + DEFAULTS.get("default_reference_year")
+    )
 
     indicator_dropdown_group.dropdown_objects[0].value = DEFAULTS.get(
         "default_indicator_group"
@@ -132,7 +133,8 @@ def set_dropdown_defaults(
         "default_indicator"
     )
 
-    reference_date.dropdown_objects[0].value = DEFAULTS.get("default_reference_year")
-    reference_date.dropdown_objects[1].value = DEFAULTS.get("default_reference_month")
+    date_dropdowns.from_date.value = (
+        DEFAULTS.get("default_target_month") + " " + DEFAULTS.get("default_target_year")
+    )
 
     district_control_group.dropdown_objects[0].value = DEFAULTS.get("default_district")

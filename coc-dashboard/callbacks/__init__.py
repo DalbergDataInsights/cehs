@@ -11,8 +11,6 @@ from store import (
     district_control_group,
     indicator_dropdown_group,
     outlier_policy_dropdown_group,
-    reference_date,
-    target_date,
 )
 
 from pprint import pprint as print
@@ -34,10 +32,8 @@ callback_ids = {
     outlier_policy_dropdown_group.dropdown_ids[-1]: "value",  # Outlier policy
     indicator_dropdown_group.dropdown_ids[0]: "value",  # Indicator group
     indicator_dropdown_group.dropdown_ids[-1]: "value",  # Indicator
-    reference_date.dropdown_ids[0]: "value",  # Reference date year
-    reference_date.dropdown_ids[-1]: "value",  # Reference date month
-    target_date.dropdown_ids[0]: "value",  # Target date year
-    target_date.dropdown_ids[-1]: "value",  # Target date month
+    "date_from": "value",
+    "date_to": "value",
     district_control_group.dropdown_ids[-1]: "value",  # District
 }
 
@@ -133,8 +129,7 @@ def define_callbacks(ds):
                     indicator_dropdown_group.dropdown_ids[0], "value"
                 ),  # Indicator group
                 Input(indicator_dropdown_group.dropdown_ids[-1], "value"),  # Indicator
-                Input(target_date.dropdown_ids[0], "value"),
-                Input(target_date.dropdown_ids[-1], "value"),
+                Input("date_to", "value"),
             ],
             "outputs": [
                 Output(f"{stacked_bar_reporting_country.my_name}_title", "children"),
