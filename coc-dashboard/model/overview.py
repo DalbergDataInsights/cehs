@@ -10,7 +10,7 @@ class Overview(DataCard):
     def _DataCard__get_figure_layout(self):
         layout = dbc.Col(
             [
-                dbc.Row(dbc.Col(self.figure)),
+                dbc.Row(self.figure, id="overview-card"),
                 # dbc.Row(self.__get_link_layout()),
             ]
         )
