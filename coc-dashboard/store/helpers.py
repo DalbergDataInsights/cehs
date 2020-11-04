@@ -138,6 +138,7 @@ def get_ratio(df, indicator, agg_level):
 
     """
     # TODO Link to the index_columns defined in the database object
+    # TODO find a way to delete the hardcoded name mapping step
 
     index = ["date", "id", "facility_name"]
 
@@ -152,10 +153,15 @@ def get_ratio(df, indicator, agg_level):
     col_count = len(set(df.columns).difference(set(index)))
 
     if col_count == 2:
-        df[indicator] = df[f'{indicator}__weighted_ratio'] / \
-            df[f'{indicator}__weight']
+
+        weighted_ratio = [
+            x for x in df.columns if x.endswith('__weighted_ratio')][0]
+        weight = [x for x in df.columns if x.endswith('__weight')][0]
+
+        df[indicator] = df[weighted_ratio] / df[weight]
+
         df = df.drop(
-            columns=[f'{indicator}__weighted_ratio', f'{indicator}__weight'])
+            columns=[weighted_ratio, weight])
 
     return df, index
 

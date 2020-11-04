@@ -167,7 +167,12 @@ class Database(metaclass=SingletonMeta):
 
     def filter_by_indicator(self, df, indicator):
 
-        is_ratio = self.get_is_ratio(indicator)
+        config = self.get_serialized_into_df(Config)
+
+        function = config[config.config_indicator ==
+                          indicator]['config_function'].values[0]
+
+        is_ratio = (function == 'ratio')
 
         if is_ratio == False:
             try:
@@ -177,15 +182,14 @@ class Database(metaclass=SingletonMeta):
                 print("No such column is present in the dataframe")
 
         else:
-            select_col = [col for col in df if col.startswith(indicator)]
+            nominator = f'{indicator}__weighted_ratio'
 
-            # TODO This is a camouflaged 'assert' statement, so write it explicitely as one
+            denominator = config[config.config_indicator ==
+                                 indicator]['config_denominator'].values[0]
+            denominator = f'{denominator}__weight'
 
-            filter_col = [x for x in select_col
-                          if ((x.endswith('__weighted_ratio')
-                               or (x.endswith('__weight'))))]
             try:
-                df = df[list(self.index_columns) + filter_col]
+                df = df[list(self.index_columns) + [nominator, denominator]]
             except Exception as e:
                 print(e)
                 print("No such columns are present in the dataframe")

@@ -12,4 +12,4 @@ ratio_markers = ['coverage', 'per 10']
 
 Z = X + [x]
 
-print(Z)
+print(next(X))

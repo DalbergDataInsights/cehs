@@ -13,6 +13,7 @@ class Config(Base):
     function = Column(String, nullable=False)
     group = Column(String, nullable=False)
     view = Column(String, nullable=False)
+    denominator = Column(String, nullable=False)
 
     def serialize(self):
         return {
@@ -20,6 +21,7 @@ class Config(Base):
             "config_function": self.function,
             "config_group": self.group,
             "config_view": self.view,
+            "config_denominator": self.denominator,
         }
 
 
