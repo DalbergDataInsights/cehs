@@ -6,6 +6,7 @@ from .datacard_5 import stacked_bar_reporting_country
 from .datacard_6 import reporting_map
 from .datacard_7 import stacked_bar_district
 from .title import title
+from .indicators_overview import overview
 
 # from .data_overview import statistics
 # from .districts_overview import grid

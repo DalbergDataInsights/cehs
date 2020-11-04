@@ -8,8 +8,6 @@ import dash_core_components as dcc
 import geopandas as gpd
 import pandas as pd
 
-import store
-
 from store import credentials, side_nav
 
 from components import (
@@ -26,6 +24,8 @@ from package.layout.data_story import DataStory
 ##############
 #   LAYOUT   #
 ##############
+
+# ds = DataStory(data_cards=[overview], ind_elements=[side_nav])
 
 ds = DataStory(
     data_cards=[

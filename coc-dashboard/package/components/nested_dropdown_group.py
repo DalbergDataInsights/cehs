@@ -8,7 +8,7 @@ from store import timeit
 
 
 class NestedDropdownGroup:
-    def __init__(self, dataframe, title=None, vertical=True, info=None):
+    def __init__(self, dataframe, title=None, vertical=True, info=None, defaults=None):
         self.info = info
         try:
             for col in dataframe.columns:
@@ -20,6 +20,7 @@ class NestedDropdownGroup:
         self.dropdowns = {}
         self.title = title
         self.vertical = vertical
+        self.defaults = defaults or {}
         self.define_dropdowns()
 
         self.callbacks = [
@@ -51,6 +52,7 @@ class NestedDropdownGroup:
                 options=self.dataframe[name].unique().tolist(),
                 visible_id=False,
                 clearable=False,
+                value=self.defaults.get(name),
             )
 
             if parent:

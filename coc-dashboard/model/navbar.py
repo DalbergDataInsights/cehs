@@ -152,7 +152,8 @@ class SideNav:
             dbc.Tooltip(
                 info,
                 target=f"{id}",
-                placement="right",
+                placement="left-end",
+                autohide=False,
             ),
         ]
         return tooltip
@@ -243,14 +244,17 @@ class SideNav:
                             ),
                             " Overview of the 20",
                         ]
-                        + self.get_tooltip(self.overview_info, "overview", icon=False),
+                        + self.get_tooltip(
+                            self.overview_info, "overview-info", icon=False
+                        ),
                         id="overview",
                         className=active_style
                         if active == "overview"
                         else passive_style,
                     ),
                     style=wrapper_style,
-                )
+                ),
+                id="overview-info",
             ),
             dbc.Row(
                 dbc.Col(
@@ -263,12 +267,13 @@ class SideNav:
                             ),
                             " Trends",
                         ]
-                        + self.get_tooltip(self.trends_info, "trends", icon=False),
+                        + self.get_tooltip(self.trends_info, "trends-info", icon=False),
                         id="trends",
                         className=active_style if active == "trends" else passive_style,
                     ),
                     style=wrapper_style,
-                )
+                ),
+                id="trends-info",
             ),
             dbc.Row(
                 dbc.Col(
@@ -281,7 +286,9 @@ class SideNav:
                             ),
                             " Data quality",
                         ]
-                        + self.get_tooltip(self.datarep_info, "reporting", icon=False),
+                        + self.get_tooltip(
+                            self.datarep_info, "reporting-info", icon=False
+                        ),
                         id="reporting",
                         className=active_style
                         if active == "reporting"
@@ -289,6 +296,7 @@ class SideNav:
                     ),
                     style=wrapper_style,
                 ),
+                id="reporting-info",
             ),
         ]
 

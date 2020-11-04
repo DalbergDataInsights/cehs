@@ -13,6 +13,7 @@ from .cards_mutations import (
     bar_reporting_country_data,
     map_reporting_dated_data,
     scatter_reporting_district_data,
+    apply_date_filter,
     # indicator_group,
 )
 
@@ -23,6 +24,7 @@ from .cards_mutations import (
 
 FUNC_DICT = {
     "country": scatter_country_data,
+    "date_filter": apply_date_filter,
     "dated": map_bar_country_dated_data,
     "district": scatter_district_data,
     "district_dated": tree_map_district_dated_data,
