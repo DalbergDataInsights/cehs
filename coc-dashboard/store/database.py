@@ -48,7 +48,7 @@ class Database(metaclass=SingletonMeta):
         "facility_name": str,
         "date": "datetime64[ns]",
         "indicator_name": str,
-        "*": float,
+        "*": int,
     }
 
     index_columns = ["id", "facility_name", "date"]
@@ -105,13 +105,15 @@ class Database(metaclass=SingletonMeta):
             self.fetch_data_query.format(repo_name), con=self.engine
         )
 
-        for col in __dataframe.columns:
-            try:
-                __dataframe[col] = __dataframe[col].astype(
-                    self.data_types.get(col, self.data_types.get("*"))
-                )
-            except:
-                pass
+        # for col in __dataframe.columns:
+        #     try:
+        #         __dataframe[col] = __dataframe[col].astype(
+        #             self.data_types.get(col, self.data_types.get("*"))
+        #         )
+        #     except:
+        #         pass
+
+        __dataframe["date"] = __dataframe["date"].astype("datetime64[ns]")
 
         __dataframe.rename(columns={"district_name": "id"}, inplace=True)
 
