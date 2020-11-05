@@ -158,7 +158,7 @@ def get_ratio(df, indicator, agg_level):
             x for x in df.columns if x.endswith('__weighted_ratio')][0]
         weight = [x for x in df.columns if x.endswith('__weight')][0]
 
-        df[indicator] = df[weighted_ratio] / df[weight]
+        df[indicator] = (df[weighted_ratio]*1000) / df[weight]
 
         df = df.drop(
             columns=[weighted_ratio, weight])
