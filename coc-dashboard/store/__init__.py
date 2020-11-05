@@ -25,14 +25,6 @@ from .geopopulation import shapefile  # NOQA: E402
 ) = initiate_dropdowns()
 
 
-set_dropdown_defaults(
-    outlier_policy_dropdown_group,
-    aggregation_type,
-    date_dropdowns,
-    indicator_dropdown_group,
-    district_control_group,
-)
-
 CONTROLS = dict(
     outlier=outlier_policy_dropdown_group.dropdown_objects[0].value,
     indicator=indicator_dropdown_group.dropdown_objects[-1].value,
