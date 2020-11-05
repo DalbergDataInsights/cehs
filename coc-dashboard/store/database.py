@@ -105,14 +105,6 @@ class Database(metaclass=SingletonMeta):
             self.fetch_data_query.format(repo_name), con=self.engine
         )
 
-        # for col in __dataframe.columns:
-        #     try:
-        #         __dataframe[col] = __dataframe[col].astype(
-        #             self.data_types.get(col, self.data_types.get("*"))
-        #         )
-        #     except:
-        #         pass
-
         __dataframe["date"] = __dataframe["date"].astype("datetime64[ns]")
 
         __dataframe.rename(columns={"district_name": "id"}, inplace=True)
@@ -184,6 +176,7 @@ class Database(metaclass=SingletonMeta):
                 print("No such column is present in the dataframe")
 
         else:
+
             nominator = f'{indicator}__weighted_ratio'
 
             denominator = config[config.config_indicator ==

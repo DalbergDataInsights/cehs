@@ -191,6 +191,7 @@ def change_titles_trends(*inputs):
         descrip = "changed by an unknown percentage"
 
     district_overview_scatter.title = f"Deep-dive in {district} district: the {indicator_view_name} {descrip} between {reference_month}-{reference_year} and {target_month}-{target_year}"
+    district_overview_scatter.fig_title = f"Total {indicator_view_name} in the {district} district"
 
     tree_map_district.title = f"Contribution of individual facilities in {district} district to the {indicator_view_name_vetted} on {target_month}-{target_year}"
 
@@ -198,6 +199,7 @@ def change_titles_trends(*inputs):
         country_overview_scatter.title,
         district_overview_scatter.title,
         tree_map_district.title,
+        district_overview_scatter.fig_title
     ]
 
 
