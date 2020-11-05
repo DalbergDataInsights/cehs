@@ -82,8 +82,8 @@ def initiate_dropdowns():
         title="SELECT AN INDICATOR",
         info="We focus on a key set of indicators as advised by experts and described in WHO's list of priority indicators. For simplicity of interpretation and time comparison, we focus on absolute numbers rather than calculated indicators. ",
         defaults={
-            "indicator_group": DEFAULTS.get("default_indicator_group"),
-            "indicator_name": DEFAULTS.get("default_indicator"),
+            "config_group": DEFAULTS.get("default_indicator_group"),
+            "config_indicator": DEFAULTS.get("default_indicator"),
         },
     )
 
