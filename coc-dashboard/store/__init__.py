@@ -1,6 +1,6 @@
 import os
 from .helpers import *
-from .dropdown import initiate_dropdowns, set_dropdown_defaults
+from .dropdown import initiate_dropdowns
 from .database import Database
 
 # READ FROM DATABASE
