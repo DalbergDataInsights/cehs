@@ -16,7 +16,6 @@ from store import (
     CONTROLS,
     LAST_CONTROLS,
     define_datasets,
-    month_order,
     timeit,
     Database,
     get_perc_description,
@@ -77,8 +76,8 @@ def change_titles_reporting(*inputs):
     try:
         data_reporting = stacked_bar_reporting_country.data
 
-        date_reporting = datetime(
-            int(target_year), month_order.index(target_month) + 1, 1
+        date_reporting = datetime.strptime(
+            f"{target_month} 1 {target_year}", "%b %d %Y"
         )
 
         try:

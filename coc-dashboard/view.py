@@ -25,6 +25,8 @@ from package.layout.data_story import DataStory
 #   LAYOUT   #
 ##############
 
+# ds = DataStory(data_cards=[overview], ind_elements=[side_nav])
+
 ds = DataStory(
     data_cards=[
         title,

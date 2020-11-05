@@ -30,7 +30,7 @@ def scatter_facility_plot(data):
 
     data = get_year_and_month_cols(data)
 
-    data = get_sub_dfs(data, "year", [2018, 2019, 2020], "month", month_order)
+    data = get_sub_dfs(data, "year", [2018, 2019, 2020], "month")
 
     return data
 

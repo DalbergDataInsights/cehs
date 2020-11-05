@@ -7,11 +7,13 @@ from package.elements.nested_dropdown import NestedDropdown
 
 
 class DateDropdownLayout:
-    def __init__(self, options):
+    def __init__(self, options, from_default="", to_default=""):
         self.from_date = NestedDropdown(
-            id="date_from", options=options, visible_id=False
+            id="date_from", options=options, visible_id=False, value=from_default
         )
-        self.to_date = NestedDropdown(id="date_to", options=options, visible_id=False)
+        self.to_date = NestedDropdown(
+            id="date_to", options=options, visible_id=False, value=to_default
+        )
         self.callbacks = []
 
     @property

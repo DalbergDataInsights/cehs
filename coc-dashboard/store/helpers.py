@@ -3,22 +3,7 @@ from time import time
 from datetime import datetime
 import pandas as pd
 import numpy as np
-
-month_order = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-]
-
+import calendar
 
 # Filtering methods for data transform functions
 
@@ -32,14 +17,11 @@ def filter_df_by_dates(df, target_year, target_month, reference_year, reference_
 
     df = df.sort_values(["date"])
 
-    if target_year and target_month:
-        target_date = datetime(
-            int(target_year), int(month_order.index(target_month) + 1), 1
-        )
-    if reference_year and reference_month:
-        reference_date = datetime(
-            int(reference_year), int(month_order.index(reference_month) + 1), 1
-        )
+    target_date = datetime.strptime(f"{target_month} 1 {target_year}", "%b %d %Y")
+    reference_date = datetime.strptime(
+        f"{reference_month} 1 {reference_year}", "%b %d %Y"
+    )
+
     if reference_date <= target_date:
         max_date = target_date
         min_date = reference_date
@@ -47,12 +29,13 @@ def filter_df_by_dates(df, target_year, target_month, reference_year, reference_
         max_date = reference_date
         min_date = target_date
         reverse = True
-    if min_date:
-        min_mask = df.date >= min_date
-        df = df.loc[min_mask].reset_index(drop=True)
-    if max_date:
-        max_mask = df.date <= max_date
-        df = df.loc[max_mask].reset_index(drop=True)
+
+    min_mask = df.date >= min_date
+    df = df.loc[min_mask].reset_index(drop=True)
+
+    max_mask = df.date <= max_date
+    df = df.loc[max_mask].reset_index(drop=True)
+
     if reverse:
         df = df.reindex(index=df.index[::-1])
     return df
@@ -64,7 +47,7 @@ def filter_by_district(df, district):
     return df
 
 
-def get_sub_dfs(df, select_index, values, new_index, order=None):
+def get_sub_dfs(df, select_index, values, new_index):
     """
     Extract and return a dictionary of dictionaries splitting each original dictionary df entry into traces based on values
     """
@@ -73,8 +56,7 @@ def get_sub_dfs(df, select_index, values, new_index, order=None):
     for value in values:
         sub_df = df[df.index.get_level_values(select_index) == value]
         sub_df = sub_df.groupby(new_index).sum()
-        if order:
-            sub_df = sub_df.reindex(order)
+        sub_df = sub_df.reindex(calendar.month_abbr[1:], axis=0)
         traces[value] = sub_df
 
     return traces

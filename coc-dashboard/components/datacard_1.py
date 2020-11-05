@@ -4,7 +4,6 @@ from package.layout.chart_card import ChartDataCard
 from store import (
     get_sub_dfs,
     timeit,
-    month_order,
     init_data_set,
     get_year_and_month_cols,
 )
@@ -19,9 +18,7 @@ def scatter_country_plot(df):
 
     df_country = get_year_and_month_cols(df_country)
 
-    df_country = get_sub_dfs(
-        df_country, "year", [2018, 2019, 2020], "month", month_order
-    )
+    df_country = get_sub_dfs(df_country, "year", [2018, 2019, 2020], "month")
 
     return df_country
 

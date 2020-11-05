@@ -6,6 +6,7 @@ title = Title(
     subtitles={
         "trends": "Trends analysis over time, across districts and health facilities",
         "reporting": "Quality of the reporting of health facilities across districts",
+        "overview": "Overview of WHO's 20 CEHS indicators",
     },
     icons={
         "trends": "analytics",
