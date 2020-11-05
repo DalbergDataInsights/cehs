@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from store import timeit, get_sub_dfs, init_data_set, month_order, get_year_and_month_cols
+from store import timeit, get_sub_dfs, init_data_set, get_year_and_month_cols
 from package.layout.area_card import AreaDataCard
 from package.layout.chart_card import ChartDataCard
 

@@ -17,7 +17,8 @@ def filter_df_by_dates(df, target_year, target_month, reference_year, reference_
 
     df = df.sort_values(["date"])
 
-    target_date = datetime.strptime(f"{target_month} 1 {target_year}", "%b %d %Y")
+    target_date = datetime.strptime(
+        f"{target_month} 1 {target_year}", "%b %d %Y")
     reference_date = datetime.strptime(
         f"{reference_month} 1 {reference_year}", "%b %d %Y"
     )
@@ -140,7 +141,7 @@ def get_ratio(df, indicator, agg_level):
             x for x in df.columns if x.endswith('__weighted_ratio')][0]
         weight = [x for x in df.columns if x.endswith('__weight')][0]
 
-        df[indicator] = df[weighted_ratio] / df[weight]
+        df[indicator] = (df[weighted_ratio] / df[weight])*1000
 
         df = df.drop(
             columns=[weighted_ratio, weight])
