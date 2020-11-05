@@ -52,17 +52,17 @@ def overview_plot(data):
     # filter indicators
     index = ["date"]
     indicators = {
-        "OPD attendance": "rgb(255, 166, 145)",
-        "1st ANC Visits": "rgb(162, 227, 158)",
-        "Deliveries in unit": "rgb(162, 227, 158)",
-        "Newborn deaths": "rgb(162, 227, 158)",
-        "Maternal deaths (all)": "rgb(162, 227, 158)",
-        "DPT3 doses (all)": "rgb(181, 173, 222)",
-        "MR1 doses (all)": "rgb(181, 173, 222)",
-        "SAM cases identified": "rgb(155, 188, 237)",
-        "Doses of vitamin A (1st & 2nd)": "rgb(155, 188, 237)",
-        "TB cases registered": "rgb(67, 84, 106)",
-        "Injuries related to GBV": "rgb(255, 184, 125)",
+        "OPD attendance": "rgb(39, 190, 182)",
+        "1st ANC Visits": "rgb(244, 174, 26)",
+        "Deliveries in unit": "rgb(244, 174, 26)",
+        "Newborn deaths": "rgb(244, 174, 26)",
+        "Maternal deaths (all)": "rgb(244, 174, 26)",
+        "DPT3 doses (all)": "rgb(81, 139, 201)",
+        "MR1 doses (all)": "rgb(81, 139, 201)",
+        "SAM cases identified": "rgb(238, 47, 68)",
+        "Doses of vitamin A (1st & 2nd)": "rgb(103, 191, 107)",
+        "TB cases registered": "rgb(236, 70, 139)",
+        "Injuries related to GBV": "rgb(145, 91, 166)",
     }
 
     data = data[index + list(indicators.keys())]
@@ -77,7 +77,7 @@ def overview_plot(data):
 
     data["percentage"] = (data[max_date] - data[min_date]) / data[min_date] * 100
 
-    data["percentage"] = data["percentage"].apply(lambda x: round(x, 2))
+    data["percentage"] = data["percentage"].apply(lambda x: round(x, 1))
 
     data.rename(
         columns={max_date: "absolute", "variable": "indicator_name"}, inplace=True
@@ -94,7 +94,15 @@ def overview_plot(data):
         lambda x: f"{x}%" if x[0] == "-" else f"+{x}%"
     )
 
-    data.sort_values(by="color", inplace=True)
+    sort_dict = dict(
+        zip(list(indicators.keys()), range(0, len(list(indicators.keys()))))
+    )
+
+    data.sort_values(
+        by=["indicator_name"],
+        inplace=True,
+        key=lambda x: x.map(sort_dict),
+    )
 
     data.set_index(["indicator_name", "color", "percentage"], inplace=True)
 

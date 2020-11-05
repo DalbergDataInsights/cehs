@@ -40,50 +40,112 @@ class IndicatorCard:
 
         self.style = style
 
-        self.style["margin"] = "1em 1.6%"
-        self.style["height"] = "15vh"
+        # self.style["margin"] = "1em 1.6%"
+        # self.style["height"] = "15vh"
         self.style["color"] = "white"
-        self.style["box-shadow"] = "0 20px 50px rgba(0,0,0,0.6)"
+        self.style["box-shadow"] = "5px 5px 5px gray"
+        self.style["border"] = f"solid rgba(0, 0, 0, 0.25)"
+        self.style["text-align"] = "center"
+        self.style["min-height"] = "160px"
+        self.top_background = self.style.pop("background-color")
+        self.bottom_background = self.top_background.split(")")[0] + ", 0.8)"
+        self.style["background-color"] = self.bottom_background
 
-        # self.style["padding-left"] = "20px"
-        # self.style["padding-right"] = "20px"
-        # self.style["opacity"] = "0.75"
+    def format_number(self, number):
+        number = number.split(".0")[0]
+        if len(number) > 2:
+            n_chars = len(number)
+            for i in range(n_chars, 1, 3):
+                if i != n_chars:
+                    number = number[:i] + "`" + number[i:]
+
+        return number
 
     def get_layout(self):
         layout = dbc.Col(
-            [
-                dbc.Row(
+            html.Div(
+                [
                     html.Div(
                         self.indicator,
-                        style={"margin": "7% auto"},
-                        className="overview-title",
+                        className="p-2",
+                        style={
+                            "min-height": "70px",
+                            "border-bottom": "solid rgba(0, 0, 0, 0.25)",
+                            "background-color": self.top_background,
+                            "display": "flex",
+                            "justify-content": "center",
+                            "align-items": "center",
+                            "font-weight": "bold",
+                            "font-style": "italic",
+                        },
                     ),
-                    style={"font-size": "1vw", "text-align": "center"},
-                    className="overview-title-container",
-                ),
-                dbc.Row(
-                    dbc.Col(self.values[0], className="value", style={"padding": "0"}),
-                    style={
-                        "margin": "0 auto",
-                        "font-size": "1.1vw",
-                        "text-align": "center",
-                        "font-weight": "bold",
-                    },
-                    className="value-container",
-                ),
-                dbc.Row(
-                    dbc.Col(self.values[1], className="value", style={"padding": "0"}),
-                    style={
-                        "margin": "0 auto",
-                        "font-size": "1.1vw",
-                        "text-align": "center",
-                        "font-weight": "bold",
-                    },
-                    className="value-container",
-                ),
-            ],
-            width=2,
-            style=self.style,
-            className="overview-card",
+                    html.Div(
+                        self.format_number(self.values[0]),
+                        className="p-2",
+                        style={
+                            "font-weight": "bold",
+                            "display": "flex",
+                            "justify-content": "center",
+                            "align-items": "center",
+                            "font-size": "1.2rem",
+                        },
+                    ),
+                    html.Div(
+                        self.values[1],
+                        className="p-2",
+                        style={
+                            "display": "flex",
+                            "justify-content": "center",
+                            "align-items": "center",
+                        },
+                    ),
+                ],
+                style=self.style,
+                className="d-flex flex-column mb-3",
+            ),
+            width=3,
         )
+
+        # dbc.Col(
+        #     [
+        #         dbc.Row(
+        #             html.Div(
+        #                 self.indicator,
+        #                 style={"margin": "7% auto"},
+        #                 className="overview-title",
+        #             ),
+        #             style={"font-size": "1vw", "text-align": "center", "height": "30%"},
+        #             className="overview-title-container",
+        #         ),
+        #         html.Div(
+        #             [
+        #                 dbc.Row(
+        #                     dbc.Col(
+        #                         self.values[0],
+        #                         className="value",
+        #                         style={"padding": "0"},
+        #                     ),
+        #                 ),
+        #                 dbc.Row(
+        #                     dbc.Col(
+        #                         self.values[1],
+        #                         className="value",
+        #                         style={"padding": "0"},
+        #                     ),
+        #                 ),
+        #             ],
+        #             style={
+        #                 "margin": "0 auto",
+        #                 "font-size": "1.8vh",
+        #                 "text-align": "center",
+        #                 "font-weight": "bold",
+        #                 "height": "70%",
+        #             },
+        #             className="value-container",
+        #         ),
+        #     ],
+        #     width=2,
+        #     style=self.style,
+        #     className="overview-card",
+        # )
         return layout
