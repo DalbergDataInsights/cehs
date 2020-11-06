@@ -1,21 +1,18 @@
 from store import (
     filter_df_by_dates,
     filter_by_district,
-    get_district_sum,
-    get_national_sum,
-    get_percentage,
-    get_sub_dfs,
-    timeit,
+    get_ratio,
     Database,
-    static,
 )
 
 import pandas as pd
 
 # CARD 1
 
+# FIXME Try and run without teh outlier parameter, see if it breaks anything
 
-def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
+
+def scatter_country_data(*, indicator, **kwargs):
 
     # dfs, static,
 
@@ -25,14 +22,9 @@ def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
 
     df = db.filter_by_indicator(df, indicator)
 
-    df = get_percentage(
-        df,
-        static.get("population data"),
-        static.get("target population type"),
-        indicator_group,
-        indicator,
-        all_country=True,
-    )
+    df, index = get_ratio(df, indicator, agg_level='country')
+
+    df = df.set_index(index)
 
     df = db.rename_df_columns(df)
 
@@ -40,7 +32,6 @@ def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
 
 
 # CARD 2
-
 
 def apply_date_filter(
     *,
@@ -64,9 +55,7 @@ def apply_date_filter(
 
 def map_bar_country_dated_data(
     *,
-    outlier,
     indicator,
-    indicator_group,
     target_year,
     target_month,
     reference_year,
@@ -80,19 +69,11 @@ def map_bar_country_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
+    df = get_ratio(df, indicator, agg_level='district')[0]
+
     data_in = filter_df_by_dates(
         df, target_year, target_month, reference_year, reference_month
     )
-
-    data_in = get_percentage(
-        data_in,
-        static.get("population data"),
-        static.get("target population type"),
-        indicator_group,
-        indicator,
-    )
-
-    data_in.reset_index(inplace=True)
 
     # TODO updat teh filter by data function so that this step is no longer needed
 
@@ -102,8 +83,6 @@ def map_bar_country_dated_data(
     mask = (data_in.date == min_date) | (data_in.date == max_date)
 
     data_in = data_in[mask]
-
-    data_in = data_in.groupby(by=["id", "date"], as_index=False).agg({indicator: "sum"})
 
     data_in["year"] = data_in.date.apply(lambda x: x.year)
 
@@ -117,7 +96,6 @@ def map_bar_country_dated_data(
     data_in[indicator] = data_in[indicator].apply(lambda x: round(x, 2))
 
     data_in = data_in[[indicator]].reset_index()
-    data_in["id"] = data_in["id"].astype(str)
     data_in = data_in.set_index("id")
     data_out = data_in[~pd.isna(data_in[indicator])]
 
@@ -129,7 +107,7 @@ def map_bar_country_dated_data(
 # CARD 3
 
 
-def scatter_district_data(*, outlier, indicator, indicator_group, district, **kwargs):
+def scatter_district_data(*,  indicator, district, **kwargs):
 
     db = Database()
 
@@ -137,19 +115,15 @@ def scatter_district_data(*, outlier, indicator, indicator_group, district, **kw
 
     df = db.filter_by_indicator(df, indicator)
 
-    df_district = filter_by_district(df, district)
-    df_district = get_district_sum(df_district, indicator)
-    df_district = get_percentage(
-        df_district,
-        static.get("population data"),
-        static.get("target population type"),
-        indicator_group,
-        indicator,
-    )
+    df = filter_by_district(df, district)
 
-    df_district = db.rename_df_columns(df_district)
+    df, index = get_ratio(df, indicator, agg_level='district')
 
-    return df_district
+    df = df.set_index(index)
+
+    df = db.rename_df_columns(df)
+
+    return df
 
 
 # CARD 4
@@ -157,7 +131,6 @@ def scatter_district_data(*, outlier, indicator, indicator_group, district, **kw
 
 def tree_map_district_dated_data(
     *,
-    outlier,
     indicator,
     district,
     target_year,
@@ -171,7 +144,11 @@ def tree_map_district_dated_data(
 
     df = db.raw_data
 
+    indicator = db.vet_indic_for_pop_dependency(indicator)
+
     df = db.filter_by_indicator(df, indicator)
+
+    df = get_ratio(df, indicator, agg_level='facility')[0]
 
     # TODO check how the date function works such that it shows only target date
 
@@ -186,15 +163,19 @@ def tree_map_district_dated_data(
     return df_district_dated
 
 
-def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
+def scatter_facility_data(*, indicator, district, facility, **kwargs):
 
     db = Database()
 
     df = db.raw_data
 
+    indicator = db.vet_indic_for_pop_dependency(indicator)
+
     df = db.filter_by_indicator(df, indicator)
 
     df = filter_by_district(df, district)
+
+    df, index = get_ratio(df, indicator, agg_level='facility')
 
     # TODO Reorder such that its the one facility with the on selected data max value that shows
 
@@ -208,6 +189,8 @@ def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
     df = df[df.facility_name == facility].reset_index(drop=True)
 
     df = db.rename_df_columns(df)
+
+    df = df.set_index(index)
 
     return df
 

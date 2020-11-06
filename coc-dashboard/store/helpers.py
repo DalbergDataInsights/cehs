@@ -17,7 +17,8 @@ def filter_df_by_dates(df, target_year, target_month, reference_year, reference_
 
     df = df.sort_values(["date"])
 
-    target_date = datetime.strptime(f"{target_month} 1 {target_year}", "%b %d %Y")
+    target_date = datetime.strptime(
+        f"{target_month} 1 {target_year}", "%b %d %Y")
     reference_date = datetime.strptime(
         f"{reference_month} 1 {reference_year}", "%b %d %Y"
     )
@@ -114,53 +115,38 @@ def get_year_and_month_cols(df):
 # Data cleaning methods for dataset selection and callbacks
 
 
-# def parse_target_pop(df, indicator):
-
-
-def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=False):
+def get_ratio(df, indicator, agg_level):
     """
-    Transforms the data using percentage of a target population, and group it by district or country
+    Aggregates the ratio properly using weights
+
     """
+    # TODO Link to the index_columns defined in the database object
+    # TODO find a way to delete the hardcoded name mapping step
 
-    # Pick what to grouby and index on : either district level or national level
-    merge = ["id", "year"]
-    index = ["id", "date"]
+    index = ["date", "id", "facility_name"]
 
-    if all_country == True:
-        merge = merge[1:]
-        index = index[1:]
+    if agg_level == 'country':
+        index = [index[0]]
 
-    ind_type = indicator_group.split("(")[-1][:-1]
+    if agg_level == 'district':
+        index = index[:2]
 
-    # Return the data as is, with a simple grouby if we are showing absolute numbers
+    df = df.groupby(index, as_index=False).sum()
 
-    if ind_type != "coverage":
-        return df.groupby(index).agg({indicator: "sum"})
+    col_count = len(set(df.columns).difference(set(index)))
 
-    # Else get target population, merge it and calculate percentage
+    if col_count == 2:
 
-    elif ind_type == "coverage":
+        weighted_ratio = [
+            x for x in df.columns if x.endswith('__weighted_ratio')][0]
+        weight = [x for x in df.columns if x.endswith('__weight')][0]
 
-        target = pop_tgt[pop_tgt.indicator == indicator]["cat"].values[0]
-        val_col = df.columns[-1]
+        df[indicator] = (df[weighted_ratio] / df[weight])*1000
 
-        columns = merge + [target]
+        df = df.drop(
+            columns=[weighted_ratio, weight])
 
-        pop_in = pop[columns].groupby(merge, as_index=False).sum()
-
-        data_in = df.groupby(index, as_index=False).sum()
-
-        data_in = get_year_and_month_cols(data_in).reset_index()
-
-        data_in = pd.merge(data_in, pop_in, how="left", left_on=merge, right_on=merge)
-
-        data_in[val_col] = (data_in[val_col] / data_in[target]) * 12
-
-        data_in.replace(np.inf, np.nan, inplace=True)
-
-        data_out = data_in.set_index(index)[[val_col]]
-
-        return data_out
+    return df, index
 
 
 def check_index(df, index=["id", "date", "facility_name"]):
@@ -168,18 +154,9 @@ def check_index(df, index=["id", "date", "facility_name"]):
     Check that the dataframe is formatted in the expected way, with expected indexes. Restructure the dataframe (set the indices) if this is not the case.
     """
     if df.index.values != index:
-        # print('Checking index')
-        # Set the indices
+
         df = df.reset_index(drop=True).set_index(index)
     return df
-
-
-def get_national_sum(df, indicator):
-    return df.groupby("date", as_index=False).agg({indicator: "sum"})
-
-
-def get_district_sum(df, indicator):
-    return df.groupby(["id", "date"], as_index=False).agg({indicator: "sum"})
 
 
 # Decorators

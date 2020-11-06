@@ -56,11 +56,11 @@ def overview_plot(data):
         "1st ANC Visits": "rgb(244, 174, 26)",
         "Deliveries in unit": "rgb(244, 174, 26)",
         "Newborn deaths": "rgb(244, 174, 26)",
-        "Maternal deaths (all)": "rgb(244, 174, 26)",
-        "DPT3 doses (all)": "rgb(81, 139, 201)",
-        "MR1 doses (all)": "rgb(81, 139, 201)",
+        "Maternal deaths": "rgb(244, 174, 26)",
+        "DPT3 doses to U1": "rgb(81, 139, 201)",
+        "MR1 doses to U1": "rgb(81, 139, 201)",
         "SAM cases identified": "rgb(238, 47, 68)",
-        "Doses of vitamin A (1st & 2nd)": "rgb(103, 191, 107)",
+        "1st & 2nd doses of vitamin A to U5": "rgb(103, 191, 107)",
         "TB cases registered": "rgb(236, 70, 139)",
         "Injuries related to GBV": "rgb(145, 91, 166)",
     }
@@ -75,7 +75,8 @@ def overview_plot(data):
         data, values="value", index="variable", columns="date"
     ).reset_index()
 
-    data["percentage"] = (data[max_date] - data[min_date]) / data[min_date] * 100
+    data["percentage"] = (data[max_date] - data[min_date]
+                          ) / data[min_date] * 100
 
     data["percentage"] = data["percentage"].apply(lambda x: round(x, 1))
 

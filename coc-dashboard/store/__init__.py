@@ -1,6 +1,6 @@
 import os
 from .helpers import *
-from .dropdown import initiate_dropdowns, set_dropdown_defaults
+from .dropdown import initiate_dropdowns
 from .database import Database
 
 # READ FROM DATABASE
@@ -9,7 +9,9 @@ DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]
 db = Database(DATABASE_URI)
 
 # STATIC DATA
-from .geopopulation import shapefile, static
+
+from .geopopulation import shapefile  # NOQA: E402
+
 
 # NAVIGATION
 
@@ -22,14 +24,6 @@ from .geopopulation import shapefile, static
     district_control_group,
 ) = initiate_dropdowns()
 
-
-set_dropdown_defaults(
-    outlier_policy_dropdown_group,
-    aggregation_type,
-    date_dropdowns,
-    indicator_dropdown_group,
-    district_control_group,
-)
 
 CONTROLS = dict(
     outlier=outlier_policy_dropdown_group.dropdown_objects[0].value,
@@ -60,6 +54,6 @@ for x in os.environ:
 
 # GLOBAL DATASET
 
-from .define_datasets import define_datasets
+from .define_datasets import define_datasets  # NOQA: E402
 
 init_data_set = define_datasets(controls=CONTROLS)

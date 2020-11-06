@@ -14,7 +14,7 @@ def scatter_country_plot(df):
 
     df_country = df.get("country")
 
-    df_country = df_country[df_country[df_country.columns[0]] > 0]
+    df_country = df_country[df_country[df_country.columns[-1]] > 0]
 
     df_country = get_year_and_month_cols(df_country)
 
@@ -27,7 +27,7 @@ def scatter_country_plot(df):
 
 
 country_overview_scatter = ChartDataCard(
-    title="Overview: Across the country, the number of $label$ changed by between 04-2019 and 04-2020",
+    title="Overview: Across the country, the $label$ changed by between 04-2019 and 04-2020",
     fig_title="Total $label$ across the country",
     data=init_data_set,
     data_transform=scatter_country_plot,

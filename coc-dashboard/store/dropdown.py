@@ -82,8 +82,8 @@ def initiate_dropdowns():
         title="SELECT AN INDICATOR",
         info="We focus on a key set of indicators as advised by experts and described in WHO's list of priority indicators. For simplicity of interpretation and time comparison, we focus on absolute numbers rather than calculated indicators. ",
         defaults={
-            "indicator_group": DEFAULTS.get("default_indicator_group"),
-            "indicator_name": DEFAULTS.get("default_indicator"),
+            "config_group": DEFAULTS.get("default_indicator_group"),
+            "config_indicator": DEFAULTS.get("default_indicator"),
         },
     )
 
@@ -126,34 +126,3 @@ def initiate_dropdowns():
         date_dropdowns,
         district_control_group,
     )
-
-
-def set_dropdown_defaults(
-    outlier_policy_dropdown_group,
-    aggregation_type,
-    date_dropdowns,
-    indicator_dropdown_group,
-    district_control_group,
-):
-    outlier_policy_dropdown_group.dropdown_objects[0].value = DEFAULTS.get(
-        "default_outlier"
-    )
-
-    date_dropdowns.from_date.value = (
-        DEFAULTS.get("default_reference_month")
-        + " "
-        + DEFAULTS.get("default_reference_year")
-    )
-
-    indicator_dropdown_group.dropdown_objects[0].value = DEFAULTS.get(
-        "default_indicator_group"
-    )
-    indicator_dropdown_group.dropdown_objects[1].value = DEFAULTS.get(
-        "default_indicator"
-    )
-
-    date_dropdowns.to_date.value = (
-        DEFAULTS.get("default_target_month") + " " + DEFAULTS.get("default_target_year")
-    )
-
-    district_control_group.dropdown_objects[0].value = DEFAULTS.get("default_district")

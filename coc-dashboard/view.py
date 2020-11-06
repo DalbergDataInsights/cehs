@@ -45,9 +45,3 @@ app = ds.app
 app.title = "CEHS Uganda"
 
 auth = dash_auth.BasicAuth(app, credentials)
-
-
-#     This tool is used to identify data trends, from the national level to the facility level.
-#     If you notice any surprising trends, make sure to check the effect of a more stringent outlier exclusion policy on that trend,
-#     and explore the reporting tool to better understand whether a reporting issue could explain that trend.
-#     For more details, click on the information button on the top right.""",

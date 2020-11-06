@@ -3,9 +3,11 @@ from os import rename
 from sqlalchemy import create_engine
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
-from model.database import FetchDate, Population, PopulationTarget, Indicator
+from model.database import FetchDate, Config
 import pandas as pd
 from .helpers import timeit
+
+# No more pop, pop target, Indicator
 
 
 class SingletonMeta(type):
@@ -39,7 +41,7 @@ class Database(metaclass=SingletonMeta):
     """
 
     fetch_data_query = """SELECT * FROM {}"""
-    active_repo = "value_std"
+    active_repo = "out"
 
     data_types = {
         "district_name": str,
@@ -50,6 +52,8 @@ class Database(metaclass=SingletonMeta):
     }
 
     index_columns = ["id", "facility_name", "date"]
+
+    pop_markers = ["coverage", '(per ']
 
     datasets = {}
     raw_data = None
@@ -67,7 +71,7 @@ class Database(metaclass=SingletonMeta):
             self.set_indicator_groups_and_view()
             # Get init data
             self.raw_data = self.get_repository(self.active_repo)
-            self.rep_data = self.get_repository("value_rep")
+            self.rep_data = self.get_repository("rep")
 
             self.set_districts()
 
@@ -83,11 +87,11 @@ class Database(metaclass=SingletonMeta):
         self.districts.sort()
 
     def set_indicator_groups_and_view(self):
-        serialized_groups = self.get_serialized_obj(Indicator)
+        serialized_groups = self.get_serialized_obj(Config)
         self.__indicator_serialized = serialized_groups
         indicator_groups = pd.DataFrame(serialized_groups)
         self.__indicator_dropdowns = (
-            indicator_groups[["indicator_group", "indicator_name"]]
+            indicator_groups[["config_group", "config_indicator"]]
             .copy()
             .reset_index(drop=True)
         )
@@ -101,30 +105,15 @@ class Database(metaclass=SingletonMeta):
             self.fetch_data_query.format(repo_name), con=self.engine
         )
 
-        for col in __dataframe.columns:
-            try:
-                __dataframe[col] = __dataframe[col].astype(
-                    self.data_types.get(col, self.data_types.get("*"))
-                )
-            except:
-                pass
+        __dataframe["date"] = __dataframe["date"].astype("datetime64[ns]")
 
         __dataframe.rename(columns={"district_name": "id"}, inplace=True)
-        __dataframe.rename(
-            columns=self.get_renaming_dict(rename_to="indicator_name"), inplace=True
-        )
 
         return __dataframe
 
     def get_serialized_into_df(self, sqlalchemy_obj):
         df = pd.DataFrame(self.get_serialized_obj(sqlalchemy_obj))
         return df
-
-    def get_population_data(self):
-        return self.get_serialized_into_df(Population)
-
-    def get_population_target(self):
-        return self.get_serialized_into_df(PopulationTarget)
 
     @property
     def fetch_date(self):
@@ -143,9 +132,9 @@ class Database(metaclass=SingletonMeta):
     # Active raw data management
     def filter_by_policy(self, policy):
         dropdown_filters = {
-            "Correct outliers - using standard deviation": "value_std",
-            "Correct outliers - using interquartile range": "value_iqr",
-            "Keep outliers": "value_raw",
+            "Correct outliers - using standard deviation": "std",
+            "Correct outliers - using interquartile range": "iqr",
+            "Keep outliers": "out",
         }
         new_repo = dropdown_filters.get(policy)
         if self.active_repo == new_repo:
@@ -163,43 +152,84 @@ class Database(metaclass=SingletonMeta):
         return self.datasets.get(key)
 
     # Data filters
+
+    def get_is_ratio(self, indicator):
+        ratio_list = [x.get("config_indicator")
+                      for x in self.__indicator_serialized
+                      if x.get("config_function") == 'ratio']
+        return indicator in ratio_list
+
     def filter_by_indicator(self, df, indicator):
-        df = df.reset_index()
-        try:
-            df = df[self.index_columns + [indicator]]
-        except Exception as e:
-            print(e)
-            print("No such column is present in the dataframe")
+
+        config = self.get_serialized_into_df(Config)
+
+        function = config[config.config_indicator ==
+                          indicator]['config_function'].values[0]
+
+        is_ratio = (function == 'ratio')
+
+        if is_ratio == False:
+            try:
+                df = df[list(self.index_columns) + [indicator]]
+            except Exception as e:
+                print(e)
+                print("No such column is present in the dataframe")
+
+        else:
+
+            nominator = f'{indicator}__weighted_ratio'
+
+            denominator = config[config.config_indicator ==
+                                 indicator]['config_denominator'].values[0]
+            denominator = f'{denominator}__weight'
+
+            try:
+                df = df[list(self.index_columns) + [nominator, denominator]]
+            except Exception as e:
+                print(e)
+                print("No such columns are present in the dataframe")
+
         return df
 
+    def vet_indic_for_pop_dependency(self, indicator):
+
+        is_pop_dependant = any(map(indicator.__contains__, self.pop_markers))
+
+        if is_pop_dependant:
+            new_indic = indicator.split(' (')[0]
+            return new_indic
+        else:
+            return indicator
+
     # Labels
+
     def get_renaming_dict(
         self,
-        rename_from="indicator_id",
-        rename_to="indicator_view",
+        rename_from="config_indicator",
+        rename_to="config_view",
     ):
         return {
             x.get(rename_from): x.get(rename_to) for x in self.__indicator_serialized
         }
 
     def get_indicator_view(
-        self, indicator, rename_from="name", rename_to="view", indicator_group=None
+        self, indicator, rename_from="indicator", rename_to="view", indicator_group=None
     ):
         if indicator_group:
             for x in self.__indicator_serialized:
                 if (
-                    x.get("indicator_group") == indicator_group
-                    and x.get(f"indicator_{rename_from}") == indicator
+                    x.get("config_group") == indicator_group
+                    and x.get(f"config_{rename_from}") == indicator
                 ):
-                    return x.get(f"indicator_{rename_to}")
+                    return x.get(f"config_{rename_to}")
         else:
             return self.get_renaming_dict(
-                rename_from=f"indicator_{rename_from}",
-                rename_to=f"indicator_{rename_to}",
+                rename_from=f"config_{rename_from}",
+                rename_to=f"config_{rename_to}",
             ).get(indicator)
 
     def rename_df_columns(
-        self, df, rename_from="indicator_name", rename_to="indicator_view"
+        self, df, rename_from="config_indicator", rename_to="config_view"
     ):
         rename_dict = self.get_renaming_dict(rename_from, rename_to)
         df.rename(columns=rename_dict, inplace=True)
