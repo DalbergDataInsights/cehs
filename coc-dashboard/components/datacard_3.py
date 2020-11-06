@@ -30,7 +30,7 @@ def scatter_district_plot(df):
 
 
 district_overview_scatter = ChartDataCard(
-    # title="$label$",
+    title="dummy",
     fig_title="$label$",
     data=init_data_set,
     data_transform=scatter_district_plot,

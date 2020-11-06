@@ -126,6 +126,7 @@ def change_titles_trends(*inputs):
 
     indicator_group = inputs[1]
     indicator = inputs[2]
+    # Mon YYYY
     reference_year = inputs[3].split(" ")[1]
     reference_month = inputs[3].split(" ")[0]
     target_year = inputs[4].split(" ")[1]

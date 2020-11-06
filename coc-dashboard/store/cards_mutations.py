@@ -26,7 +26,7 @@ def scatter_country_data(*, indicator, **kwargs):
 
     df = df.set_index(index)
 
-    title = f'Total {db.rename_df_columns(indicator)} across the country'
+    title = f'Total {db.get_indicator_view(indicator)} across the country'
 
     df = df.rename(columns={indicator: title})
 
@@ -101,7 +101,7 @@ def map_bar_country_dated_data(
     data_in = data_in.set_index("id")
     data_out = data_in[~pd.isna(data_in[indicator])]
 
-    title = f'Percentage change of {db.rename_df_columns(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
+    title = f'Percentage change of {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
     data_out = data_out.rename(columns={indicator: title})
 
     return data_out
@@ -124,7 +124,7 @@ def scatter_district_data(*,  indicator, district, **kwargs):
 
     df = df.set_index(index)
 
-    title = f'Total {db.rename_df_columns(indicator)} in {district} district'
+    title = f'Total {db.get_indicator_view(indicator)} in {district} district'
 
     df = df.rename(columns={indicator: title})
 
@@ -165,7 +165,7 @@ def tree_map_district_dated_data(
 
     df_district_dated = filter_by_district(df_district_dated, district)
 
-    title = f'"Contribution of individual facilities to {db.rename_df_columns(indicator)} in {district} district'
+    title = f'"Contribution of individual facilities to {db.get_indicator_view(indicator)} in {district} district'
 
     df_district_dated = df_district_dated.rename(columns={indicator: title})
 
@@ -197,7 +197,7 @@ def scatter_facility_data(*, indicator, district, facility, **kwargs):
 
     df = df[df.facility_name == facility].reset_index(drop=True)
 
-    title = f'Evolution of {db.rename_df_columns(indicator)} in {facility}'
+    title = f'Evolution of {db.get_indicator_view(indicator)} in {facility}'
 
     df = df.rename(columns={indicator: title})
 
@@ -217,7 +217,7 @@ def bar_reporting_country_data(*, outlier, indicator, **kwargs):
 
     df = db.filter_by_indicator(df, indicator)
 
-    title = f'Total number of facilities reporting on their 105:1 form and reported a non-zero number for {db.rename_df_columns(indicator)} across the country'
+    title = f'Total number of facilities reporting on their 105:1 form and reported a non-zero number for {db.get_indicator_view(indicator)} across the country'
 
     df = df.rename(columns={indicator: title})
 
@@ -248,7 +248,7 @@ def map_reporting_dated_data(
         df, target_year, target_month, reference_year, reference_month
     )
 
-    title = f'Percnetage of reportng facilities that reported a non-zero number for {db.rename_df_columns(indicator)} by district'
+    title = f'Percnetage of reportng facilities that reported a non-zero number for {db.get_indicator_view(indicator)} by district'
 
     df = df.rename(columns={indicator: title})
 
@@ -268,112 +268,8 @@ def scatter_reporting_district_data(*, outlier, indicator, district, **kwargs):
 
     df = filter_by_district(df, district)
 
-    title = f'Total number of facilities reporting on their 105:1 form and reported a non-zero number for {db.rename_df_columns(indicator)} in {district} district'
+    title = f'Total number of facilities reporting on their 105:1 form and reported a non-zero number for {db.get_indicator_view(indicator)} in {district} district'
 
     df = df.rename(columns={indicator: title})
-
-    return df
-
-
-# Indicator group grid
-
-
-def indicator_group(*, outlier, indicator_group, **kwargs):
-
-    db = Database()
-
-    df = db.raw_data
-
-    # FIXME when mutations and store are decoupled! !IMPORTANT
-
-    groups = dict(
-        MNCH=[
-            "1st ANC Visits",
-            "4th ANC Visits",
-            "Maternity Admissions",
-            "Deliveries in unit",
-            "Deliveries in unit - live",
-            "Deliveries in unit - fresh stillbirth",
-            "Deliveries in unit - macerated stillbirth",
-            "Newborn deaths",
-            "Postnatal Visits",
-        ],
-        EPI=[
-            "BCG (all)",
-            "BCG (outreach)",
-            "BCG (static)",
-            "DPT1 (all)",
-            "DPT1 (outreach)",
-            "DPT1 (static)",
-            "DPT3 (all)",
-            "DPT3 (outreach)",
-            "DPT3 (static)",
-            "HPV1 (all)",
-            "HPV1 (community)",
-            "HPV1 (school)",
-            "HPV2 (all)",
-            "HPV2 (community)",
-            "HPV2 (school)",
-            "MR1 (all)",
-            "MR1 (outreach)",
-            "MR1 (static)",
-            "PCV1 (all)",
-            "PCV1 (outreach)",
-            "PCV1 (static)",
-            "PCV3 (all)",
-            "PCV3 (outreach)",
-            "PCV3 (static)",
-            "TD1 (nonpregnant)",
-            "TD1 (pregnant)",
-            "TD2 (nonpregnant)",
-            "TD2 (pregnant)",
-            "TD3 (nonpregnant)",
-            "TD3 (pregnant)",
-            "TD4-5 (nonpregnant)",
-            "TD4-5 (pregnant)",
-        ],
-        GENERAL=["OPD attendance", "IPD attendance"],
-        HIV=[
-            "Tested HIV",
-            "Tested HIV positive",
-            "HIV positive linked to care",
-            "ANC tested HIV",
-            "ANC tested HIV positive",
-            "ANC initiated on ART",
-            "Mat tested HIV",
-            "Mat tested HIV positive",
-            "Mat initiated on ART",
-            "PNC tested HIV",
-            "PNC tested HIV positive",
-            "PNC initiated on ART",
-        ],
-        TB=["TB cases registered"],
-        MAL=[
-            "Malaria deaths",
-            "Malaria cases treated",
-            "Malaria cases",
-            "Malaria tests",
-        ],
-        NUT=[
-            "Number of doses of vitamin A distributed",
-            "Number of SAM admissions",
-            "Number of MAM admissions",
-            "Low weight births",
-        ],
-    )
-
-    df_groups = {"group": [], "indicator": []}
-    for group, indicators in groups.items():
-        df_groups["group"].extend([group] * len(indicators))
-        df_groups["indicator"].extend(indicators)
-
-    indicators_groups = pd.DataFrame(df_groups)
-
-    indicators = list(
-        indicators_groups[indicators_groups.group == indicator_group].indicator
-    )
-
-    columns_to_keep = db.index_columns + indicators
-    df = df[columns_to_keep]
 
     return df

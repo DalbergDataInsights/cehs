@@ -6,6 +6,8 @@ from store import (
     timeit,
     init_data_set,
     get_year_and_month_cols,
+    DEFAULTS,
+    Database,
 )
 
 
@@ -25,9 +27,10 @@ def scatter_country_plot(df):
 
 # DATACARD 1 #
 
+db = Database()
 
 country_overview_scatter = ChartDataCard(
-    title="Overview",
+    title=f"Total {db.get_indicator_view(DEFAULTS.get('default_indicator'))} across the country",
     fig_title="$label$",
     data=init_data_set,
     data_transform=scatter_country_plot,

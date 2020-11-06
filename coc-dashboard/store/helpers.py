@@ -158,6 +158,8 @@ def check_index(df, index=["id", "date", "facility_name"]):
         df = df.reset_index(drop=True).set_index(index)
     return df
 
+# TODO : get_percentage method
+
 
 # Decorators
 

@@ -228,7 +228,7 @@ class Database(metaclass=SingletonMeta):
                 rename_to=f"config_{rename_to}",
             ).get(indicator)
 
-    def rename_df_columns(
+    def get_indicator_view(
         self, indicator, rename_from="config_indicator", rename_to="config_view"
     ):
         rename_dict = self.get_renaming_dict(rename_from, rename_to)
