@@ -10,4 +10,4 @@ coc-dashboard/data/std.csv
 *debug*
 coc-dashboard/data/*.csv
 coc-dashboard/data/db.sqlite
-
+*.sqlite
