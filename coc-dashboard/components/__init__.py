@@ -1,5 +1,5 @@
 from .datacard_1 import country_overview_scatter
-from .datacard_2 import country_overview
+from .datacard_2 import country_overview, country_overview_map
 from .datacard_3 import district_overview_scatter
 from .datacard_4 import facility_scatter, tree_map_district
 from .datacard_5 import stacked_bar_reporting_country

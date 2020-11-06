@@ -1,5 +1,6 @@
 from components import (
     country_overview_scatter,
+    country_overview_map,
     district_overview_scatter,
     facility_scatter,
     stacked_bar_district,
@@ -11,6 +12,7 @@ from components import (
 )
 
 from dash.dependencies import Input, Output, State
+
 from store import (
     district_control_group,
     indicator_dropdown_group,
@@ -116,25 +118,31 @@ def define_callbacks(ds):
             "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
             "outputs": [
                 Output(f"{country_overview_scatter.my_name}_title", "children"),
+                Output(f"{country_overview_map.my_name}_fig_title", "children"),
                 Output(f"{district_overview_scatter.my_name}_title", "children"),
-                Output(f"{tree_map_district.my_name}_title", "children"),
                 Output(
                     f"{district_overview_scatter.my_name}_fig_title", "children"),
+                Output(f"{tree_map_district.my_name}_title", "children"),
+
             ],
             "function": change_titles_trends,
         },
         {
-            "inputs": [
-                Input(
-                    indicator_dropdown_group.dropdown_ids[0], "value"
-                ),  # Indicator group
-                # Indicator
-                Input(indicator_dropdown_group.dropdown_ids[-1], "value"),
-                Input("date_to", "value"),
-            ],
+            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
+            # "inputs": [
+            #     # Indicator group
+            #     Input(indicator_dropdown_group.dropdown_ids[0], "value"),
+            #     # Indicator
+            #     Input(indicator_dropdown_group.dropdown_ids[-1], "value"),
+            #     Input("date_to", "value"),
+            # ],
             "outputs": [
                 Output(
                     f"{stacked_bar_reporting_country.my_name}_title", "children"),
+                Output(
+                    f"{reporting_map.my_name}_fig_title", "children"),
+                Output(
+                    f"{stacked_bar_district.my_name}_fig_title", "children"),
             ],
             "function": change_titles_reporting,
         },

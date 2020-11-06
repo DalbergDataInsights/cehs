@@ -5,11 +5,13 @@ import pandas as pd
 
 from components import (
     country_overview_scatter,
+    country_overview_map,
     district_overview_scatter,
     facility_scatter,
     stacked_bar_district,
     stacked_bar_reporting_country,
     tree_map_district,
+    reporting_map,
 )
 
 from store import (
@@ -68,6 +70,7 @@ def change_titles_reporting(*inputs):
     indicator = inputs[1]
     target_year = inputs[2].split(" ")[1]
     target_month = inputs[2].split(" ")[0]
+    district = inputs[5]
 
     indicator_view_name = db.get_indicator_view(
         indicator, indicator_group=indicator_group
@@ -117,7 +120,13 @@ def change_titles_reporting(*inputs):
         f"Reporting: On {target_month}-{target_year}, around {reported_perc}% of facilities reported on their 105:1 form, and, out of those, {reported_positive}% reported for {indicator_view_name}",
     )
 
-    return [stacked_bar_reporting_country.title]
+    reporting_map.fig_title = f'Percentage of reporting facilities that reported a non-zero number for {indicator_view_name} on {target_month}-{target_year}'
+
+    stacked_bar_district.fig_title = f'Total number of facilities reporting on their 105:1 form and reporting on {indicator_view_name} in {district} district'
+
+    return [stacked_bar_reporting_country.title,
+            reporting_map.fig_title,
+            stacked_bar_district.fig_title]
 
 
 @timeit
@@ -166,6 +175,7 @@ def change_titles_trends(*inputs):
         descrip = "changed by an unknown percentage"
 
     country_overview_scatter.title = f"Overview: Across the country, the {indicator_view_name} {descrip} between {reference_month}-{reference_year} and {target_month}-{target_year}"
+    country_overview_map.fig_title = f"Percentage change of number of {indicator_view_name} between between {reference_month}-{reference_year} and {target_month}-{target_year}"
 
     try:
 
@@ -191,15 +201,17 @@ def change_titles_trends(*inputs):
         descrip = "changed by an unknown percentage"
 
     district_overview_scatter.title = f"Deep-dive in {district} district: the {indicator_view_name} {descrip} between {reference_month}-{reference_year} and {target_month}-{target_year}"
-    district_overview_scatter.fig_title = f"Total {indicator_view_name} in the {district} district"
+    district_overview_scatter.title = f"Total {indicator_view_name} in the {district} district"
 
     tree_map_district.title = f"Contribution of individual facilities in {district} district to the {indicator_view_name_vetted} on {target_month}-{target_year}"
 
     return [
         country_overview_scatter.title,
+        country_overview_map.fig_title,
         district_overview_scatter.title,
+        district_overview_scatter.fig_title,
         tree_map_district.title,
-        district_overview_scatter.fig_title
+
     ]
 
 
