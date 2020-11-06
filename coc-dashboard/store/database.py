@@ -229,8 +229,7 @@ class Database(metaclass=SingletonMeta):
             ).get(indicator)
 
     def rename_df_columns(
-        self, df, rename_from="config_indicator", rename_to="config_view"
+        self, indicator, rename_from="config_indicator", rename_to="config_view"
     ):
         rename_dict = self.get_renaming_dict(rename_from, rename_to)
-        df.rename(columns=rename_dict, inplace=True)
-        return df
+        return rename_dict.get(indicator, 'chosen indicator')

@@ -26,7 +26,9 @@ def scatter_country_data(*, indicator, **kwargs):
 
     df = df.set_index(index)
 
-    df = db.rename_df_columns(df)
+    title = f'Total {db.rename_df_columns(indicator)} across the country'
+
+    df = df.rename(columns={indicator: title})
 
     return df
 
@@ -99,7 +101,8 @@ def map_bar_country_dated_data(
     data_in = data_in.set_index("id")
     data_out = data_in[~pd.isna(data_in[indicator])]
 
-    data_out = db.rename_df_columns(data_out)
+    title = f'Percentage change of {db.rename_df_columns(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
+    data_out = data_out.rename(columns={indicator: title})
 
     return data_out
 
@@ -121,7 +124,9 @@ def scatter_district_data(*,  indicator, district, **kwargs):
 
     df = df.set_index(index)
 
-    df = db.rename_df_columns(df)
+    title = f'Total {db.rename_df_columns(indicator)} in {district} district'
+
+    df = df.rename(columns={indicator: title})
 
     return df
 
@@ -138,6 +143,8 @@ def tree_map_district_dated_data(
     reference_year,
     reference_month,
     **kwargs,
+
+
 ):
 
     db = Database()
@@ -158,7 +165,9 @@ def tree_map_district_dated_data(
 
     df_district_dated = filter_by_district(df_district_dated, district)
 
-    df_district_dated = db.rename_df_columns(df_district_dated)
+    title = f'"Contribution of individual facilities to {db.rename_df_columns(indicator)} in {district} district'
+
+    df_district_dated = df_district_dated.rename(columns={indicator: title})
 
     return df_district_dated
 
@@ -188,7 +197,9 @@ def scatter_facility_data(*, indicator, district, facility, **kwargs):
 
     df = df[df.facility_name == facility].reset_index(drop=True)
 
-    df = db.rename_df_columns(df)
+    title = f'Evolution of {db.rename_df_columns(indicator)} in {facility}'
+
+    df = df.rename(columns={indicator: title})
 
     df = df.set_index(index)
 
@@ -206,7 +217,9 @@ def bar_reporting_country_data(*, outlier, indicator, **kwargs):
 
     df = db.filter_by_indicator(df, indicator)
 
-    df = db.rename_df_columns(df)
+    title = f'Total number of facilities reporting on their 105:1 form and reported a non-zero number for {db.rename_df_columns(indicator)} across the country'
+
+    df = df.rename(columns={indicator: title})
 
     return df
 
@@ -235,7 +248,9 @@ def map_reporting_dated_data(
         df, target_year, target_month, reference_year, reference_month
     )
 
-    df = db.rename_df_columns(df)
+    title = f'Percnetage of reportng facilities that reported a non-zero number for {db.rename_df_columns(indicator)} by district'
+
+    df = df.rename(columns={indicator: title})
 
     return df
 
@@ -253,7 +268,9 @@ def scatter_reporting_district_data(*, outlier, indicator, district, **kwargs):
 
     df = filter_by_district(df, district)
 
-    df = db.rename_df_columns(df)
+    title = f'Total number of facilities reporting on their 105:1 form and reported a non-zero number for {db.rename_df_columns(indicator)} in {district} district'
+
+    df = df.rename(columns={indicator: title})
 
     return df
 

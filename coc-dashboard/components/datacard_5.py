@@ -15,10 +15,9 @@ def bar_reporting_country_plot(data):
 
 
 stacked_bar_reporting_country = ChartDataCard(
-    title="Reporting for $label$",
     data=init_data_set,
     data_transform=bar_reporting_country_plot,
-    fig_title="Total number of facilities reporting on their 105:1 form and reported a positive number of $label$ in country",
+    fig_title="$label$",
     fig_object="Bar",
 )
 

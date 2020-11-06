@@ -1,6 +1,5 @@
 from components import (
     country_overview_scatter,
-    country_overview_map,
     district_overview_scatter,
     facility_scatter,
     stacked_bar_district,
@@ -50,38 +49,38 @@ def define_callbacks(ds):
 
     callbacks = [
         # Data cards
-        {
-            "inputs": [
-                Input(id, prop)
-                for id, prop in stacked_bar_district.callbacks[0].get("input")
-            ],
-            "outputs": [
-                Output(id, prop)
-                for id, prop in stacked_bar_district.callbacks[0].get("output")
-            ],
-            "function": stacked_bar_district.callbacks[0].get("func"),
-        },
-        {
-            "inputs": [
-                Input(id, prop) for id, prop in reporting_map.callbacks[0].get("input")
-            ],
-            "outputs": [
-                Output(id, prop)
-                for id, prop in reporting_map.callbacks[0].get("output")
-            ],
-            "function": reporting_map.callbacks[0].get("func"),
-        },
-        {
-            "inputs": [
-                Input(id, prop)
-                for id, prop in stacked_bar_reporting_country.callbacks[0].get("input")
-            ],
-            "outputs": [
-                Output(id, prop)
-                for id, prop in stacked_bar_reporting_country.callbacks[0].get("output")
-            ],
-            "function": stacked_bar_reporting_country.callbacks[0].get("func"),
-        },
+        # {
+        #     "inputs": [
+        #         Input(id, prop)
+        #         for id, prop in stacked_bar_district.callbacks[0].get("input")
+        #     ],
+        #     "outputs": [
+        #         Output(id, prop)
+        #         for id, prop in stacked_bar_district.callbacks[0].get("output")
+        #     ],
+        #     "function": stacked_bar_district.callbacks[0].get("func"),
+        # },
+        # {
+        #     "inputs": [
+        #         Input(id, prop) for id, prop in reporting_map.callbacks[0].get("input")
+        #     ],
+        #     "outputs": [
+        #         Output(id, prop)
+        #         for id, prop in reporting_map.callbacks[0].get("output")
+        #     ],
+        #     "function": reporting_map.callbacks[0].get("func"),
+        # },
+        # {
+        #     "inputs": [
+        #         Input(id, prop)
+        #         for id, prop in stacked_bar_reporting_country.callbacks[0].get("input")
+        #     ],
+        #     "outputs": [
+        #         Output(id, prop)
+        #         for id, prop in stacked_bar_reporting_country.callbacks[0].get("output")
+        #     ],
+        #     "function": stacked_bar_reporting_country.callbacks[0].get("func"),
+        # },
         # User interface
         {
             "inputs": [Input("side-nav__menu-button", "n_clicks")],
@@ -109,58 +108,41 @@ def define_callbacks(ds):
             "function": change_page,
         },
         # Global callbacks
-        {
-            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
-            "outputs": [Output("ds-container", "children")],
-            "function": global_story_callback,
-        },
+        # {
+        #     "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
+        #     "outputs": [Output("ds-container", "children")],
+        #     "function": global_story_callback,
+        # },
         {
             "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
             "outputs": [
-                Output(f"{country_overview_scatter.my_name}_title", "children"),
-                Output(f"{country_overview_map.my_name}_fig_title", "children"),
-                Output(f"{district_overview_scatter.my_name}_title", "children"),
                 Output(
-                    f"{district_overview_scatter.my_name}_fig_title", "children"),
+                    f"{country_overview_scatter.my_name}_title", "children"),
+                Output(
+                    f"{district_overview_scatter.my_name}_title", "children"),
                 Output(f"{tree_map_district.my_name}_title", "children"),
 
             ],
             "function": change_titles_trends,
         },
-        {
-            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
-            # "inputs": [
-            #     # Indicator group
-            #     Input(indicator_dropdown_group.dropdown_ids[0], "value"),
-            #     # Indicator
-            #     Input(indicator_dropdown_group.dropdown_ids[-1], "value"),
-            #     Input("date_to", "value"),
-            # ],
-            "outputs": [
-                Output(
-                    f"{stacked_bar_reporting_country.my_name}_title", "children"),
-                Output(
-                    f"{reporting_map.my_name}_fig_title", "children"),
-                Output(
-                    f"{stacked_bar_district.my_name}_fig_title", "children"),
-            ],
-            "function": change_titles_reporting,
-        },
-        {
-            "inputs": [Input(f"{tree_map_district.my_name}_figure", "clickData")],
-            "outputs": [
-                Output(f"{facility_scatter.my_name}_figure", "figure"),
-                Output(f"{facility_scatter.my_name}_fig_title", "children"),
-            ],
-            "function": update_on_click,
-        },
-    ]
+        #     {
+        #         "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
 
-    # {
-    # "inputs": ,
-    # "outputs": ,
-    # "function": ,
-    # },
+        #         "outputs": [
+        #             Output(
+        #                 f"{stacked_bar_reporting_country.my_name}_title", "children")
+        #         ],
+        #         "function": change_titles_reporting,
+        #     },
+        #     {
+        #         "inputs": [Input(f"{tree_map_district.my_name}_figure", "clickData")],
+        #         "outputs": [
+        #             Output(f"{facility_scatter.my_name}_figure", "figure"),
+        #             Output(f"{facility_scatter.my_name}_fig_title", "children"),
+        #         ],
+        #         "function": update_on_click,
+        #     },
+    ]
 
     print("==Registering callbacks==")
 

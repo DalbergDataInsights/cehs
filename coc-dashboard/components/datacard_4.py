@@ -36,7 +36,7 @@ def scatter_facility_plot(data):
 
 
 tree_map_district = AreaDataCard(
-    title="The contribution of individual facilities in the selected district",
+    title="District",
     data=init_data_set,
     data_transform=tree_map_district_dated_plot,
     fig_object="Treemap",
@@ -45,7 +45,7 @@ tree_map_district.set_colors({"fig": ["#e2d5d1", "#96c0e0", "#3c6792"]})
 
 
 facility_scatter = ChartDataCard(
-    fig_title="Evolution of $label$ (click on the graph above to filter)",
+    fig_title="$label$",
     data=init_data_set,
     data_transform=scatter_facility_plot,
 )
