@@ -112,6 +112,7 @@ xlsxwriter = "*"
 pep8 = "*"
 black = "*"
 dash-extensions = "*"
+postgres = "*"
 
 [requires]
 python_version = "3.7"

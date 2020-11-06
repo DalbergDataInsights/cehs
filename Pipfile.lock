@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "472c1428592cc8d57a1af94d4468a56d23168cedbbf0ba0030ca8a48268fa068"
+            "sha256": "27f9e05c38fdc60cc385180b6c7a4065ed583714cb0c0840e588a1c399cb1072"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -750,6 +750,14 @@
             "index": "pypi",
             "version": "==4.8.2"
         },
+        "postgres": {
+            "hashes": [
+                "sha256:85649aed35fc109c8413ffa5d167ff003f76e978e726f65340bf949ab7cd22ab",
+                "sha256:ada2608527d56058ac2f72b5b0671a4893e04207d63059279ce9196436b98637"
+            ],
+            "index": "pypi",
+            "version": "==3.0.0"
+        },
         "prometheus-client": {
             "hashes": [
                 "sha256:983c7ac4b47478720db338f1491ef67a100b474e3bc7dafcbaefb7d0b8f9b01c",
@@ -806,6 +814,13 @@
             ],
             "index": "pypi",
             "version": "==2.8.6"
+        },
+        "psycopg2-pool": {
+            "hashes": [
+                "sha256:529c4100db56a3522cf680ce8d89e71511e37c7e0b1f120ce0dde0f13c6e5844",
+                "sha256:de88615c24ddfc7ee314c566976cfed4bbb009211255f2773ea09e5f938ff400"
+            ],
+            "version": "==1.1"
         },
         "ptyprocess": {
             "hashes": [
