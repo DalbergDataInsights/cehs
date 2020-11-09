@@ -12,6 +12,7 @@ from components import (
     get_title_district_treemap,
     stacked_bar_district,
     stacked_bar_reporting_country,
+    get_title_reporting_country,
     tree_map_district,
     reporting_map,
 )
