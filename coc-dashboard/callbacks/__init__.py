@@ -50,6 +50,12 @@ def define_callbacks(ds):
     app = ds.app
 
     callbacks = [
+        # Global callbacks
+        {
+            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
+            "outputs": [Output("ds-container", "children")],
+            "function": global_story_callback,
+        },
         # Data cards
         {
             "inputs": [
@@ -109,12 +115,7 @@ def define_callbacks(ds):
             ],
             "function": change_page,
         },
-        # Global callbacks
-        {
-            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
-            "outputs": [Output("ds-container", "children")],
-            "function": global_story_callback,
-        },
+        # Titles callbacks
         {
             "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
             "outputs": [
@@ -141,6 +142,7 @@ def define_callbacks(ds):
             ],
             "function": update_on_click,
         },
+
     ]
 
     print("==Registering callbacks==")

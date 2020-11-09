@@ -75,8 +75,9 @@ class Database(metaclass=SingletonMeta):
             # Get init data
             self.raw_data = self.get_repository(self.active_repo)
             self.rep_data = self.get_repository("rep")
-
             self.set_districts()
+            # Locking for callbacks
+            self.locked = False
 
         assert self.init, "You must pass a DB bind string to use Database first!"
 

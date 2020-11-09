@@ -1,4 +1,5 @@
 from datetime import datetime
+import time
 import base64
 import io
 import pandas as pd
@@ -32,25 +33,35 @@ from view import ds
 @timeit
 def global_story_callback(*inputs):
 
-    db = Database()
+    try:
 
-    global LAST_CONTROLS
-    LAST_CONTROLS = CONTROLS.copy()
+        db = Database()
 
-    CONTROLS["outlier"] = inputs[0]
-    CONTROLS["indicator"] = inputs[2]
-    CONTROLS["district"] = inputs[5]
-    CONTROLS["target_year"] = inputs[4].split(" ")[1]
-    CONTROLS["target_month"] = inputs[4].split(" ")[0]
-    CONTROLS["reference_year"] = inputs[3].split(" ")[1]
-    CONTROLS["reference_month"] = inputs[3].split(" ")[0]
-    CONTROLS["indicator_group"] = inputs[1]
+        db.locked = True
 
-    db.filter_by_policy(CONTROLS["outlier"])
+        global LAST_CONTROLS
+        LAST_CONTROLS = CONTROLS.copy()
 
-    df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+        CONTROLS["outlier"] = inputs[0]
+        CONTROLS["indicator"] = inputs[2]
+        CONTROLS["district"] = inputs[5]
+        CONTROLS["target_year"] = inputs[4].split(" ")[1]
+        CONTROLS["target_month"] = inputs[4].split(" ")[0]
+        CONTROLS["reference_year"] = inputs[3].split(" ")[1]
+        CONTROLS["reference_month"] = inputs[3].split(" ")[0]
+        CONTROLS["indicator_group"] = inputs[1]
 
-    ds.switch_data_set(df)
+        db.filter_by_policy(CONTROLS["outlier"])
+
+        df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+
+        ds.switch_data_set(df)
+
+        print('Datasets updated')
+    except:
+        print("Error updating global callback")
+    finally:
+        db.locked = False
 
     return [ds.get_layout()]
 
@@ -69,6 +80,14 @@ def change_titles_reporting(*inputs):
     controls['district'] = inputs[5]
 
     db = Database()
+
+    while True:
+        time.sleep(1)
+        print('DB waiting')
+        if not db.locked:
+            print('DB unlocked')
+            break
+        print('DB locked')
 
     indicator_view_name = db.get_indicator_view(controls['indicator'],
                                                 indicator_group=controls['indicator_group'])
@@ -96,6 +115,14 @@ def change_titles_trends(*inputs):
     controls['district'] = inputs[5]
 
     db = Database()
+
+    while True:
+        time.sleep(1)
+        print('DB waiting')
+        if not db.locked:
+            print('DB unlocked')
+            break
+        print('DB locked')
 
     indicator_view_name = db.get_indicator_view(controls['indicator'],
                                                 indicator_group=controls['indicator_group'])
