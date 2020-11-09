@@ -7,6 +7,8 @@ from store import (
     init_data_set,
     get_year_and_month_cols,
     get_time_diff_perc,
+    DEFAULTS,
+    Database,
 )
 
 
@@ -42,9 +44,15 @@ def get_title_district_overview(data, indicator_view_name, **controls):
 
 # DATACARD 3 #
 
+db = Database()
+
+default_title = get_title_district_overview(scatter_district_plot(init_data_set),
+                                            db.get_indicator_view(
+                                                DEFAULTS.get('indicator')),
+                                            **DEFAULTS)
 
 district_overview_scatter = ChartDataCard(
-    title="Select an indicator",
+    title=default_title,
     fig_title="$label$",
     data=init_data_set,
     data_transform=scatter_district_plot,

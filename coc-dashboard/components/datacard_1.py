@@ -45,13 +45,13 @@ db = Database()
 
 # TODO The class would need to include this title function by default to avoid repetition
 
-# default_title = get_title_country_overview(scatter_country_plot(init_data_set),
-#                                            db.get_indicator_view(
-#                                                DEFAULTS.get('indicator')),
-#                                            **DEFAULTS)
+default_title = get_title_country_overview(scatter_country_plot(init_data_set),
+                                           db.get_indicator_view(
+                                               DEFAULTS.get('indicator')),
+                                           **DEFAULTS)
 
 country_overview_scatter = ChartDataCard(
-    title='Select an indicator',  # default_title,
+    title=default_title,
     fig_title="$label$",
     data=init_data_set,
     data_transform=scatter_country_plot,

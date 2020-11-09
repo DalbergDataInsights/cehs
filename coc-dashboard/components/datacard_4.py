@@ -1,6 +1,11 @@
 import numpy as np
 import pandas as pd
-from store import timeit, get_sub_dfs, init_data_set, get_year_and_month_cols
+from store import (timeit,
+                   get_sub_dfs,
+                   init_data_set,
+                   get_year_and_month_cols,
+                   DEFAULTS,
+                   Database)
 from package.layout.area_card import AreaDataCard
 from package.layout.chart_card import ChartDataCard
 
@@ -45,12 +50,20 @@ def get_title_district_treemap(indicator_view_name, **controls):
     return title
 
 
+# DATACARD 4 #
+
+db = Database()
+
+default_title = get_title_district_treemap(
+    db.get_indicator_view(DEFAULTS.get('indicator')), **DEFAULTS)
+
 tree_map_district = AreaDataCard(
-    title="Select an indicator",
+    title=default_title,
     data=init_data_set,
     data_transform=tree_map_district_dated_plot,
     fig_object="Treemap",
 )
+
 tree_map_district.set_colors({"fig": ["#e2d5d1", "#96c0e0", "#3c6792"]})
 
 

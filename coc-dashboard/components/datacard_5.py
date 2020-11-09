@@ -1,4 +1,10 @@
-from store import timeit, reporting_count_transform, init_data_set, get_report_perc
+from store import (timeit,
+                   reporting_count_transform,
+                   init_data_set,
+                   get_report_perc,
+                   DEFAULTS,
+                   Database)
+
 from package.layout.chart_card import ChartDataCard
 
 
@@ -25,10 +31,18 @@ def get_title_reporting_country(data, indicator_view_name, **controls):
 
 
 # DATACARD 5 #
+
+db = Database()
+
+default_title = get_title_reporting_country(bar_reporting_country_plot(init_data_set),
+                                            db.get_indicator_view(
+                                                DEFAULTS.get('indicator')),
+                                            **DEFAULTS)
+
 stacked_bar_reporting_country = ChartDataCard(
     data=init_data_set,
     data_transform=bar_reporting_country_plot,
-    title='Select an indicator'
+    title=default_title,
     fig_title="$label$",
     fig_object="Bar",
 )

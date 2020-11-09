@@ -95,14 +95,12 @@ def change_titles_trends(*inputs):
     controls['target_month'] = inputs[4].split(" ")[0]
     controls['district'] = inputs[5]
 
-    indicator_vetted = db.switch_indic_to_numerator(indicator)
-
     db = Database()
 
     indicator_view_name = db.get_indicator_view(controls['indicator'],
                                                 indicator_group=controls['indicator_group'])
 
-    indicator_vetted = db.vet_indic_for_pop_dependency(controls['indicator'])
+    indicator_vetted = db.get_indicator_view(controls['indicator'])
 
     indicator_view_name_vetted = db.get_indicator_view(indicator_vetted,
                                                        indicator_group=controls['indicator_group'])
