@@ -28,6 +28,7 @@ def get_title_reporting_country(data, indicator_view_name, **controls):
 stacked_bar_reporting_country = ChartDataCard(
     data=init_data_set,
     data_transform=bar_reporting_country_plot,
+    title='Select an indicator'
     fig_title="$label$",
     fig_object="Bar",
 )
