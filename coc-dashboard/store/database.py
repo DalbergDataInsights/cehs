@@ -191,14 +191,23 @@ class Database(metaclass=SingletonMeta):
 
         return df
 
-    def vet_indic_for_pop_dependency(self, indicator):
+    def switch_indic_to_numerator(self, indicator, popcheck=True):
 
-        is_pop_dependant = any(map(indicator.__contains__, self.pop_markers))
+        if popcheck:
+            needs_switch = any(map(indicator.__contains__, self.pop_markers))
 
-        if is_pop_dependant:
+        else:
+            config = self.get_serialized_into_df(Config)
+            function = config[config.config_indicator ==
+                              indicator]['config_function'].values[0]
+            needs_switch = (function == 'ratio')
+
+        if needs_switch:
             new_indic = indicator.split(' (')[0]
             return new_indic
+
         else:
+
             return indicator
 
     # Labels

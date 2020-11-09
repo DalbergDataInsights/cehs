@@ -144,7 +144,7 @@ def tree_map_district_dated_data(
 
     df = db.raw_data
 
-    indicator = db.vet_indic_for_pop_dependency(indicator)
+    indicator = db.switch_indic_to_numerator(indicator)
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -169,7 +169,7 @@ def scatter_facility_data(*, indicator, district, facility, **kwargs):
 
     df = db.raw_data
 
-    indicator = db.vet_indic_for_pop_dependency(indicator)
+    indicator = db.switch_indic_to_numerator(indicator)
 
     df = db.filter_by_indicator(df, indicator)
 
@@ -204,6 +204,8 @@ def bar_reporting_country_data(*, outlier, indicator, **kwargs):
 
     df = db.rep_data
 
+    indicator = db.switch_indic_to_numerator(indicator, popcheck=False)
+
     df = db.filter_by_indicator(df, indicator)
 
     df = db.rename_df_columns(df)
@@ -229,6 +231,8 @@ def map_reporting_dated_data(
 
     df = db.rep_data
 
+    indicator = db.switch_indic_to_numerator(indicator, popcheck=False)
+
     df = db.filter_by_indicator(df, indicator)
 
     df = filter_df_by_dates(
@@ -248,6 +252,8 @@ def scatter_reporting_district_data(*, outlier, indicator, district, **kwargs):
     db = Database()
 
     df = db.rep_data
+
+    indicator = db.switch_indic_to_numerator(indicator, popcheck=False)
 
     df = db.filter_by_indicator(df, indicator)
 

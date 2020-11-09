@@ -147,7 +147,7 @@ def change_titles_trends(*inputs):
         indicator, indicator_group=indicator_group
     )
 
-    indicator_vetted = db.vet_indic_for_pop_dependency(indicator)
+    indicator_vetted = db.switch_indic_to_numerator(indicator)
 
     indicator_view_name_vetted = db.get_indicator_view(indicator_vetted,
                                                        indicator_group=indicator_group
