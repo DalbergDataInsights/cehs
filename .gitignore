@@ -7,6 +7,7 @@ coc-dashboard/data/outliers.csv
 coc-dashboard/data/reporting.csv
 coc-dashboard/data/std.csv
 .env
+coc-dashboard/testing
 *debug*
 coc-dashboard/data/*.csv
 coc-dashboard/data/db.sqlite
