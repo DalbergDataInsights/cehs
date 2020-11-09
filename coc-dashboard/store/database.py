@@ -41,6 +41,9 @@ class Database(metaclass=SingletonMeta):
     """
 
     fetch_data_query = """SELECT * FROM {}"""
+
+    # TODO have thislinked to DEFAULT
+
     active_repo = "out"
 
     data_types = {
@@ -212,6 +215,8 @@ class Database(metaclass=SingletonMeta):
             x.get(rename_from): x.get(rename_to) for x in self.__indicator_serialized
         }
 
+    # TODO : Understand the need for if statement below
+
     def get_indicator_view(
         self, indicator, rename_from="indicator", rename_to="view", indicator_group=None
     ):
@@ -227,9 +232,3 @@ class Database(metaclass=SingletonMeta):
                 rename_from=f"config_{rename_from}",
                 rename_to=f"config_{rename_to}",
             ).get(indicator)
-
-    def get_indicator_view(
-        self, indicator, rename_from="config_indicator", rename_to="config_view"
-    ):
-        rename_dict = self.get_renaming_dict(rename_from, rename_to)
-        return rename_dict.get(indicator, 'chosen indicator')

@@ -158,8 +158,6 @@ def check_index(df, index=["id", "date", "facility_name"]):
         df = df.reset_index(drop=True).set_index(index)
     return df
 
-# TODO : get_percentage method
-
 
 # Decorators
 
@@ -181,7 +179,7 @@ def timeit(f):
     return timed
 
 
-# Formattimg method
+# Data card title methods
 
 
 def get_perc_description(perc):
@@ -193,3 +191,93 @@ def get_perc_description(perc):
     elif perc <= 0.1:
         descrip = f"decreased by {perc_abs}%"
     return descrip
+
+
+def get_time_diff_perc(data, **controls):
+    """
+    Returns a string describing the percentage change difference between two dates 
+
+    """
+
+    target_year = controls.get("target_year")
+    target_month = controls.get("target_month")
+    reference_year = controls.get("reference_year")
+    reference_month = controls.get("reference_month")
+
+    try:
+
+        data_reference = data.get(int(reference_year))
+        data_target = data.get(int(target_year))
+        perc_first = round(
+            (
+                (
+                    data_target.loc[target_month][0]
+                    - data_reference.loc[reference_month][0]
+                )
+                / data_reference.loc[reference_month][0]
+            )
+            * 100
+        )
+        descrip = get_perc_description(perc_first)
+
+    except Exception as e:
+        print(e)
+        descrip = "changed by an unknown percentage"
+
+    return descrip
+
+
+def get_report_perc(data, **controls):
+    """
+    Returns two strings describing the percentage of reprting facilities, and non-zero reporting facilities
+
+    """
+    target_year = controls.get("target_year")
+    target_month = controls.get("target_month")
+
+    try:
+
+        date_reporting = datetime.strptime(
+            f"{target_month} 1 {target_year}", "%b %d %Y"
+        )
+
+        try:
+            reported_positive = data\
+                .get("Reported a positive number")\
+                .loc[date_reporting][0]
+        except Exception:
+            reported_positive = 0
+
+        try:
+            did_not_report = data\
+                .get("Did not report on their 105:1 form")\
+                .loc[date_reporting][0]
+        except Exception:
+            did_not_report = 0
+
+        try:
+            reported_negative = data\
+                .get("Did not report a positive number")\
+                .loc[date_reporting][0]
+        except Exception:
+            reported_negative = 0
+
+        reported_perc = round(
+            (
+                (reported_positive + reported_negative)
+                / (reported_positive + did_not_report + reported_negative)
+            )
+            * 100
+        )
+        reported_positive = round(
+            (reported_positive / (reported_positive + reported_negative)) * 100
+        )
+
+        descrip_reported = f'around {reported_perc} %'
+        descrip_positive = f'around {reported_positive} %'
+
+    except Exception:
+        descrip_reported = "an unknown percentage"
+        descrip_positive = "an unknown percentage"
+
+    return descrip_reported, descrip_positive

@@ -35,8 +35,18 @@ def scatter_facility_plot(data):
     return data
 
 
+def get_title_district_treemap(indicator_view_name, **controls):
+    """
+    get title for the third section based on a percentage calcution and the inputs
+    """
+    title = f'''Contribution of individual facilities in {controls.get('district')} district to the {indicator_view_name}
+            on {controls.get('target_month')}-{controls.get('target_year')}'''
+
+    return title
+
+
 tree_map_district = AreaDataCard(
-    title="District",
+    title="Select an indicator",
     data=init_data_set,
     data_transform=tree_map_district_dated_plot,
     fig_object="Treemap",

@@ -5,8 +5,11 @@ import pandas as pd
 
 from components import (
     country_overview_scatter,
+    get_title_country_overview,
     district_overview_scatter,
+    get_title_district_overview,
     facility_scatter,
+    get_title_district_treemap,
     stacked_bar_district,
     stacked_bar_reporting_country,
     tree_map_district,
@@ -30,26 +33,17 @@ def global_story_callback(*inputs):
 
     db = Database()
 
-    outlier = inputs[0]
-    indicator_group = inputs[1]
-    indicator = inputs[2]
-    reference_year = inputs[3].split(" ")[1]
-    reference_month = inputs[3].split(" ")[0]
-    target_year = inputs[4].split(" ")[1]
-    target_month = inputs[4].split(" ")[0]
-    district = inputs[5]
-
     global LAST_CONTROLS
     LAST_CONTROLS = CONTROLS.copy()
 
-    CONTROLS["outlier"] = outlier
-    CONTROLS["indicator"] = indicator
-    CONTROLS["district"] = district
-    CONTROLS["target_year"] = target_year
-    CONTROLS["target_month"] = target_month
-    CONTROLS["reference_year"] = reference_year
-    CONTROLS["reference_month"] = reference_month
-    CONTROLS["indicator_group"] = indicator_group
+    CONTROLS["outlier"] = inputs[0]
+    CONTROLS["indicator"] = inputs[2]
+    CONTROLS["district"] = inputs[5]
+    CONTROLS["target_year"] = inputs[4].split(" ")[1]
+    CONTROLS["target_month"] = inputs[4].split(" ")[0]
+    CONTROLS["reference_year"] = inputs[3].split(" ")[1]
+    CONTROLS["reference_month"] = inputs[3].split(" ")[0]
+    CONTROLS["indicator_group"] = inputs[1]
 
     db.filter_by_policy(CONTROLS["outlier"])
 
@@ -63,60 +57,24 @@ def global_story_callback(*inputs):
 @timeit
 def change_titles_reporting(*inputs):
 
-    indicator_group = inputs[1]
-    indicator = inputs[2]
-    target_year = inputs[4].split(" ")[1]
-    target_month = inputs[4].split(" ")[0]
+    controls = {}
+
+    controls['indicator_group'] = inputs[1]
+    controls['indicator'] = inputs[2]
+    controls['reference_year'] = inputs[3].split(" ")[1]
+    controls['reference_month'] = inputs[3].split(" ")[0]
+    controls['target_year'] = inputs[4].split(" ")[1]
+    controls['target_month'] = inputs[4].split(" ")[0]
+    controls['district'] = inputs[5]
 
     db = Database()
 
-    indicator_view_name = db.get_indicator_view(
-        indicator, indicator_group=indicator_group
-    )
+    indicator_view_name = db.get_indicator_view(controls['indicator'],
+                                                indicator_group=controls['indicator_group'])
 
-    try:
-        data_reporting = stacked_bar_reporting_country.data
-
-        date_reporting = datetime.strptime(
-            f"{target_month} 1 {target_year}", "%b %d %Y"
-        )
-
-        try:
-            reported_positive = data_reporting.get("Reported a positive number").loc[
-                date_reporting
-            ][0]
-        except Exception:
-            reported_positive = 0
-        try:
-            did_not_report = data_reporting.get(
-                "Did not report on their 105:1 form"
-            ).loc[date_reporting][0]
-        except Exception:
-            did_not_report = 0
-        try:
-            reported_negative = data_reporting.get(
-                "Did not report a positive number"
-            ).loc[date_reporting][0]
-        except Exception:
-            reported_negative = 0
-
-        reported_perc = round(
-            (
-                (reported_positive + reported_negative)
-                / (reported_positive + did_not_report + reported_negative)
-            )
-            * 100
-        )
-        reported_positive = round(
-            (reported_positive / (reported_positive + reported_negative)) * 100
-        )
-    except Exception:
-        reported_perc = "?"
-        reported_positive = "?"
-
-    stacked_bar_reporting_country.title = (
-        f"Reporting: On {target_month}-{target_year}, around {reported_perc}% of facilities reported on their 105:1 form, and, out of those, {reported_positive}% reported for {indicator_view_name}",
-    )
+    stacked_bar_reporting_country.title = get_title_reporting_country(stacked_bar_reporting_country.data,
+                                                                      indicator_view_name,
+                                                                      **controls)
 
     return [stacked_bar_reporting_country.title]
 
@@ -124,77 +82,49 @@ def change_titles_reporting(*inputs):
 @timeit
 def change_titles_trends(*inputs):
 
-    indicator_group = inputs[1]
-    indicator = inputs[2]
-    # Mon YYYY
-    reference_year = inputs[3].split(" ")[1]
-    reference_month = inputs[3].split(" ")[0]
-    target_year = inputs[4].split(" ")[1]
-    target_month = inputs[4].split(" ")[0]
-    district = inputs[5]
+    # TODO GET RID OF THIS? SHouldnt the call backs be chained properly and use the CONTROLS object?
 
-    # Data card 1
+    controls = {}
+
+    controls['indicator_group'] = inputs[1]
+    controls['indicator'] = inputs[2]
+    controls['reference_year'] = inputs[3].split(" ")[1]
+    controls['reference_month'] = inputs[3].split(" ")[0]
+    controls['target_year'] = inputs[4].split(" ")[1]
+    controls['target_month'] = inputs[4].split(" ")[0]
+    controls['district'] = inputs[5]
+
+    # Get view names
+
     db = Database()
 
-    indicator_view_name = db.get_indicator_view(
-        indicator, indicator_group=indicator_group
-    )
+    indicator_view_name = db.get_indicator_view(controls['indicator'],
+                                                indicator_group=controls['indicator_group'])
 
-    indicator_vetted = db.vet_indic_for_pop_dependency(indicator)
+    indicator_vetted = db.vet_indic_for_pop_dependency(controls['indicator'])
 
     indicator_view_name_vetted = db.get_indicator_view(indicator_vetted,
-                                                       indicator_group=indicator_group
-                                                       )
+                                                       indicator_group=controls['indicator_group'])
 
-    try:
+    # data = db.datasets.get('country')
 
-        data = country_overview_scatter.data
-        data_reference = data.get(int(reference_year))
-        data_target = data.get(int(target_year))
-        perc_first = round(
-            (
-                (
-                    data_target.loc[target_month][0]
-                    - data_reference.loc[reference_month][0]
-                )
-                / data_reference.loc[reference_month][0]
-            )
-            * 100
-        )
-        descrip = get_perc_description(perc_first)
+    country_overview_scatter.title = get_title_country_overview(country_overview_scatter.data,
+                                                                indicator_view_name,
+                                                                **controls)
 
-    except Exception as e:
-        print(e)
-        descrip = "changed by an unknown percentage"
+    district_overview_scatter.title = get_title_district_overview(district_overview_scatter.data,
+                                                                  indicator_view_name,
+                                                                  **controls)
 
-    country_overview_scatter.title = f"Overview: Across the country, the {indicator_view_name} {descrip} between {reference_month}-{reference_year} and {target_month}-{target_year}"
+    tree_map_district.title = get_title_district_treemap(indicator_view_name_vetted,
+                                                         **controls)
 
-    try:
+    # TODO : delete check
 
-        dis_data = district_overview_scatter.data
+    data = country_overview_scatter.data
 
-        dis_data_reference = dis_data.get(int(reference_year))
-        dis_data_target = dis_data.get(int(target_year))
-
-        dist_perc = round(
-            (
-                (
-                    dis_data_target.loc[target_month][0]
-                    - dis_data_reference.loc[reference_month][0]
-                )
-                / dis_data_reference.loc[reference_month][0]
-            )
-            * 100
-        )
-        descrip = get_perc_description(dist_perc)
-
-    except Exception as e:
-        print(e)
-        descrip = "changed by an unknown percentage"
-
-    district_overview_scatter.title = f"Deep-dive in {district} district: the {indicator_view_name} {descrip} between {reference_month}-{reference_year} and {target_month}-{target_year}"
-
-    tree_map_district.title = f"Contribution of individual facilities in {district} district to the {indicator_view_name_vetted} on {target_month}-{target_year}"
+    check = (data.get(2020).loc['Aug'].values[0]-data.get(
+        2019).loc['Aug'].values[0])/data.get(2019).loc['Aug'].values[0]
 
     return [
         country_overview_scatter.title,
