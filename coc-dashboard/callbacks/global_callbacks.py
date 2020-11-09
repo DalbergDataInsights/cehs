@@ -95,7 +95,7 @@ def change_titles_trends(*inputs):
     controls['target_month'] = inputs[4].split(" ")[0]
     controls['district'] = inputs[5]
 
-    # Get view names
+    indicator_vetted = db.switch_indic_to_numerator(indicator)
 
     db = Database()
 

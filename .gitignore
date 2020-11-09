@@ -8,6 +8,7 @@ coc-dashboard/data/reporting.csv
 coc-dashboard/data/std.csv
 coc-dashboard/testing/*
 .env
+coc-dashboard/testing
 *debug*
 coc-dashboard/data/*.csv
 coc-dashboard/data/db.sqlite
