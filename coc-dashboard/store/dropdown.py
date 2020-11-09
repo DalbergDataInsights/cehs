@@ -5,7 +5,6 @@ from datetime import datetime
 
 from .database import Database
 from package.components.nested_dropdown_group import NestedDropdownGroup
-from package.components.methodology_section import MethodologySection
 
 import os
 from dotenv import find_dotenv, load_dotenv
