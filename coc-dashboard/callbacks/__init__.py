@@ -22,9 +22,7 @@ from pprint import pprint as print
 
 from .global_callbacks import (
     global_story_callback,
-    change_titles_reporting,
     update_on_click,
-    change_titles_trends,
 )
 
 
@@ -115,25 +113,7 @@ def define_callbacks(ds):
             ],
             "function": change_page,
         },
-        # Titles callbacks
-        {
-            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
-            "outputs": [
-                Output(f"{country_overview_scatter.my_name}_title", "children"),
-                Output(f"{district_overview_scatter.my_name}_title", "children"),
-                Output(f"{tree_map_district.my_name}_title", "children"),
-            ],
-            "function": change_titles_trends,
-        },
-        {
-            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
-
-            "outputs": [
-                Output(
-                    f"{stacked_bar_reporting_country.my_name}_title", "children")
-            ],
-            "function": change_titles_reporting,
-        },
+        # N-click callbacks
         {
             "inputs": [Input(f"{tree_map_district.my_name}_figure", "clickData")],
             "outputs": [

@@ -33,11 +33,9 @@ from view import ds
 @timeit
 def global_story_callback(*inputs):
 
+    db = Database()
+
     try:
-
-        db = Database()
-
-        db.locked = True
 
         global LAST_CONTROLS
         LAST_CONTROLS = CONTROLS.copy()
@@ -57,82 +55,55 @@ def global_story_callback(*inputs):
 
         ds.switch_data_set(df)
 
-        print('Datasets updated')
+        print(f"Datasets updated for {CONTROLS['indicator']}")
     except:
-        print("Error updating global callback")
-    finally:
-        db.locked = False
+        print(f"Error updating global callback for {CONTROLS['indicator']}")
+
+    indicator_view_name = db.get_indicator_view(CONTROLS['indicator'],
+                                                indicator_group=CONTROLS['indicator_group'])
+
+    indicator_vetted = db.get_indicator_view(CONTROLS['indicator'])
+
+    indicator_view_name_vetted = db.get_indicator_view(indicator_vetted,
+                                                       indicator_group=CONTROLS['indicator_group'])
+
+    try:
+        change_titles_reporting(indicator_view_name,
+                                CONTROLS)
+
+    except:
+        print(f"Error updating reporting title for {CONTROLS['indicator']}")
+
+    try:
+        change_titles_trends(indicator_view_name,
+                             indicator_view_name_vetted,
+                             CONTROLS)
+
+    except:
+        print(f"Error updating trend title for {CONTROLS['indicator']}")
 
     return [ds.get_layout()]
 
 
 @timeit
-def change_titles_reporting(*inputs):
+def change_titles_reporting(indicator_view_name, controls):
 
-    controls = {}
-
-    controls['indicator_group'] = inputs[1]
-    controls['indicator'] = inputs[2]
-    controls['reference_year'] = inputs[3].split(" ")[1]
-    controls['reference_month'] = inputs[3].split(" ")[0]
-    controls['target_year'] = inputs[4].split(" ")[1]
-    controls['target_month'] = inputs[4].split(" ")[0]
-    controls['district'] = inputs[5]
-
-    db = Database()
-
-    while True:
-        time.sleep(1)
-        print('DB waiting')
-        if not db.locked:
-            print('DB unlocked')
-            break
-        print('DB locked')
-
-    indicator_view_name = db.get_indicator_view(controls['indicator'],
-                                                indicator_group=controls['indicator_group'])
+    print(
+        f"Starting updates for reporting titles with {controls['indicator']}")
 
     stacked_bar_reporting_country.title = get_title_reporting_country(stacked_bar_reporting_country.data,
                                                                       indicator_view_name,
                                                                       **controls)
 
-    return [stacked_bar_reporting_country.title]
+    print(f"Updated reporting titles with {controls['indicator']}")
 
 
 @timeit
-def change_titles_trends(*inputs):
+def change_titles_trends(indicator_view_name, indicator_view_name_vetted, controls):
 
-    # TODO GET RID OF THIS? SHouldnt the call backs be chained properly and use the CONTROLS object?
+    print(f"Starting updates for trend titles with {controls['indicator']}")
 
-    controls = {}
-
-    controls['indicator_group'] = inputs[1]
-    controls['indicator'] = inputs[2]
-    controls['reference_year'] = inputs[3].split(" ")[1]
-    controls['reference_month'] = inputs[3].split(" ")[0]
-    controls['target_year'] = inputs[4].split(" ")[1]
-    controls['target_month'] = inputs[4].split(" ")[0]
-    controls['district'] = inputs[5]
-
-    db = Database()
-
-    while True:
-        time.sleep(1)
-        print('DB waiting')
-        if not db.locked:
-            print('DB unlocked')
-            break
-        print('DB locked')
-
-    indicator_view_name = db.get_indicator_view(controls['indicator'],
-                                                indicator_group=controls['indicator_group'])
-
-    indicator_vetted = db.get_indicator_view(controls['indicator'])
-
-    indicator_view_name_vetted = db.get_indicator_view(indicator_vetted,
-                                                       indicator_group=controls['indicator_group'])
-
-    # data = db.datasets.get('country')
+    # TODO data = db.datasets.get('country')
 
     country_overview_scatter.title = get_title_country_overview(country_overview_scatter.data,
                                                                 indicator_view_name,
@@ -145,18 +116,7 @@ def change_titles_trends(*inputs):
     tree_map_district.title = get_title_district_treemap(indicator_view_name_vetted,
                                                          **controls)
 
-    # TODO : delete check
-
-    data = country_overview_scatter.data
-
-    check = (data.get(2020).loc['Aug'].values[0]-data.get(
-        2019).loc['Aug'].values[0])/data.get(2019).loc['Aug'].values[0]
-
-    return [
-        country_overview_scatter.title,
-        district_overview_scatter.title,
-        tree_map_district.title,
-    ]
+    print(f"Updated trend titles with {controls['indicator']} with")
 
 
 @timeit
