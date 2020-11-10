@@ -41,6 +41,9 @@ class Database(metaclass=SingletonMeta):
     """
 
     fetch_data_query = """SELECT * FROM {}"""
+
+    # TODO have thislinked to DEFAULT
+
     active_repo = "out"
 
     data_types = {
@@ -72,7 +75,6 @@ class Database(metaclass=SingletonMeta):
             # Get init data
             self.raw_data = self.get_repository(self.active_repo)
             self.rep_data = self.get_repository("rep")
-
             self.set_districts()
 
         assert self.init, "You must pass a DB bind string to use Database first!"
@@ -221,6 +223,8 @@ class Database(metaclass=SingletonMeta):
             x.get(rename_from): x.get(rename_to) for x in self.__indicator_serialized
         }
 
+    # TODO : Understand the need for if statement below
+
     def get_indicator_view(
         self, indicator, rename_from="indicator", rename_to="view", indicator_group=None
     ):
@@ -236,10 +240,3 @@ class Database(metaclass=SingletonMeta):
                 rename_from=f"config_{rename_from}",
                 rename_to=f"config_{rename_to}",
             ).get(indicator)
-
-    def rename_df_columns(
-        self, df, rename_from="config_indicator", rename_to="config_view"
-    ):
-        rename_dict = self.get_renaming_dict(rename_from, rename_to)
-        df.rename(columns=rename_dict, inplace=True)
-        return df

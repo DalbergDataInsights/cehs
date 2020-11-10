@@ -6,6 +6,9 @@ from store import (
     timeit,
     init_data_set,
     get_year_and_month_cols,
+    get_time_diff_perc,
+    DEFAULTS,
+    Database,
 )
 
 
@@ -26,12 +29,31 @@ def scatter_district_plot(df):
     return df_district
 
 
+def get_title_district_overview(data, indicator_view_name, **controls):
+    """
+    get title for the second section based on a percentage calcution and the inputs
+    """
+    district_descrip = get_time_diff_perc(data, **controls)
+
+    title = f'''Deep-dive in {controls.get('district')} district: the {indicator_view_name} {district_descrip} 
+            between {controls.get('reference_month')}-{controls.get('reference_year')} 
+            and {controls.get('target_month')}-{controls.get('target_year')} '''
+
+    return title
+
+
 # DATACARD 3 #
 
+db = Database()
+
+default_title = get_title_district_overview(scatter_district_plot(init_data_set),
+                                            db.get_indicator_view(
+                                                DEFAULTS.get('indicator')),
+                                            **DEFAULTS)
 
 district_overview_scatter = ChartDataCard(
-    title="Deep-dive in the selected district: The $label$ changed by % between 05-2019 and 05-2020",
-    fig_title="Total $label$ in the selected district",
+    title=default_title,
+    fig_title="$label$",
     data=init_data_set,
     data_transform=scatter_district_plot,
     fig_type="Scatter",
