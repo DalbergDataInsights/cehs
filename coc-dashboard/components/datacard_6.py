@@ -47,7 +47,7 @@ def map_reporting_dated_plot(data):
 reporting_map = MapDataCard(
     data=init_data_set,
     data_transform=map_reporting_dated_plot,
-    fig_title="Percentage change of indicator reporting rate between target and reference date",
+    fig_title="$label",
     geodata=shapefile,
     locations="id",
     map_tolerance=0.005,

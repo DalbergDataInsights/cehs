@@ -1,22 +1,19 @@
 from store import (
     filter_df_by_dates,
     filter_by_district,
-    get_district_sum,
-    get_national_sum,
-    get_percentage,
-    get_sub_dfs,
-    month_order,
-    timeit,
+    get_ratio,
     Database,
-    static,
 )
 
 import pandas as pd
+import numpy as np
 
 # CARD 1
 
+# FIXME Try and run without teh outlier parameter, see if it breaks anything
 
-def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
+
+def scatter_country_data(*, indicator, **kwargs):
 
     # dfs, static,
 
@@ -26,28 +23,42 @@ def scatter_country_data(*, outlier, indicator, indicator_group, **kwargs):
 
     df = db.filter_by_indicator(df, indicator)
 
-    df = get_percentage(
-        df,
-        static.get("population data"),
-        static.get("target population type"),
-        indicator_group,
-        indicator,
-        all_country=True,
-    )
+    df, index = get_ratio(df, indicator, agg_level='country')
 
-    df = db.rename_df_columns(df)
+    df = df.set_index(index)
+
+    title = f'Total {db.get_indicator_view(indicator)} across the country'
+
+    df = df.rename(columns={indicator: title})
 
     return df
 
 
 # CARD 2
 
+def apply_date_filter(
+    *,
+    outlier,
+    target_year,
+    target_month,
+    reference_year,
+    reference_month,
+    **kwargs,
+):
+    db = Database()
+
+    df = db.raw_data
+
+    df = filter_df_by_dates(
+        df, target_year, target_month, reference_year, reference_month
+    )
+
+    return df
+
 
 def map_bar_country_dated_data(
     *,
-    outlier,
     indicator,
-    indicator_group,
     target_year,
     target_month,
     reference_year,
@@ -61,19 +72,11 @@ def map_bar_country_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
+    df = get_ratio(df, indicator, agg_level='district')[0]
+
     data_in = filter_df_by_dates(
         df, target_year, target_month, reference_year, reference_month
     )
-
-    data_in = get_percentage(
-        data_in,
-        static.get("population data"),
-        static.get("target population type"),
-        indicator_group,
-        indicator,
-    )
-
-    data_in.reset_index(inplace=True)
 
     # TODO updat teh filter by data function so that this step is no longer needed
 
@@ -84,8 +87,6 @@ def map_bar_country_dated_data(
 
     data_in = data_in[mask]
 
-    data_in = data_in.groupby(by=["id", "date"], as_index=False).agg({indicator: "sum"})
-
     data_in["year"] = data_in.date.apply(lambda x: x.year)
 
     data_in = data_in.pivot_table(columns="year", values=indicator, index="id")
@@ -95,14 +96,17 @@ def map_bar_country_dated_data(
         / data_in[int(reference_year)]
         * 100
     )
+
+    data_in = data_in.replace([np.inf, -np.inf], np.nan)
+
     data_in[indicator] = data_in[indicator].apply(lambda x: round(x, 2))
 
     data_in = data_in[[indicator]].reset_index()
-    data_in["id"] = data_in["id"].astype(str)
     data_in = data_in.set_index("id")
     data_out = data_in[~pd.isna(data_in[indicator])]
 
-    data_out = db.rename_df_columns(data_out)
+    title = f'Percentage change of {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
+    data_out = data_out.rename(columns={indicator: title})
 
     return data_out
 
@@ -110,7 +114,7 @@ def map_bar_country_dated_data(
 # CARD 3
 
 
-def scatter_district_data(*, outlier, indicator, indicator_group, district, **kwargs):
+def scatter_district_data(*,  indicator, district, **kwargs):
 
     db = Database()
 
@@ -118,19 +122,17 @@ def scatter_district_data(*, outlier, indicator, indicator_group, district, **kw
 
     df = db.filter_by_indicator(df, indicator)
 
-    df_district = filter_by_district(df, district)
-    df_district = get_district_sum(df_district, indicator)
-    df_district = get_percentage(
-        df_district,
-        static.get("population data"),
-        static.get("target population type"),
-        indicator_group,
-        indicator,
-    )
+    df = filter_by_district(df, district)
 
-    df_district = db.rename_df_columns(df_district)
+    df, index = get_ratio(df, indicator, agg_level='district')
 
-    return df_district
+    df = df.set_index(index)
+
+    title = f'Total {db.get_indicator_view(indicator)} in {district} district'
+
+    df = df.rename(columns={indicator: title})
+
+    return df
 
 
 # CARD 4
@@ -138,7 +140,6 @@ def scatter_district_data(*, outlier, indicator, indicator_group, district, **kw
 
 def tree_map_district_dated_data(
     *,
-    outlier,
     indicator,
     district,
     target_year,
@@ -146,13 +147,19 @@ def tree_map_district_dated_data(
     reference_year,
     reference_month,
     **kwargs,
+
+
 ):
 
     db = Database()
 
     df = db.raw_data
 
+    indicator = db.switch_indic_to_numerator(indicator)
+
     df = db.filter_by_indicator(df, indicator)
+
+    df = get_ratio(df, indicator, agg_level='facility')[0]
 
     # TODO check how the date function works such that it shows only target date
 
@@ -162,20 +169,26 @@ def tree_map_district_dated_data(
 
     df_district_dated = filter_by_district(df_district_dated, district)
 
-    df_district_dated = db.rename_df_columns(df_district_dated)
+    title = f'"Contribution of individual facilities to {db.get_indicator_view(indicator)} in {district} district'
+
+    df_district_dated = df_district_dated.rename(columns={indicator: title})
 
     return df_district_dated
 
 
-def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
+def scatter_facility_data(*, indicator, district, facility, **kwargs):
 
     db = Database()
 
     df = db.raw_data
 
+    indicator = db.switch_indic_to_numerator(indicator)
+
     df = db.filter_by_indicator(df, indicator)
 
     df = filter_by_district(df, district)
+
+    df, index = get_ratio(df, indicator, agg_level='facility')
 
     # TODO Reorder such that its the one facility with the on selected data max value that shows
 
@@ -188,7 +201,11 @@ def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
 
     df = df[df.facility_name == facility].reset_index(drop=True)
 
-    df = db.rename_df_columns(df)
+    title = f'Evolution of {db.get_indicator_view(indicator)} in {facility}'
+
+    df = df.rename(columns={indicator: title})
+
+    df = df.set_index(index)
 
     return df
 
@@ -202,9 +219,13 @@ def bar_reporting_country_data(*, outlier, indicator, **kwargs):
 
     df = db.rep_data
 
+    indicator = db.switch_indic_to_numerator(indicator, popcheck=False)
+
     df = db.filter_by_indicator(df, indicator)
 
-    df = db.rename_df_columns(df)
+    title = f'Total number of facilities reporting on their 105:1 form, and reporting a non-zero number for {db.get_indicator_view(indicator)} across the country'
+
+    df = df.rename(columns={indicator: title})
 
     return df
 
@@ -227,13 +248,17 @@ def map_reporting_dated_data(
 
     df = db.rep_data
 
+    indicator = db.switch_indic_to_numerator(indicator, popcheck=False)
+
     df = db.filter_by_indicator(df, indicator)
 
     df = filter_df_by_dates(
         df, target_year, target_month, reference_year, reference_month
     )
 
-    df = db.rename_df_columns(df)
+    title = f'Percentage of reporting facilities that reported a non-zero number for {db.get_indicator_view(indicator)} by district'
+
+    df = df.rename(columns={indicator: title})
 
     return df
 
@@ -247,114 +272,14 @@ def scatter_reporting_district_data(*, outlier, indicator, district, **kwargs):
 
     df = db.rep_data
 
+    indicator = db.switch_indic_to_numerator(indicator, popcheck=False)
+
     df = db.filter_by_indicator(df, indicator)
 
     df = filter_by_district(df, district)
 
-    df = db.rename_df_columns(df)
+    title = f'Total number of facilities reporting on their 105:1 form, and reporting a non-zero number for {db.get_indicator_view(indicator)} in {district} district'
 
-    return df
-
-
-# Indicator group grid
-
-
-def indicator_group(*, outlier, indicator_group, **kwargs):
-
-    db = Database()
-
-    df = db.raw_data
-
-    # FIXME when mutations and store are decoupled! !IMPORTANT
-
-    groups = dict(
-        MNCH=[
-            "1st ANC Visits",
-            "4th ANC Visits",
-            "Maternity Admissions",
-            "Deliveries in unit",
-            "Deliveries in unit - live",
-            "Deliveries in unit - fresh stillbirth",
-            "Deliveries in unit - macerated stillbirth",
-            "Newborn deaths",
-            "Postnatal Visits",
-        ],
-        EPI=[
-            "BCG (all)",
-            "BCG (outreach)",
-            "BCG (static)",
-            "DPT1 (all)",
-            "DPT1 (outreach)",
-            "DPT1 (static)",
-            "DPT3 (all)",
-            "DPT3 (outreach)",
-            "DPT3 (static)",
-            "HPV1 (all)",
-            "HPV1 (community)",
-            "HPV1 (school)",
-            "HPV2 (all)",
-            "HPV2 (community)",
-            "HPV2 (school)",
-            "MR1 (all)",
-            "MR1 (outreach)",
-            "MR1 (static)",
-            "PCV1 (all)",
-            "PCV1 (outreach)",
-            "PCV1 (static)",
-            "PCV3 (all)",
-            "PCV3 (outreach)",
-            "PCV3 (static)",
-            "TD1 (nonpregnant)",
-            "TD1 (pregnant)",
-            "TD2 (nonpregnant)",
-            "TD2 (pregnant)",
-            "TD3 (nonpregnant)",
-            "TD3 (pregnant)",
-            "TD4-5 (nonpregnant)",
-            "TD4-5 (pregnant)",
-        ],
-        GENERAL=["OPD attendance", "IPD attendance"],
-        HIV=[
-            "Tested HIV",
-            "Tested HIV positive",
-            "HIV positive linked to care",
-            "ANC tested HIV",
-            "ANC tested HIV positive",
-            "ANC initiated on ART",
-            "Mat tested HIV",
-            "Mat tested HIV positive",
-            "Mat initiated on ART",
-            "PNC tested HIV",
-            "PNC tested HIV positive",
-            "PNC initiated on ART",
-        ],
-        TB=["TB cases registered"],
-        MAL=[
-            "Malaria deaths",
-            "Malaria cases treated",
-            "Malaria cases",
-            "Malaria tests",
-        ],
-        NUT=[
-            "Number of doses of vitamin A distributed",
-            "Number of SAM admissions",
-            "Number of MAM admissions",
-            "Low weight births",
-        ],
-    )
-
-    df_groups = {"group": [], "indicator": []}
-    for group, indicators in groups.items():
-        df_groups["group"].extend([group] * len(indicators))
-        df_groups["indicator"].extend(indicators)
-
-    indicators_groups = pd.DataFrame(df_groups)
-
-    indicators = list(
-        indicators_groups[indicators_groups.group == indicator_group].indicator
-    )
-
-    columns_to_keep = db.index_columns + indicators
-    df = df[columns_to_keep]
+    df = df.rename(columns={indicator: title})
 
     return df

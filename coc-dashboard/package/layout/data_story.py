@@ -33,7 +33,11 @@ class DataStory(Dashboard):
     def get_layout(self):
 
         layout = (
-            [self.__get_header()]
+            [
+                self.__get_header()
+                if (self.title != "" or self.sub_title != "" or self.text_section != "")
+                else None
+            ]
             + [
                 dbc.Row(
                     x.layout, className="data-card shadow-sm p-3 mb-5 rounded m-top-24"
@@ -46,7 +50,7 @@ class DataStory(Dashboard):
         return layout
 
     def get_container(self):
-        return dbc.Container(self.get_layout(), id="ds-container")
+        return dbc.Container(self.get_layout(), id="ds-container", fluid=True)
 
     def _set_layout(self):
         layout = html.Div(
@@ -61,6 +65,10 @@ class DataStory(Dashboard):
                         html.Link(
                             href="https://fonts.googleapis.com/icon?family=Material+Icons",
                             rel="stylesheet",
+                        ),
+                        html.Meta(
+                            name="viewport",
+                            content="width=device-width, initial-scale=1.0",
                         ),
                         dcc.Location(id="url", refresh=False),
                     ],
@@ -80,14 +88,6 @@ class DataStory(Dashboard):
         header_layout = dbc.Row(
             dbc.Col(
                 [
-                    dbc.Row(
-                        dbc.Col(
-                            html.Img(
-                                src="/static/images/UNICEF-MOH-header-resized.jpg",  # TODO automatic placement
-                                className="ds-header__logo m-top-24",
-                            )
-                        )
-                    ),
                     dbc.Row(
                         dbc.Col(
                             [

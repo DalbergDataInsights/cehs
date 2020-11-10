@@ -1,10 +1,19 @@
+import base64
+import io
+from pathlib import Path
+
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
 import dash_html_components as html
+from dash_extensions import Download
+from dash_extensions.snippets import send_data_frame
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import xlsxwriter
+import csv
+
 
 # FIXME: For some reason this is not working (even if function is made not private, so I pasted in the functions here for now, but ideally they would be imported)
 
@@ -12,8 +21,8 @@ import plotly.graph_objects as go
 class DataCard:
 
     default_colors = {
-        "title": "#3c6792",
-        "subtitle": "#555555",
+        "title": "white",
+        "subtitle": "rgb(34, 94, 140)",
         "text": "#363638",
         "fig": ["#b00d3b", "#f77665", "#e2d5d1", "#96c0e0", "#3c6792"],
     }
@@ -57,7 +66,16 @@ class DataCard:
 
         # Callbacks
 
-        self.callbacks = []
+        self.callbacks = [
+            {
+                "func": self.__download_graph_data,
+                "input": [(f"{self.my_name}_download_button", "n_clicks")],
+                "output": [(f"{self.my_name}_download_data", "data")],
+            }
+        ]
+
+        # TODO check why this is commented out
+
         # self.callbacks = [
         #     {'func': self.__update_figure,
         #      'input': [(f'{self.my_name}_dropdown', 'value')],
@@ -82,7 +100,8 @@ class DataCard:
         assert (
             type(value) == dict
         ), "Data should be dict with pandas DataFrame as values"
-        self.__data = self.data_transform(value) if self.data_transform else value
+        self.__data = self.data_transform(
+            value) if self.data_transform else value
 
     @property
     def figure(self):
@@ -91,13 +110,14 @@ class DataCard:
 
     @figure.setter
     def figure(self, fig):
-        assert type(fig) == go.Figure, "Figure should be plotly Graph Object Figure"
-        fig.update_layout(
-            margin={"r": 0, "t": 20, "l": 0, "b": 20},
-            coloraxis=dict(colorbar_len=1),
-            showlegend=True,
-        )
-        fig.update_yaxes(rangemode="tozero")
+        # assert type(fig) == go.Figure, "Figure should be plotly Graph Object Figure"
+        if type(fig) == go.Figure:
+            fig.update_layout(
+                margin={"r": 0, "t": 20, "l": 0, "b": 20},
+                coloraxis=dict(colorbar_len=1),
+                showlegend=True,
+            )
+            fig.update_yaxes(rangemode="tozero")
         self.__figure = fig
 
     @property
@@ -136,7 +156,8 @@ class DataCard:
         """Get the static plotly layout of a data card"""
         els = [
             self.__get_figure_layout() if self.data or self.figure else None,
-            self.__get_text_layout(self.key_points) if self.key_points else None,
+            self.__get_text_layout(
+                self.key_points) if self.key_points else None,
         ]
 
         layout = dbc.Col(
@@ -186,9 +207,11 @@ class DataCard:
                             figure=self.figure,
                             config={"displayModeBar": False},
                             id=f"{self.my_name}_figure",
+                            className="data-card__figure",
                         )
                     )
                 ),
+                dbc.Row(self.__get_link_layout()),
             ],
         )
         return layout
@@ -199,7 +222,7 @@ class DataCard:
         formated_fig_title = self.__format_string(self.__figure_title, data)
 
         fig_title = html.H5(
-            html.B(formated_fig_title),
+            formated_fig_title,
             style={
                 "color": self.colors["subtitle"],
                 "text-align": "center",
@@ -261,7 +284,8 @@ class DataCard:
     def __get_orientation(self, els):
         els = els if self.orientation_left else els[::-1]
         return (
-            [dbc.Row(e) for e in els] if self.orientation_vertical else [dbc.Row(els)]
+            [dbc.Row(e) for e in els] if self.orientation_vertical else [
+                dbc.Row(els)]
         )
 
     ## TEXT SECTION ##
@@ -273,7 +297,8 @@ class DataCard:
                     dbc.Col(
                         html.Div(
                             [
-                                self.__unwrap_section_and_points(section, points)
+                                self.__unwrap_section_and_points(
+                                    section, points)
                                 for section, points in text.items()
                             ],
                             className="h-90 w-75 text-section",
@@ -283,6 +308,22 @@ class DataCard:
             ],
         )
 
+        return text_section_layout
+
+    def __get_link_layout(self):
+        text_section_layout = dbc.Col(
+            [
+                html.A(
+                    html.Span(
+                        "cloud_download", className="material-icons align-middle"
+                    ),
+                    className="data-card__download-button",
+                    id=f"{self.my_name}_download_button",
+                ),
+                Download(id=f"{self.my_name}_download_data"),
+            ],
+            width={"size": 1, "offset": 11},
+        )
         return text_section_layout
 
     def __unwrap_section_and_points(self, section, points):
@@ -297,7 +338,8 @@ class DataCard:
                 html.Div(
                     html.Ul(
                         [
-                            html.Li(html.P(self.__format_string(item, self.data)))
+                            html.Li(
+                                html.P(self.__format_string(item, self.data)))
                             for item in points
                         ]
                     ),
@@ -354,7 +396,8 @@ class DataCard:
 
             # deal with complex labels
             while "$" in formatted_string:
-                sub = self.__get_substring_between_elements(formatted_string, "$")
+                sub = self.__get_substring_between_elements(
+                    formatted_string, "$")
 
                 try:
                     if "trace" in sub:
@@ -384,7 +427,8 @@ class DataCard:
     def __get_substring_between_elements(self, string, element, closing_element="$"):
         try:
             out = string.split(element, 1)[1]
-            out = out.split(closing_element, 1)[0] if closing_element in out else None
+            out = out.split(closing_element, 1)[
+                0] if closing_element in out else None
         except IndexError as e:
             out = None
             print(e)
@@ -414,6 +458,7 @@ class DataCard:
         return list(all_columns)
 
     def _requires_dropdown(self):
+        return True
         return len(self._get_all_columns()) > 1
 
     def __update_figure(self, value):
@@ -423,3 +468,13 @@ class DataCard:
         self.figure = self._get_figure(data_dict)
         self.figure_title = self._get_figure_title(data_dict)
         return [self.figure, self.figure_title]
+
+    def __download_graph_data(self, *inputs):
+        """Download data associated with a figure"""
+        print("Download callback fired")
+        print(inputs)
+
+        # prep data file
+        df = pd.concat(self.data.values()).reset_index()
+
+        return [send_data_frame(df.to_excel, f"{df.columns[-1]}.xlsx")]
