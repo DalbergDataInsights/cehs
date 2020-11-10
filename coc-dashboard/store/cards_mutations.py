@@ -7,6 +7,7 @@ from store import (
 
 import pandas as pd
 import numpy as np
+from datetime import datetime
 
 # CARD 1
 
@@ -80,20 +81,20 @@ def map_bar_country_dated_data(
 
     # TODO updat teh filter by data function so that this step is no longer needed
 
-    min_date = data_in.date.min()
-    max_date = data_in.date.max()
+    target_date = datetime.strptime(f"{target_month} 1 {target_year}",
+                                    "%b %d %Y")
+    reference_date = datetime.strptime(f"{reference_month} 1 {reference_year}",
+                                       "%b %d %Y")
 
-    mask = (data_in.date == min_date) | (data_in.date == max_date)
+    mask = (data_in.date == target_date) | (data_in.date == reference_date)
 
     data_in = data_in[mask]
 
-    data_in["year"] = data_in.date.apply(lambda x: x.year)
-
-    data_in = data_in.pivot_table(columns="year", values=indicator, index="id")
+    data_in = data_in.pivot_table(columns="date", values=indicator, index="id")
 
     data_in[indicator] = (
-        (data_in[int(target_year)] - data_in[int(reference_year)])
-        / data_in[int(reference_year)]
+        (data_in[target_date] - data_in[reference_date])
+        / data_in[reference_date]
         * 100
     )
 
