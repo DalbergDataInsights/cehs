@@ -12,14 +12,14 @@ from dotenv import find_dotenv, load_dotenv
 load_dotenv(find_dotenv())
 
 DEFAULTS = {
-    "default_outlier": os.environ["OUTLIER"],
-    "default_indicator": os.environ["INDICATOR"],
-    "default_indicator_group": os.environ["INDICATOR_GROUP"],
-    "default_district": os.environ["DISTRICT"],
-    "default_target_year": os.environ["TARGET_YEAR"],
-    "default_target_month": os.environ["TARGET_MONTH"],
-    "default_reference_year": os.environ["REFERENCE_YEAR"],
-    "default_reference_month": os.environ["REFERENCE_MONTH"],
+    "outlier": os.environ["OUTLIER"],
+    "indicator": os.environ["INDICATOR"],
+    "indicator_group": os.environ["INDICATOR_GROUP"],
+    "district": os.environ["DISTRICT"],
+    "target_year": os.environ["TARGET_YEAR"],
+    "target_month": os.environ["TARGET_MONTH"],
+    "reference_year": os.environ["REFERENCE_YEAR"],
+    "reference_month": os.environ["REFERENCE_MONTH"],
 }
 
 
@@ -45,12 +45,12 @@ def initiate_dropdowns():
 
     date_dropdowns = DateDropdownLayout(
         options=dates,
-        from_default=DEFAULTS.get("default_reference_month")
+        from_default=DEFAULTS.get("reference_month")
         + " "
-        + DEFAULTS.get("default_reference_year"),
-        to_default=DEFAULTS.get("default_target_month")
+        + DEFAULTS.get("reference_year"),
+        to_default=DEFAULTS.get("target_month")
         + " "
-        + DEFAULTS.get("default_target_year"),
+        + DEFAULTS.get("target_year"),
     )
 
     # Initiate outlier policy dropdown
@@ -72,7 +72,7 @@ def initiate_dropdowns():
         This approach is best suited for 'cleaner', normally distributed data. An interquartile range-based approach, using Tukey's fences method with k=3,
         which fits a broader range of data distributions but is also more stringent, and hence best suited for 'messier' data.""",
         defaults={
-            "SELECT AN OUTLIER POLICY": DEFAULTS.get("default_outlier"),
+            "SELECT AN OUTLIER POLICY": DEFAULTS.get("outlier"),
         },
     )
 
@@ -81,15 +81,15 @@ def initiate_dropdowns():
         title="SELECT AN INDICATOR",
         info="We focus on a key set of indicators as advised by experts and described in WHO's list of priority indicators. For simplicity of interpretation and time comparison, we focus on absolute numbers rather than calculated indicators. ",
         defaults={
-            "config_group": DEFAULTS.get("default_indicator_group"),
-            "config_indicator": DEFAULTS.get("default_indicator"),
+            "config_group": DEFAULTS.get("indicator_group"),
+            "config_indicator": DEFAULTS.get("indicator"),
         },
     )
 
     district_control_group = NestedDropdownGroup(
         pd.DataFrame({"SELECT A DISTRICT": db.districts}),
         title="SELECT A DISTRICT",
-        defaults={"SELECT A DISTRICT": DEFAULTS.get("default_district")},
+        defaults={"SELECT A DISTRICT": DEFAULTS.get("district")},
     )
 
     side_nav = SideNav(

@@ -6,6 +6,9 @@ from store import (
     timeit,
     init_data_set,
     get_year_and_month_cols,
+    DEFAULTS,
+    Database,
+    get_time_diff_perc,
 )
 
 
@@ -23,12 +26,33 @@ def scatter_country_plot(df):
     return df_country
 
 
+def get_title_country_overview(data, indicator_view_name, **controls):
+    """
+    get title for the first section based on a percentage calcution and the inputs
+    """
+    country_descrip = get_time_diff_perc(data, **controls)
+
+    title = f'''Overview: Across the country, the {indicator_view_name} {country_descrip} 
+            between {controls.get('reference_month')}-{controls.get('reference_year')} 
+            and {controls.get('target_month')}-{controls.get('target_year')} '''
+
+    return title
+
 # DATACARD 1 #
 
 
+db = Database()
+
+# TODO The class would need to include this title function by default to avoid repetition
+
+default_title = get_title_country_overview(scatter_country_plot(init_data_set),
+                                           db.get_indicator_view(
+                                               DEFAULTS.get('indicator')),
+                                           **DEFAULTS)
+
 country_overview_scatter = ChartDataCard(
-    title="Overview: Across the country, the $label$ changed by between 04-2019 and 04-2020",
-    fig_title="Total $label$ across the country",
+    title=default_title,
+    fig_title="$label$",
     data=init_data_set,
     data_transform=scatter_country_plot,
     fig_type="Scatter",

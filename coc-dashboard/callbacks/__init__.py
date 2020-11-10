@@ -1,6 +1,5 @@
 from components import (
     country_overview_scatter,
-    country_overview_map,
     district_overview_scatter,
     facility_scatter,
     stacked_bar_district,
@@ -23,9 +22,7 @@ from pprint import pprint as print
 
 from .global_callbacks import (
     global_story_callback,
-    change_titles_reporting,
     update_on_click,
-    change_titles_trends,
 )
 
 
@@ -34,6 +31,8 @@ from .user_interface import (
     menu_toggle_button,
 )
 
+
+# Input(id, property), Output(id, property)
 callback_ids = {
     outlier_policy_dropdown_group.dropdown_ids[-1]: "value",  # Outlier policy
     indicator_dropdown_group.dropdown_ids[0]: "value",  # Indicator group
@@ -49,7 +48,16 @@ def define_callbacks(ds):
     app = ds.app
 
     callbacks = [
+        # Global callbacks
+        {
+            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
+            "outputs": [Output("ds-container", "children")],
+            "function": global_story_callback,
+        },
         # Data cards
+
+        # TODO : change this manual step below, which results in reporting pane not updating properly
+
         {
             "inputs": [
                 Input(id, prop)
@@ -108,44 +116,7 @@ def define_callbacks(ds):
             ],
             "function": change_page,
         },
-        # Global callbacks
-        {
-            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
-            "outputs": [Output("ds-container", "children")],
-            "function": global_story_callback,
-        },
-        {
-            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
-            "outputs": [
-                Output(f"{country_overview_scatter.my_name}_title", "children"),
-                Output(f"{country_overview_map.my_name}_fig_title", "children"),
-                Output(f"{district_overview_scatter.my_name}_title", "children"),
-                Output(
-                    f"{district_overview_scatter.my_name}_fig_title", "children"),
-                Output(f"{tree_map_district.my_name}_title", "children"),
-
-            ],
-            "function": change_titles_trends,
-        },
-        {
-            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
-            # "inputs": [
-            #     # Indicator group
-            #     Input(indicator_dropdown_group.dropdown_ids[0], "value"),
-            #     # Indicator
-            #     Input(indicator_dropdown_group.dropdown_ids[-1], "value"),
-            #     Input("date_to", "value"),
-            # ],
-            "outputs": [
-                Output(
-                    f"{stacked_bar_reporting_country.my_name}_title", "children"),
-                Output(
-                    f"{reporting_map.my_name}_fig_title", "children"),
-                Output(
-                    f"{stacked_bar_district.my_name}_fig_title", "children"),
-            ],
-            "function": change_titles_reporting,
-        },
+        # N-click callbacks
         {
             "inputs": [Input(f"{tree_map_district.my_name}_figure", "clickData")],
             "outputs": [
@@ -154,13 +125,8 @@ def define_callbacks(ds):
             ],
             "function": update_on_click,
         },
-    ]
 
-    # {
-    # "inputs": ,
-    # "outputs": ,
-    # "function": ,
-    # },
+    ]
 
     print("==Registering callbacks==")
 

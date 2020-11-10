@@ -1,6 +1,11 @@
 import numpy as np
 import pandas as pd
-from store import timeit, get_sub_dfs, init_data_set, get_year_and_month_cols
+from store import (timeit,
+                   get_sub_dfs,
+                   init_data_set,
+                   get_year_and_month_cols,
+                   DEFAULTS,
+                   Database)
 from package.layout.area_card import AreaDataCard
 from package.layout.chart_card import ChartDataCard
 
@@ -35,17 +40,35 @@ def scatter_facility_plot(data):
     return data
 
 
+def get_title_district_treemap(indicator_view_name, **controls):
+    """
+    get title for the third section based on a percentage calcution and the inputs
+    """
+    title = f'''Contribution of individual facilities in {controls.get('district')} district to the {indicator_view_name}
+            on {controls.get('target_month')}-{controls.get('target_year')}'''
+
+    return title
+
+
+# DATACARD 4 #
+
+db = Database()
+
+default_title = get_title_district_treemap(
+    db.get_indicator_view(DEFAULTS.get('indicator')), **DEFAULTS)
+
 tree_map_district = AreaDataCard(
-    title="The contribution of individual facilities in the selected district",
+    title=default_title,
     data=init_data_set,
     data_transform=tree_map_district_dated_plot,
     fig_object="Treemap",
 )
+
 tree_map_district.set_colors({"fig": ["#e2d5d1", "#96c0e0", "#3c6792"]})
 
 
 facility_scatter = ChartDataCard(
-    fig_title="Evolution of $label$ (click on the graph above to filter)",
+    fig_title="$label$",
     data=init_data_set,
     data_transform=scatter_facility_plot,
 )
