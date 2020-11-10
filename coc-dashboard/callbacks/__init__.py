@@ -31,7 +31,7 @@ from .user_interface import (
     menu_toggle_button,
 )
 
-# TODO : understand the data input format
+
 # Input(id, property), Output(id, property)
 callback_ids = {
     outlier_policy_dropdown_group.dropdown_ids[-1]: "value",  # Outlier policy
@@ -55,6 +55,9 @@ def define_callbacks(ds):
             "function": global_story_callback,
         },
         # Data cards
+
+        # TODO : change this manual step below, which results in reporting pane not updating properly
+
         {
             "inputs": [
                 Input(id, prop)
