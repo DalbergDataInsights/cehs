@@ -46,7 +46,35 @@ class MapDataCard(DataCard):
 
         figure_colors = self.colors.get("fig")
 
+        # FIXME do this properly
+
+        def get_custom_colorscale(df):
+
+            df = df[df.columns[0]]
+
+            q1 = df.quantile(0.25)
+            q3 = df.quantile(0.75)
+            iqr = q3 - q1
+            lower_bound = max(df.min(), (q1 - 1.5 * iqr))
+            upper_bound = min(df.max(), (q3 + 1.5 * iqr))
+            zero_norm = (-lower_bound)/(upper_bound-lower_bound)
+
+            colorscale = [
+                [0.0, '#b00d3b'],
+                [zero_norm/2, '#f77665'],
+                [zero_norm, '#e2d5d1'],
+                [zero_norm+(1-zero_norm)/2, '#96c0e0'],
+                [1.0, '#3c6792']
+            ]
+
+            return colorscale, lower_bound, upper_bound
+
         for name, df in data.items():
+
+            colorscale, lower_bound, upper_bound = get_custom_colorscale(df)
+
+            figure_colors[name] = colorscale
+
             choropleth_map = go.Choroplethmapbox(
                 z=df[df.columns[0]],
                 geojson=self.__geojson,
@@ -57,9 +85,10 @@ class MapDataCard(DataCard):
                 + "<extra></extra>",
                 marker_opacity=self.opacity,
                 marker_line_width=1,
-                colorscale=figure_colors.get(name, next(iter(figure_colors.values()))),
-                zauto=True,
-                zmid=0,
+                colorscale=figure_colors.get(
+                    name, next(iter(figure_colors.values()))),
+                zmin=lower_bound,
+                zmax=upper_bound
             )
 
         fig = go.Figure(choropleth_map)
