@@ -113,6 +113,7 @@ pep8 = "*"
 black = "*"
 dash-extensions = "*"
 postgres = "*"
+geos = "*"
 
 [requires]
 python_version = "3.7"
