@@ -143,6 +143,8 @@ def get_ratio(df, indicator, agg_level):
 
         df[indicator] = (df[weighted_ratio] / df[weight])*1000
 
+        df = df.replace([np.inf, -np.inf], np.nan)
+
         df = df.drop(
             columns=[weighted_ratio, weight])
 

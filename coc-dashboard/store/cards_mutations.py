@@ -6,6 +6,7 @@ from store import (
 )
 
 import pandas as pd
+import numpy as np
 
 # CARD 1
 
@@ -95,6 +96,9 @@ def map_bar_country_dated_data(
         / data_in[int(reference_year)]
         * 100
     )
+
+    data_in = data_in.replace([np.inf, -np.inf], np.nan)
+
     data_in[indicator] = data_in[indicator].apply(lambda x: round(x, 2))
 
     data_in = data_in[[indicator]].reset_index()
