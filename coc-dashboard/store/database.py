@@ -44,7 +44,7 @@ class Database(metaclass=SingletonMeta):
 
     # TODO have thislinked to DEFAULT
 
-    active_repo = "out"
+    active_repo = "std"
 
     data_types = {
         "district_name": str,
@@ -56,7 +56,7 @@ class Database(metaclass=SingletonMeta):
 
     index_columns = ["id", "facility_name", "date"]
 
-    pop_markers = ["coverage", '(per ']
+    pop_markers = ["coverage", "(per "]
 
     datasets = {}
     raw_data = None
@@ -156,19 +156,22 @@ class Database(metaclass=SingletonMeta):
     # Data filters
 
     def get_is_ratio(self, indicator):
-        ratio_list = [x.get("config_indicator")
-                      for x in self.__indicator_serialized
-                      if x.get("config_function") == 'ratio']
+        ratio_list = [
+            x.get("config_indicator")
+            for x in self.__indicator_serialized
+            if x.get("config_function") == "ratio"
+        ]
         return indicator in ratio_list
 
     def filter_by_indicator(self, df, indicator):
 
         config = self.get_serialized_into_df(Config)
 
-        function = config[config.config_indicator ==
-                          indicator]['config_function'].values[0]
+        function = config[config.config_indicator == indicator][
+            "config_function"
+        ].values[0]
 
-        is_ratio = (function == 'ratio')
+        is_ratio = function == "ratio"
 
         if is_ratio == False:
             try:
@@ -179,11 +182,12 @@ class Database(metaclass=SingletonMeta):
 
         else:
 
-            nominator = f'{indicator}__weighted_ratio'
+            nominator = f"{indicator}__weighted_ratio"
 
-            denominator = config[config.config_indicator ==
-                                 indicator]['config_denominator'].values[0]
-            denominator = f'{denominator}__weight'
+            denominator = config[config.config_indicator == indicator][
+                "config_denominator"
+            ].values[0]
+            denominator = f"{denominator}__weight"
 
             try:
                 df = df[list(self.index_columns) + [nominator, denominator]]
@@ -200,12 +204,13 @@ class Database(metaclass=SingletonMeta):
 
         else:
             config = self.get_serialized_into_df(Config)
-            function = config[config.config_indicator ==
-                              indicator]['config_function'].values[0]
-            needs_switch = (function == 'ratio')
+            function = config[config.config_indicator == indicator][
+                "config_function"
+            ].values[0]
+            needs_switch = function == "ratio"
 
         if needs_switch:
-            new_indic = indicator.split(' (')[0]
+            new_indic = indicator.split(" (")[0]
             return new_indic
 
         else:

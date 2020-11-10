@@ -242,7 +242,7 @@ class SideNav:
                                 className=self.icon_class,
                                 style=self.icon_style,
                             ),
-                            " Overview of the 20",
+                            " Overview",
                         ]
                         + self.get_tooltip(
                             self.overview_info, "overview-info", icon=False
