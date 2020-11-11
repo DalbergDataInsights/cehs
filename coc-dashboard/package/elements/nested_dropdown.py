@@ -48,8 +48,8 @@ class NestedDropdown:
             else None,
             dcc.Dropdown(
                 options=options,
-                id=self.id,
                 value=self.value,
+                id=self.id,
                 persistence=True,
                 persistence_type="session",
                 className="m-1",
@@ -57,7 +57,10 @@ class NestedDropdown:
             ),
         ]
         self.layout = dbc.Col(
-            layout, style={"overflow": "visible !important"}, className="m-12"
+            layout,
+            style={"overflow": "visible !important"},
+            className="m-12",
+            id=self.id + "_container",
         )
 
     def add_child(self, child):
