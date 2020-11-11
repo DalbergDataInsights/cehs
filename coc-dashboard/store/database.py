@@ -44,7 +44,7 @@ class Database(metaclass=SingletonMeta):
 
     # TODO have thislinked to DEFAULT
 
-    active_repo = "std"
+    active_repo = "out"
 
     data_types = {
         "district_name": str,
