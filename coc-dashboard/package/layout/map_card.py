@@ -44,22 +44,24 @@ class MapDataCard(DataCard):
 
         choropleth_map = go.Choroplethmapbox()
 
-        figure_colors = self.colors.get("fig")
-
         for name, df in data.items():
+
+            lower_bound, upper_bound = DataCard.get_range(df[df.columns[0]])
+            colorscale = self.get_custom_colorscale(name,
+                                                    (lower_bound, upper_bound))
+
             choropleth_map = go.Choroplethmapbox(
                 z=df[df.columns[0]],
                 geojson=self.__geojson,
                 locations=df.reset_index()[self.locations],
                 hovertemplate="%{location} <br>"
-                + df.columns[0]
                 + ": %{z}"
                 + "<extra></extra>",
                 marker_opacity=self.opacity,
                 marker_line_width=1,
-                colorscale=figure_colors.get(name, next(iter(figure_colors.values()))),
-                zauto=True,
-                zmid=0,
+                colorscale=colorscale,
+                zmin=lower_bound,
+                zmax=upper_bound
             )
 
         fig = go.Figure(choropleth_map)

@@ -1,6 +1,7 @@
 import base64
 import io
 from pathlib import Path
+from _plotly_utils.colors import colorscale_to_colors
 
 import dash_bootstrap_components as dbc
 import dash_core_components as dcc
@@ -24,7 +25,7 @@ class DataCard:
         "title": "white",
         "subtitle": "rgb(34, 94, 140)",
         "text": "#363638",
-        "fig": ["#b00d3b", "#f77665", "#e2d5d1", "#96c0e0", "#3c6792"],
+        "fig": ["#b00d3b", "#f77665", "#dedad9", "#96c0e0", "#3c6792"],
     }
 
     def __init__(self, data: {str: pd.DataFrame} = None, **kwargs):
@@ -44,6 +45,7 @@ class DataCard:
         # Style
         self.__colors = self.default_colors.copy()
         self.set_colors(kwargs.get("colors", self.default_colors.copy()))
+        self.center_value = (kwargs.get("center_value", 0))
 
         # Layout
         # Orientation
@@ -377,6 +379,54 @@ class DataCard:
                     next(iter(self.data.keys())): px.colors.make_colorscale(color_list)
                 }
         return colors_dict
+
+    @staticmethod
+    def get_range(data, exclude_outliers=True):
+
+        if exclude_outliers:
+
+            q1 = data.quantile(0.25)
+            q3 = data.quantile(0.75)
+            iqr = q3 - q1
+            lower_bound = max(data.min(), (q1 - 1.5 * iqr))
+            upper_bound = min(data.max(), (q3 + 1.5 * iqr))
+
+        else:
+
+            lower_bound = data.min()
+            upper_bound = data.max()
+
+        return (lower_bound, upper_bound)
+
+    def get_custom_colorscale(self, name, range):
+
+        colorscale = self.colors.get('fig').get(name)
+        colorlist = [x[-1] for x in colorscale]
+
+        colorlist_lenght = len(colorlist)
+        assert colorlist_lenght in [
+            2, 3, 5], "Color list should include 2,3, or 5 colors"
+
+        lower_bound, upper_bound = range
+
+        if lower_bound <= self.center_value <= upper_bound:
+            center_norm = (self.center_value-lower_bound) / \
+                (upper_bound-lower_bound)
+        else:
+            center_norm = 0.5
+
+        colorscale = [
+            [0.0, colorlist[0]],
+            [center_norm/2, colorlist[1]] if colorlist_lenght == 5 else None,
+            [center_norm, colorlist[2]] if colorlist_lenght in [3, 5] else None,
+            [center_norm+(1-center_norm)/2, colorlist[3]
+             ] if colorlist_lenght == 5 else None,
+            [1.0, colorlist[-1]]
+        ]
+
+        colorscale = [x for x in colorscale if x]
+
+        return colorscale
 
     #################
     #    HELPERS    #

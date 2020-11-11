@@ -48,6 +48,7 @@ reporting_map = MapDataCard(
     data=init_data_set,
     data_transform=map_reporting_dated_plot,
     fig_title="$label$",
+    center_value=50,
     geodata=shapefile,
     locations="id",
     map_tolerance=0.005,
