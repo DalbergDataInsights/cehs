@@ -18,6 +18,8 @@ class NestedDropdown:
         self.visible_id = kwargs.pop("visible_id", True)
 
         self.dropdown_settings = kwargs
+        if "clearable" not in self.dropdown_settings.items():
+            self.dropdown_settings["clearable"] = False
 
     @property
     def value(self):
