@@ -228,20 +228,9 @@ class Database(metaclass=SingletonMeta):
             x.get(rename_from): x.get(rename_to) for x in self.__indicator_serialized
         }
 
-    # TODO : Understand the need for if statement below
-
     def get_indicator_view(
-        self, indicator, rename_from="indicator", rename_to="view", indicator_group=None
-    ):
-        if indicator_group:
-            for x in self.__indicator_serialized:
-                if (
-                    x.get("config_group") == indicator_group
-                    and x.get(f"config_{rename_from}") == indicator
-                ):
-                    return x.get(f"config_{rename_to}")
-        else:
-            return self.get_renaming_dict(
-                rename_from=f"config_{rename_from}",
-                rename_to=f"config_{rename_to}",
-            ).get(indicator)
+            self, indicator, rename_from="indicator", rename_to="view"):
+        return self.get_renaming_dict(
+            rename_from=f"config_{rename_from}",
+            rename_to=f"config_{rename_to}",
+        ).get(indicator)

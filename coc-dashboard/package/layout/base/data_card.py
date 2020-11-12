@@ -1,5 +1,4 @@
-import base64
-import io
+import math
 from pathlib import Path
 from _plotly_utils.colors import colorscale_to_colors
 
@@ -46,6 +45,8 @@ class DataCard:
         self.__colors = self.default_colors.copy()
         self.set_colors(kwargs.get("colors", self.default_colors.copy()))
         self.center_value = (kwargs.get("center_value", 0))
+        self.excl_outliers_colorscale = (kwargs.get("excl_outliers_colorscale",
+                                                    True))
 
         # Layout
         # Orientation
@@ -380,10 +381,9 @@ class DataCard:
                 }
         return colors_dict
 
-    @staticmethod
-    def get_range(data, exclude_outliers=True):
+    def get_range(self, data):
 
-        if exclude_outliers:
+        if self.excl_outliers_colorscale:
 
             q1 = data.quantile(0.25)
             q3 = data.quantile(0.75)
@@ -402,6 +402,8 @@ class DataCard:
 
         colorscale = self.colors.get('fig').get(name)
         colorlist = [x[-1] for x in colorscale]
+        min_color_nb = 0
+        max_color_nb = -1
 
         colorlist_lenght = len(colorlist)
         assert colorlist_lenght in [
@@ -409,20 +411,33 @@ class DataCard:
 
         lower_bound, upper_bound = range
 
-        if lower_bound <= self.center_value <= upper_bound:
-            center_norm = (self.center_value-lower_bound) / \
-                (upper_bound-lower_bound)
-        else:
-            center_norm = 0.5
+        if colorlist_lenght == 2:
+            colorscale = [
+                [0.0, colorlist[min_color_nb]],
+                [1.0, colorlist[max_color_nb]]
+            ]
 
-        colorscale = [
-            [0.0, colorlist[0]],
-            [center_norm/2, colorlist[1]] if colorlist_lenght == 5 else None,
-            [center_norm, colorlist[2]] if colorlist_lenght in [3, 5] else None,
-            [center_norm+(1-center_norm)/2, colorlist[3]
-             ] if colorlist_lenght == 5 else None,
-            [1.0, colorlist[-1]]
-        ]
+        else:
+
+            if lower_bound <= self.center_value <= upper_bound:
+                center_norm = (self.center_value-lower_bound) / \
+                    (upper_bound-lower_bound)
+                colorscale = [
+                    [0.0, colorlist[min_color_nb]],
+                    [center_norm/2, colorlist[1]],
+                    [center_norm, colorlist[2]],
+                    [center_norm+(1-center_norm)/2, colorlist[3]],
+                    [1.0, colorlist[max_color_nb]]
+                ]
+            else:
+                if self.center_value <= lower_bound:
+                    min_color_nb = math.floor(colorlist_lenght/2)
+                else:
+                    max_color_nb = math.floor(colorlist_lenght/2)
+                colorscale = [
+                    [0.0, colorlist[min_color_nb]],
+                    [1.0, colorlist[max_color_nb]]
+                ]
 
         colorscale = [x for x in colorscale if x]
 

@@ -35,7 +35,7 @@ from .user_interface import (
 # Input(id, property), Output(id, property)
 callback_ids = {
     outlier_policy_dropdown_group.dropdown_ids[-1]: "value",  # Outlier policy
-    indicator_dropdown_group.dropdown_ids[0]: "value",  # Indicator group
+    # indicator_dropdown_group.dropdown_ids[0]: "value",  # Indicator group
     indicator_dropdown_group.dropdown_ids[-1]: "value",  # Indicator
     "date_from": "value",
     "date_to": "value",

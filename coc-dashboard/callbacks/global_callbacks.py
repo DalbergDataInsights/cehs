@@ -7,6 +7,7 @@ import pandas as pd
 from components import (
     country_overview_scatter,
     get_title_country_overview,
+    country_overview,
     district_overview_scatter,
     get_title_district_overview,
     facility_scatter,
@@ -25,7 +26,6 @@ from store import (
     define_datasets,
     timeit,
     Database,
-    get_perc_description,
 )
 
 from view import ds
@@ -42,52 +42,58 @@ def global_story_callback(*inputs):
         LAST_CONTROLS = CONTROLS.copy()
 
         CONTROLS["outlier"] = inputs[0]
-        CONTROLS["indicator"] = inputs[2]
-        CONTROLS["district"] = inputs[5]
-        CONTROLS["target_year"] = inputs[4].split(" ")[1]
-        CONTROLS["target_month"] = inputs[4].split(" ")[0]
-        CONTROLS["reference_year"] = inputs[3].split(" ")[1]
-        CONTROLS["reference_month"] = inputs[3].split(" ")[0]
-        CONTROLS["indicator_group"] = inputs[1]
+        CONTROLS["indicator"] = inputs[1]
+        CONTROLS["district"] = inputs[4]
+        CONTROLS["target_year"] = inputs[3].split(" ")[1]
+        CONTROLS["target_month"] = inputs[3].split(" ")[0]
+        CONTROLS["reference_year"] = inputs[2].split(" ")[1]
+        CONTROLS["reference_month"] = inputs[2].split(" ")[0]
+        #CONTROLS["indicator_group"] = inputs[1]
 
         db.filter_by_policy(CONTROLS["outlier"])
 
         df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
-        ds.switch_data_set(df)
+        # ds.switch_data_set(df)
 
-        # for x in [country_overview_scatter,
-        #           district_overview_scatter,
-        #           facility_scatter,
-        #           stacked_bar_district,
-        #           stacked_bar_reporting_country,
-        #           tree_map_district,
-        #           reporting_map,
-        #           overview]:
-        #     x.data = df
+        for x in [country_overview_scatter,
+                  country_overview,
+                  district_overview_scatter,
+                  facility_scatter,
+                  stacked_bar_district,
+                  stacked_bar_reporting_country,
+                  tree_map_district,
+                  reporting_map,
+                  overview]:
+            try:
+                x.data = df
+            except Exception as e:
+                print(e)
 
         print(f"Datasets updated for {CONTROLS['indicator']}")
     except:
         print(f"Error updating global callback for {CONTROLS['indicator']}")
 
-    indicator_view_name = db.get_indicator_view(CONTROLS['indicator'],
-                                                indicator_group=CONTROLS['indicator_group'])
+    indicator_view = db.get_indicator_view(CONTROLS['indicator'])
 
-    indicator_vetted = db.get_indicator_view(CONTROLS['indicator'])
+    indicator_view_if_ratio = db.get_indicator_view(
+        db.switch_indic_to_numerator(CONTROLS['indicator'],
+                                     popcheck=False))
 
-    indicator_view_name_vetted = db.get_indicator_view(indicator_vetted,
-                                                       indicator_group=CONTROLS['indicator_group'])
+    indicator_view_if_pop_dependant = db.get_indicator_view(
+        db.switch_indic_to_numerator(CONTROLS['indicator'],
+                                     popcheck=True))
 
     try:
-        change_titles_reporting(indicator_view_name,
+        change_titles_reporting(indicator_view_if_ratio,
                                 CONTROLS)
 
     except:
         print(f"Error updating reporting title for {CONTROLS['indicator']}")
 
     try:
-        change_titles_trends(indicator_view_name,
-                             indicator_view_name_vetted,
+        change_titles_trends(indicator_view,
+                             indicator_view_if_pop_dependant,
                              CONTROLS)
 
     except:
