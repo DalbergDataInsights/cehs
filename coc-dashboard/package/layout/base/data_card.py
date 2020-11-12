@@ -400,7 +400,8 @@ class DataCard:
 
     def get_custom_colorscale(self, name, range):
 
-        colorscale = self.colors.get('fig').get(name)
+        # TODO Find more stable fix, not using name
+        colorscale = list(self.colors.get('fig').values())[0]
         colorlist = [x[-1] for x in colorscale]
         min_color_nb = 0
         max_color_nb = -1
