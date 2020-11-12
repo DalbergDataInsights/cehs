@@ -257,7 +257,7 @@ def map_reporting_dated_data(
         df, target_year, target_month, reference_year, reference_month
     )
 
-    title = f'Percentage of reporting facilities that reported a non-zero number for {db.get_indicator_view(indicator)} by district'
+    title = f'Percentage of reporting facilities that reported a non-zero number for {db.get_indicator_view(indicator)} by district on {target_month}-{target_year}'
 
     df = df.rename(columns={indicator: title})
 

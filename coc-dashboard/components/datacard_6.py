@@ -32,7 +32,7 @@ def map_reporting_dated_plot(data):
         reporting.append(report_rate)
 
     reporting_df = pd.DataFrame(
-        {"id": districts, f'reporting rate for {data_in.columns[-1]}': reporting})
+        {"id": districts, f'{data_in.columns[-1]}': reporting})
     reporting_df = reporting_df.set_index("id")
 
     data_out = {
@@ -49,6 +49,7 @@ reporting_map = MapDataCard(
     data_transform=map_reporting_dated_plot,
     fig_title="$label$",
     center_value=50,
+    excl_outliers_colorscale=False,
     geodata=shapefile,
     locations="id",
     map_tolerance=0.005,

@@ -46,7 +46,7 @@ class MapDataCard(DataCard):
 
         for name, df in data.items():
 
-            lower_bound, upper_bound = DataCard.get_range(df[df.columns[0]])
+            lower_bound, upper_bound = self.get_range(df[df.columns[0]])
             colorscale = self.get_custom_colorscale(name,
                                                     (lower_bound, upper_bound))
 
