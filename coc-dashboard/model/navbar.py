@@ -85,6 +85,14 @@ class Controls:
         layout = dbc.Col(self.el_layout)
         return layout
 
+    def get_class_names(self, state):
+        if state == "trends":
+            return ["m-12 col"] * 6
+        elif state == "overview":
+            return ["m-12 col disabled"] * 4 + ["m-12 col"] * 2
+        elif state == "reporting":
+            return ["m-12 col"] * 6
+
 
 class SideNav:
 
@@ -192,7 +200,7 @@ class SideNav:
                         "padding-bottom": "2vh",
                     },
                 ),
-                dbc.Row(self.controls.get_layout()),
+                dbc.Row(self.controls.get_layout(), id="sidenav-controls"),
                 dbc.Row(
                     dbc.Col(
                         dcc.Link(

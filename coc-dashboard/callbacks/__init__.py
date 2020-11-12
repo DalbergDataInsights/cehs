@@ -42,6 +42,15 @@ callback_ids = {
     district_control_group.dropdown_ids[-1]: "value",  # District
 }
 
+dropdown_style = [
+    "config_group",
+    "config_indicator",
+    "SELECT A DISTRICT",
+    "aggregation_type",
+    "date_from",
+    "date_to",
+]
+
 
 def define_callbacks(ds):
 
@@ -55,9 +64,7 @@ def define_callbacks(ds):
             "function": global_story_callback,
         },
         # Data cards
-
         # TODO : change this manual step below, which results in reporting pane not updating properly
-
         {
             "inputs": [
                 Input(id, prop)
@@ -113,7 +120,8 @@ def define_callbacks(ds):
                 Output("ds-paginator", "children"),
                 Output("nav-buttons", "children"),
                 Output("dash-title", "children"),
-            ],
+            ]
+            + [Output(x+"_container", "className") for x in dropdown_style],
             "function": change_page,
         },
         # N-click callbacks
@@ -125,7 +133,6 @@ def define_callbacks(ds):
             ],
             "function": update_on_click,
         },
-
     ]
 
     print("==Registering callbacks==")

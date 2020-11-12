@@ -53,6 +53,7 @@ def change_page(*inputs):
     changed_id = [p["prop_id"] for p in callback_context.triggered][0]
 
     clicked = "trends"
+    navbar = ds.ind_elements[0]
 
     if "trends" in changed_id:
         ds.data_cards = [
@@ -78,4 +79,8 @@ def change_page(*inputs):
         clicked = "overview"
     title.dash = clicked
 
-    return [ds.get_container(), side_nav.get_nav_buttons(clicked), title.get_layout()]
+    return [
+        ds.get_container(),
+        side_nav.get_nav_buttons(clicked),
+        title.get_layout(),
+    ] + navbar.controls.get_class_names(clicked)
