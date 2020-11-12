@@ -93,8 +93,8 @@ def reporting_count_transform(data):
     df_no_form_report = get_num(data, 1)
 
     data = {
-        "Reported a positive number": df_positive,
-        "Did not report a positive number": df_no_positive,
+        "Reported one or above for selected indicator": df_positive,
+        "Reported a null or zero for selected indicator": df_no_positive,
         "Did not report on their 105:1 form": df_no_form_report,
     }
     return data
