@@ -11,8 +11,6 @@ from datetime import datetime
 
 # CARD 1
 
-# FIXME Try and run without teh outlier parameter, see if it breaks anything
-
 
 def scatter_country_data(*, indicator, **kwargs):
 

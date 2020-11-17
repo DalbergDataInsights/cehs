@@ -61,7 +61,7 @@ def overview_plot(data):
         "MR1 doses to U1": "rgb(81, 139, 201)",
         "SAM cases identified": "rgb(238, 47, 68)",
         "1st & 2nd doses of vitamin A to U5": "rgb(103, 191, 107)",
-        "TB cases registered": "rgb(236, 70, 139)",
+        "TB cases registered in treatment unit": "rgb(236, 70, 139)",
         "Injuries related to GBV": "rgb(145, 91, 166)",
     }
 
