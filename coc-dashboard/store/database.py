@@ -182,12 +182,12 @@ class Database(metaclass=SingletonMeta):
 
         else:
 
-            nominator = f"{indicator}__weighted_ratio"
+            nominator = f"{indicator}__wr"
 
             denominator = config[config.config_indicator == indicator][
                 "config_denominator"
             ].values[0]
-            denominator = f"{denominator}__weight"
+            denominator = f"{denominator}__w"
 
             try:
                 df = df[list(self.index_columns) + [nominator, denominator]]
