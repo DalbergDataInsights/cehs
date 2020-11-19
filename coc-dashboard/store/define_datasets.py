@@ -32,7 +32,6 @@ FUNC_DICT = {
     "reporting_country": bar_reporting_country_data,
     "reporting_dated": map_reporting_dated_data,
     "reporting_district": scatter_reporting_district_data,
-    # "indicator_group": indicator_group,
 }
 
 FUNC_DF = pd.DataFrame.from_dict(FUNC_DICT, orient="index").rename(
@@ -70,9 +69,11 @@ def define_datasets(controls, last_controls=None):
             args = set(FUNC_DF.loc[dataset_name, "args"])
             if len(args.intersection(changed_keys)) > 0:
                 db.include_dataset(
-                    dataset_name, FUNC_DF.loc[dataset_name, "function"](**controls)
+                    dataset_name, FUNC_DF.loc[dataset_name, "function"](
+                        **controls)
                 )
-                func_name = str(FUNC_DF.loc[dataset_name, "function"]).split(" ")[1]
+                func_name = str(
+                    FUNC_DF.loc[dataset_name, "function"]).split(" ")[1]
                 print(f"ran function {func_name}")
 
     return db.datasets

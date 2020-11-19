@@ -29,7 +29,10 @@ def initiate_dropdowns():
 
     # Initiate type of aggregation dropdown
 
-    entries = pd.DataFrame({"aggregation_type": ["Compare two months"]})
+    entries = pd.DataFrame({"aggregation_type": [
+        "Compare two months",
+        "Compare moving averages (last 3 months)",
+        "Sum over period"]})
 
     aggregation_type = NestedDropdownGroup(
         entries,

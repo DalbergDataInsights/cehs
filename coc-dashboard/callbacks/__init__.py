@@ -16,6 +16,7 @@ from store import (
     district_control_group,
     indicator_dropdown_group,
     outlier_policy_dropdown_group,
+    aggregation_type
 )
 
 from pprint import pprint as print
@@ -40,6 +41,7 @@ callback_ids = {
     "date_from": "value",
     "date_to": "value",
     district_control_group.dropdown_ids[-1]: "value",  # District
+    aggregation_type.dropdown_ids[0]: "value"
 }
 
 dropdown_style = [
@@ -64,7 +66,6 @@ def define_callbacks(ds):
             "function": global_story_callback,
         },
         # Data cards
-        # TODO : change this manual step below, which results in reporting pane not updating properly
         {
             "inputs": [
                 Input(id, prop)

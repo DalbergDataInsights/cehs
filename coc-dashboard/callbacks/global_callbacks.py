@@ -48,13 +48,11 @@ def global_story_callback(*inputs):
         CONTROLS["target_month"] = inputs[3].split(" ")[0]
         CONTROLS["reference_year"] = inputs[2].split(" ")[1]
         CONTROLS["reference_month"] = inputs[2].split(" ")[0]
-        #CONTROLS["indicator_group"] = inputs[1]
+        CONTROLS["aggregation_type"] = inputs[4]
 
         db.filter_by_policy(CONTROLS["outlier"])
 
         df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
-
-        # ds.switch_data_set(df)
 
         for x in [country_overview_scatter,
                   country_overview,

@@ -20,8 +20,6 @@ def bar_country_dated_plot(data):
 
     data = data.get("dated")
 
-    data[data.columns[-1]] = data[data.columns[-1]] / 100
-
     data["rank"] = data[data.columns[-1]].rank(ascending=True, method='min')
     data = data[data["rank"] < 11].sort_values(by="rank")
     data.drop("rank", axis=1, inplace=True)
@@ -52,5 +50,3 @@ country_overview = CardLayout(
     title="$label$",
     elements=[country_overview_map, bar_chart_ranks_bottom],
 )
-
-# TODO Define common color scale for map and barchart

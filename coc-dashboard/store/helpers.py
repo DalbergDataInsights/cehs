@@ -4,6 +4,7 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 import calendar
+from dateutil.relativedelta import relativedelta
 
 # Filtering methods for data transform functions
 
@@ -149,6 +150,53 @@ def get_ratio(df, indicator, agg_level):
             columns=[weighted_ratio, weight])
 
     return df, index
+
+
+def map_between_dates(df, indicator,
+                      target_year, target_month,
+                      reference_year, reference_month,
+                      aggtype):
+
+    target_date = datetime.strptime(f"1 {target_month} {target_year}",
+                                    "%d %b %Y")
+    reference_date = datetime.strptime(f"1 {reference_month} {reference_year}",
+                                       "%d %b %Y")
+
+    if aggtype == "Sum over period":
+
+        df = df.groupby('id').sum()
+
+    else:
+
+        date_list = [target_date,
+                     target_date - relativedelta(months=+1),
+                     target_date - relativedelta(months=+2),
+                     reference_date,
+                     reference_date - relativedelta(months=+1),
+                     reference_date - relativedelta(months=+2)]
+
+        mask = df.date in date_list
+        df = df[mask]
+        df = df.pivot_table(columns="date",
+                            values=indicator, index="id")
+
+        if aggtype == "Compare moving averages (last 3 months)":
+
+            df[target_date] = df[date_list[:3]].mean(axis=1)
+            df[reference_date] = df[date_list[3:]].mean(axis=1)
+
+        df[indicator] = ((df[target_date] - df[reference_date])
+                         / df[reference_date] * 100)
+
+        df = df.replace([np.inf, -np.inf], np.nan)
+
+        df[indicator] = df[indicator].apply(lambda x: round(x, 2))
+
+    df = df[[indicator]].reset_index()
+    df = df.set_index("id")
+    df = df[~pd.isna(df[indicator])]
+
+    return df
 
 
 def check_index(df, index=["id", "date", "facility_name"]):

@@ -27,6 +27,8 @@ def scatter_country_plot(df):
 
 
 def get_title_country_overview(data, indicator_view_name, **controls):
+
+    # TODO: update title to adapt to agg_type
     """
     get title for the first section based on a percentage calcution and the inputs
     """

@@ -3,6 +3,7 @@ from store import (
     filter_by_district,
     get_ratio,
     Database,
+    map_between_dates
 )
 
 import pandas as pd
@@ -37,7 +38,6 @@ def scatter_country_data(*, indicator, **kwargs):
 
 def apply_date_filter(
     *,
-    outlier,
     target_year,
     target_month,
     reference_year,
@@ -73,41 +73,19 @@ def map_bar_country_dated_data(
 
     df = get_ratio(df, indicator, agg_level='district')[0]
 
-    data_in = filter_df_by_dates(
+    df = filter_df_by_dates(
         df, target_year, target_month, reference_year, reference_month
     )
 
-    # TODO updat teh filter by data function so that this step is no longer needed
-
-    target_date = datetime.strptime(f"{target_month} 1 {target_year}",
-                                    "%b %d %Y")
-    reference_date = datetime.strptime(f"{reference_month} 1 {reference_year}",
-                                       "%b %d %Y")
-
-    mask = (data_in.date == target_date) | (data_in.date == reference_date)
-
-    data_in = data_in[mask]
-
-    data_in = data_in.pivot_table(columns="date", values=indicator, index="id")
-
-    data_in[indicator] = (
-        (data_in[target_date] - data_in[reference_date])
-        / data_in[reference_date]
-        * 100
-    )
-
-    data_in = data_in.replace([np.inf, -np.inf], np.nan)
-
-    data_in[indicator] = data_in[indicator].apply(lambda x: round(x, 2))
-
-    data_in = data_in[[indicator]].reset_index()
-    data_in = data_in.set_index("id")
-    data_out = data_in[~pd.isna(data_in[indicator])]
+    df = map_between_dates(df, indicator,
+                           target_year, target_month,
+                           reference_year, reference_month,
+                           "Sum over period")
 
     title = f'Percentage change of {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
-    data_out = data_out.rename(columns={indicator: title})
+    df = df.rename(columns={indicator: title})
 
-    return data_out
+    return df
 
 
 # CARD 3
