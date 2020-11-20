@@ -32,9 +32,9 @@ def initiate_dropdowns():
     entries = pd.DataFrame({"aggregation_type": [
         "Compare two months",
         "Compare moving averages (last 3 months)",
-        "Sum over period"]})
+        "Average over period"]})
 
-    aggregation_type = NestedDropdownGroup(
+    aggregation_dropdown = NestedDropdownGroup(
         entries,
         title="SELECT AN ANALYSIS TIMEFRAME",
         defaults={"aggregation_type": "Compare two months"},
@@ -99,7 +99,7 @@ def initiate_dropdowns():
         elements=[
             indicator_dropdown_group,
             district_control_group,
-            aggregation_type,
+            aggregation_dropdown,
             date_dropdowns,
             outlier_policy_dropdown_group,
         ],
@@ -124,7 +124,7 @@ def initiate_dropdowns():
         side_nav,
         outlier_policy_dropdown_group,
         indicator_dropdown_group,
-        aggregation_type,
+        aggregation_dropdown,
         date_dropdowns,
         district_control_group,
     )

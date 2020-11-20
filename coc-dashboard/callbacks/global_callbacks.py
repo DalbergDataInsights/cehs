@@ -48,7 +48,7 @@ def global_story_callback(*inputs):
         CONTROLS["target_month"] = inputs[3].split(" ")[0]
         CONTROLS["reference_year"] = inputs[2].split(" ")[1]
         CONTROLS["reference_month"] = inputs[2].split(" ")[0]
-        CONTROLS["aggregation_type"] = inputs[4]
+        CONTROLS["aggregation_type"] = inputs[5]
 
         db.filter_by_policy(CONTROLS["outlier"])
 

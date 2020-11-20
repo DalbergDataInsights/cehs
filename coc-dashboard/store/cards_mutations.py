@@ -10,6 +10,28 @@ import pandas as pd
 import numpy as np
 from datetime import datetime
 
+
+# Overview
+
+def overview_data(
+    *,
+    target_year,
+    target_month,
+    reference_year,
+    reference_month,
+    **kwargs,
+):
+    db = Database()
+
+    df = db.raw_data
+
+    df = filter_df_by_dates(
+        df, target_year, target_month, reference_year, reference_month
+    )
+
+    return df
+
+
 # CARD 1
 
 
@@ -36,25 +58,6 @@ def scatter_country_data(*, indicator, **kwargs):
 
 # CARD 2
 
-def apply_date_filter(
-    *,
-    target_year,
-    target_month,
-    reference_year,
-    reference_month,
-    **kwargs,
-):
-    db = Database()
-
-    df = db.raw_data
-
-    df = filter_df_by_dates(
-        df, target_year, target_month, reference_year, reference_month
-    )
-
-    return df
-
-
 def map_bar_country_dated_data(
     *,
     indicator,
@@ -62,6 +65,7 @@ def map_bar_country_dated_data(
     target_month,
     reference_year,
     reference_month,
+    aggregation_type,
     **kwargs,
 ):
 
@@ -73,14 +77,9 @@ def map_bar_country_dated_data(
 
     df = get_ratio(df, indicator, agg_level='district')[0]
 
-    df = filter_df_by_dates(
-        df, target_year, target_month, reference_year, reference_month
-    )
-
     df = map_between_dates(df, indicator,
                            target_year, target_month,
-                           reference_year, reference_month,
-                           "Sum over period")
+                           reference_year, reference_month, aggregation_type)  # "Compare moving averages (last 3 months)")
 
     title = f'Percentage change of {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
     df = df.rename(columns={indicator: title})
@@ -138,10 +137,8 @@ def tree_map_district_dated_data(
 
     df = get_ratio(df, indicator, agg_level='facility')[0]
 
-    # TODO check how the date function works such that it shows only target date
-
     df_district_dated = filter_df_by_dates(
-        df, target_year, target_month, reference_year, reference_month
+        df, target_year, target_month, reference_year, reference_month, keep_target_only=True
     )
 
     df_district_dated = filter_by_district(df_district_dated, district)
@@ -166,8 +163,6 @@ def scatter_facility_data(*, indicator, district, facility, **kwargs):
     df = filter_by_district(df, district)
 
     df, index = get_ratio(df, indicator, agg_level='facility')
-
-    # TODO Reorder such that its the one facility with the on selected data max value that shows
 
     if not facility:
         facility = (
@@ -229,9 +224,8 @@ def map_reporting_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
-    df = filter_df_by_dates(
-        df, target_year, target_month, reference_year, reference_month
-    )
+    df = filter_df_by_dates(df, target_year, target_month,
+                            reference_year, reference_month, keep_target_only=True)
 
     title = f'Percentage of reporting facilities that reported a non-zero number for {db.get_indicator_view(indicator)} by district on {target_month}-{target_year}'
 
@@ -243,7 +237,7 @@ def map_reporting_dated_data(
 # CARD 7
 
 
-def scatter_reporting_district_data(*, outlier, indicator, district, **kwargs):
+def scatter_reporting_district_data(*, indicator, district, **kwargs):
 
     db = Database()
 

@@ -11,9 +11,7 @@ def map_reporting_dated_plot(data):
 
     last_date = data_in.date.max()
 
-    last_date_df = data_in[data_in.date == last_date]
-
-    last_date_df = check_index(last_date_df)
+    last_date_df = check_index(data_in)
 
     val_col = last_date_df.columns[0]
 

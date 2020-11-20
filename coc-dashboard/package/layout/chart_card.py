@@ -39,7 +39,7 @@ class ChartDataCard(DataCard):
                         # "colorscale": figure_colors.get(name),
                     },
                     textposition="inside",
-                    texttemplate="%{x:%}",
+                    texttemplate="%{x:g}",
                     orientation="h",
                     y=df.index,
                     x=df[df.columns[0]],

@@ -9,12 +9,11 @@ from dateutil.relativedelta import relativedelta
 # Filtering methods for data transform functions
 
 
-def filter_df_by_dates(df, target_year, target_month, reference_year, reference_month):
-    min_date = None
-    max_date = None
-    reverse = False
-
-    # TODO See if I can just have this return only the two dates, not everything in between
+def filter_df_by_dates(df, target_year,
+                       target_month,
+                       reference_year,
+                       reference_month,
+                       keep_target_only=False):
 
     df = df.sort_values(["date"])
 
@@ -23,23 +22,13 @@ def filter_df_by_dates(df, target_year, target_month, reference_year, reference_
     reference_date = datetime.strptime(
         f"{reference_month} 1 {reference_year}", "%b %d %Y"
     )
+    date_list = [reference_date, target_date]
 
-    if reference_date <= target_date:
-        max_date = target_date
-        min_date = reference_date
-    elif target_date < reference_date:
-        max_date = reference_date
-        min_date = target_date
-        reverse = True
+    if keep_target_only:
+        date_list = [date_list[-1]]
 
-    min_mask = df.date >= min_date
-    df = df.loc[min_mask].reset_index(drop=True)
+    df = df[df.date.isin(date_list)]
 
-    max_mask = df.date <= max_date
-    df = df.loc[max_mask].reset_index(drop=True)
-
-    if reverse:
-        df = df.reindex(index=df.index[::-1])
     return df
 
 
@@ -155,16 +144,26 @@ def get_ratio(df, indicator, agg_level):
 def map_between_dates(df, indicator,
                       target_year, target_month,
                       reference_year, reference_month,
-                      aggtype):
+                      aggregation_type):
 
     target_date = datetime.strptime(f"1 {target_month} {target_year}",
                                     "%d %b %Y")
     reference_date = datetime.strptime(f"1 {reference_month} {reference_year}",
                                        "%d %b %Y")
+    data_min_date = min(df.date) + relativedelta(months=+2)
 
-    if aggtype == "Sum over period":
+    min_date = min([data_min_date, target_date, reference_date])
+    max_date = max([target_date, reference_date])
 
-        df = df.groupby('id').sum()
+    df = df.sort_values(["date"])
+
+    df = df[(df.date >= (min_date - relativedelta(months=+2)))
+            | (df.date <= max_date)]
+
+    if aggregation_type == "Average over period":
+
+        df = df[(df.date >= min_date)]
+        df = df.groupby('id').mean()
 
     else:
 
@@ -175,12 +174,11 @@ def map_between_dates(df, indicator,
                      reference_date - relativedelta(months=+1),
                      reference_date - relativedelta(months=+2)]
 
-        mask = df.date in date_list
-        df = df[mask]
+        df = df[df.date.isin(date_list)]
         df = df.pivot_table(columns="date",
                             values=indicator, index="id")
 
-        if aggtype == "Compare moving averages (last 3 months)":
+        if aggregation_type == "Compare moving averages (last 3 months)":
 
             df[target_date] = df[date_list[:3]].mean(axis=1)
             df[reference_date] = df[date_list[3:]].mean(axis=1)

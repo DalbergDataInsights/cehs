@@ -40,14 +40,12 @@ import pandas as pd
 @timeit
 def overview_plot(data):
 
+    # TODO : add this to Card mutation rather then in plot function
+
     data = data.get("date_filter")
 
-    # get only two dates
     min_date = data.date.min()
     max_date = data.date.max()
-
-    mask = (data.date == min_date) | (data.date == max_date)
-    data = data[mask]
 
     # filter indicators
     index = ["date"]
