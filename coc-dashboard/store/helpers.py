@@ -245,7 +245,7 @@ def get_report_perc(data, **controls):
 
         try:
             reported_positive = data\
-                .get("Reported a positive number")\
+                .get("Reported one or above for selected indicator")\
                 .loc[date_reporting][0]
         except Exception:
             reported_positive = 0
@@ -259,7 +259,7 @@ def get_report_perc(data, **controls):
 
         try:
             reported_negative = data\
-                .get("Did not report a positive number")\
+                .get("Reported a null or zero for selected indicator")\
                 .loc[date_reporting][0]
         except Exception:
             reported_negative = 0
