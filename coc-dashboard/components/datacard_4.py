@@ -1,6 +1,11 @@
 import numpy as np
 import pandas as pd
-from store import check_index, timeit, get_sub_dfs, init_data_set, month_order, get_year_and_month_cols
+from store import (timeit,
+                   get_sub_dfs,
+                   init_data_set,
+                   get_year_and_month_cols,
+                   DEFAULTS,
+                   Database)
 from package.layout.area_card import AreaDataCard
 from package.layout.chart_card import ChartDataCard
 
@@ -9,8 +14,7 @@ from package.layout.chart_card import ChartDataCard
 def tree_map_district_dated_plot(data):
 
     data_in = data.get("district_dated")
-    data_in = check_index(data_in)
-    val_col = data_in.columns[0]
+    val_col = data_in.columns[-1]
     data_in[val_col] = data_in[val_col].apply(
         lambda x: int(x) if pd.notna(x) else 0)
     data_in = data_in.reset_index()
@@ -27,27 +31,44 @@ def tree_map_district_dated_plot(data):
 def scatter_facility_plot(data):
     data = data.get("facility")
 
-    data = check_index(data)
-    data = data[data[data.columns[0]] > 0]
+    data = data[data[data.columns[-1]] > 0]
 
     data = get_year_and_month_cols(data)
 
-    data = get_sub_dfs(data, "year", [2018, 2019, 2020], "month", month_order)
+    data = get_sub_dfs(data, "year", [2018, 2019, 2020], "month")
 
     return data
 
 
+def get_title_district_treemap(indicator_view_name, **controls):
+    """
+    get title for the third section based on a percentage calcution and the inputs
+    """
+    title = f'''Contribution of individual facilities in {controls.get('district')} district to the {indicator_view_name}
+            on {controls.get('target_month')}-{controls.get('target_year')}'''
+
+    return title
+
+
+# DATACARD 4 #
+
+db = Database()
+
+default_title = get_title_district_treemap(
+    db.get_indicator_view(DEFAULTS.get('indicator')), **DEFAULTS)
+
 tree_map_district = AreaDataCard(
-    title="The contribution of individual facilities in the selected district",
+    title=default_title,
     data=init_data_set,
     data_transform=tree_map_district_dated_plot,
     fig_object="Treemap",
 )
+
 tree_map_district.set_colors({"fig": ["#e2d5d1", "#96c0e0", "#3c6792"]})
 
 
 facility_scatter = ChartDataCard(
-    fig_title="Evolution of $label$ (click on the graph above to filter)",
+    fig_title="$label$",
     data=init_data_set,
     data_transform=scatter_facility_plot,
 )

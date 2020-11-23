@@ -1,22 +1,17 @@
 import os
-
 from .helpers import *
-from .dropdown import initiate_dropdowns, set_dropdown_defaults
+from .dropdown import initiate_dropdowns, DEFAULTS
 from .database import Database
-
 
 # READ FROM DATABASE
 
 DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]
-
 db = Database(DATABASE_URI)
 
-
 # STATIC DATA
-from .static_info import *
-from .geopopulation import shapefile, static
 
-# static["indicator_groups"] = indicator_groups
+from .geopopulation import shapefile  # NOQA: E402
+
 
 # NAVIGATION
 
@@ -24,27 +19,20 @@ from .geopopulation import shapefile, static
     side_nav,
     outlier_policy_dropdown_group,
     indicator_dropdown_group,
-    reference_date,
-    target_date,
+    aggregation_type,
+    date_dropdowns,
     district_control_group,
 ) = initiate_dropdowns()
 
-set_dropdown_defaults(
-    outlier_policy_dropdown_group,
-    target_date,
-    reference_date,
-    indicator_dropdown_group,
-    district_control_group,
-)
 
 CONTROLS = dict(
     outlier=outlier_policy_dropdown_group.dropdown_objects[0].value,
     indicator=indicator_dropdown_group.dropdown_objects[-1].value,
     district=district_control_group.dropdown_objects[0].value,
-    target_year=target_date.dropdown_objects[0].value,
-    target_month=target_date.dropdown_objects[1].value,
-    reference_year=reference_date.dropdown_objects[0].value,
-    reference_month=reference_date.dropdown_objects[1].value,
+    target_year=date_dropdowns.to_date.value.split(" ")[1],
+    target_month=date_dropdowns.to_date.value.split(" ")[0],
+    reference_year=date_dropdowns.from_date.value.split(" ")[1],
+    reference_month=date_dropdowns.from_date.value.split(" ")[0],
     facility=None,
     indicator_group=indicator_dropdown_group.dropdown_objects[0].value,
 )
@@ -66,6 +54,6 @@ for x in os.environ:
 
 # GLOBAL DATASET
 
-from .define_datasets import define_datasets
+from .define_datasets import define_datasets  # NOQA: E402
 
 init_data_set = define_datasets(controls=CONTROLS)

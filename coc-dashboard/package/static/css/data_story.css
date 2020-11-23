@@ -13,36 +13,53 @@ body {
     text-align: center;
     min-width: 740px;
     overflow: auto;
-    font-family: 'Lato', sans-serif;
+    font-family: 'Lato-Light', sans-serif;
 }
 
 #ds-wrapper {
-    max-width: 100em;
     text-align: left;
+    overflow: auto;
+    transition: 0.5s;
+}
+
+#ds-paginator {
+    width: 75vw;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 2em;
-    overflow: auto;
+    transition: margin-left .5s;
+    transition: margin-right .5s;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 25px;
+    padding: 3%;
 }
 
 .data-card {
     width: 100%;
     overflow: visible;
     margin: 0px 0px 50px 0px;
+    height: auto;
 }
-
-/* .data-card:nth-child(odd) {
-    background: #d9d6d6;
-}
-.data-card:nth-child(even) {
-    background: #ffffff;
-} */
-
 
 .data-card__header-container {
     padding: 12px 0px 12px 0px;
     margin: 12px 0 12px 0;
-    background: #d9d6d6;
+    background: rgb(19, 52, 78);
+}
+
+.data-card__figure {
+    height: 25vw;
+}
+
+.data-card__download-button {
+    color: rgb(19, 52, 78) !important;
+    cursor: pointer;
+    float: right;
+}
+
+.data-card__download-button > span {
+    color: rgb(19, 52, 78) !important;
 }
 
 .text-section {
@@ -101,45 +118,6 @@ body {
     background: #cad9e5;
 }
 
-
-/* Add a black background color to the top navigation */
-#topnav-container {
-    width: 100vw;
-    z-index: 999;
-    position: fixed;
-    background-color: #333;
-    top:0;
-    left:0;
-}
-
-.topnav {
-    position: relative;
-    max-width: 1200px;
-    margin: 0 auto;
-    overflow: hidden;
-    height: 3.4em;
-}
-
-/* Style the links inside the navigation bar */
-.nav-element {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    padding: 14px 16px;
-    text-decoration: none;
-    font-size: 17px;
-    cursor: pointer;
-}
-
-.topnav button {
-    float: left;
-    color: #f2f2f2;
-    text-align: center;
-    margin: 0.35em auto;
-    text-decoration: none;
-    font-size: 17px;
-}
-
 .h1, h1 {
     font-size: calc(0.8vw + 0.8vh + 0.8vmin);
 }
@@ -153,23 +131,63 @@ body {
 }
 
 
-/* Change the color of links on hover */
-.nav-element:hover {
-    background-color: #ddd;
-    color: black;
+/* Style the links inside the navigation bar */
+.nav-element {
+    color: white;
+    text-align: center;
+    padding: 0 10px;
+    text-decoration: none;
+    font-size: 1rem;
+    cursor: pointer;
+    width: 80%;
+    margin: 0 auto;
+    border: 2px solid transparent;
+    margin-top: 2px;
+    margin-bottom: 2px;
 }
 
-
-/* Right-aligned section inside the top navigation */
-.topnav-right {
-    float: right;
+/* Change the color of links on hover */
+.nav-element:hover {
+    border: 2px solid rgb(34, 94, 140);
+    font-weight: bold;
 }
 
 .nav-element.active {
-    background-color: #ddd;
-    color: black;
+    border: 2px solid rgb(34, 94, 140);
+    font-weight: bold;
 }
 
 .fade:not(.show) {
+    pointer-events: none;
+}
+
+.m-l-25vw {
+    margin-left: 20vw !important;
+}
+
+
+/* Styling dash components */
+.Select-control {
+    background-color: rgb(19, 52, 78) !important;
+    border: none !important;
+}
+
+.Select-value-label {
+    color: white !important;
+    font-size: 1.2vh;
+}
+
+.Select-menu-outer {
+    background-color: rgb(19, 52, 78) !important;
+    color: white !important;
+    font-size: 1.2vh !important;
+}
+
+.Select-arrow {
+    color: white !important;
+}
+
+.disabled {
+    opacity: 0.5;
     pointer-events: none;
 }
