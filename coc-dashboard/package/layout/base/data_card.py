@@ -398,7 +398,7 @@ class DataCard:
 
         return (lower_bound, upper_bound)
 
-    def get_custom_colorscale(self, name, range):
+    def get_custom_colorscale(self, range):
 
         # TODO Find more stable fix, not using name
         colorscale = list(self.colors.get('fig').values())[0]

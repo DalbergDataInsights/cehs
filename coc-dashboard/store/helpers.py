@@ -9,29 +9,6 @@ from dateutil.relativedelta import relativedelta
 # Filtering methods for data transform functions
 
 
-def filter_df_by_dates(df, target_year,
-                       target_month,
-                       reference_year,
-                       reference_month,
-                       keep_target_only=False):
-
-    df = df.sort_values(["date"])
-
-    target_date = datetime.strptime(
-        f"{target_month} 1 {target_year}", "%b %d %Y")
-    reference_date = datetime.strptime(
-        f"{reference_month} 1 {reference_year}", "%b %d %Y"
-    )
-    date_list = [reference_date, target_date]
-
-    if keep_target_only:
-        date_list = [date_list[-1]]
-
-    df = df[df.date.isin(date_list)]
-
-    return df
-
-
 def filter_by_district(df, district):
     mask = df.id == district
     df = df.loc[mask].reset_index(drop=True)
@@ -141,10 +118,33 @@ def get_ratio(df, indicator, agg_level):
     return df, index
 
 
-def map_between_dates(df, indicator,
-                      target_year, target_month,
-                      reference_year, reference_month,
-                      aggregation_type):
+def filter_df_by_dates(df, target_year,
+                       target_month,
+                       reference_year,
+                       reference_month,
+                       keep_target_only=False):
+
+    df = df.sort_values(["date"])
+
+    target_date = datetime.strptime(
+        f"{target_month} 1 {target_year}", "%b %d %Y")
+    reference_date = datetime.strptime(
+        f"{reference_month} 1 {reference_year}", "%b %d %Y"
+    )
+    date_list = [reference_date, target_date]
+
+    if keep_target_only:
+        date_list = [date_list[-1]]
+
+    df = df[df.date.isin(date_list)]
+
+    return df
+
+
+def get_pivot_df_by_date(df, indicator,
+                         target_year, target_month,
+                         reference_year, reference_month,
+                         aggregation_type):
 
     target_date = datetime.strptime(f"1 {target_month} {target_year}",
                                     "%d %b %Y")
@@ -153,46 +153,115 @@ def map_between_dates(df, indicator,
     data_min_date = min(df.date) + relativedelta(months=+2)
 
     min_date = min([data_min_date, target_date, reference_date])
-    max_date = max([target_date, reference_date])
 
     df = df.sort_values(["date"])
 
-    df = df[(df.date >= (min_date - relativedelta(months=+2)))
-            | (df.date <= max_date)]
+    date_list = [target_date,
+                 target_date - relativedelta(months=+1),
+                 target_date - relativedelta(months=+2),
+                 reference_date,
+                 reference_date - relativedelta(months=+1),
+                 reference_date - relativedelta(months=+2)]
 
     if aggregation_type == "Average over period":
-
         df = df[(df.date >= min_date)]
-        df = df.groupby('id').mean()
+
+    elif aggregation_type == "Compare two months":
+        df = df[df.date.isin([date_list[0], date_list[3]])]
+
+    elif aggregation_type == "Compare moving averages (last 3 months)":
+        df = df[df.date.isin(date_list)]
+
+    if "facility_name" in list(df.columns):
+        df = df.pivot_table(columns="date",
+                            values=indicator, index=['id', 'facility_name'])
+    else:
+        df = df.pivot_table(columns="date",
+                            values=indicator, index=['id'])
+
+    return df, target_date, reference_date, date_list
+
+
+def get_delta_over_period(df, indicator,
+                          target_date,
+                          reference_date, date_list,
+                          aggregation_type,
+                          compare=True, index=['id']):
+
+    if aggregation_type == "Average over period":
+        df = df.groupby(index).mean()
+        df[indicator] = df[df.columns].mean(axis=1)
 
     else:
-
-        date_list = [target_date,
-                     target_date - relativedelta(months=+1),
-                     target_date - relativedelta(months=+2),
-                     reference_date,
-                     reference_date - relativedelta(months=+1),
-                     reference_date - relativedelta(months=+2)]
-
-        df = df[df.date.isin(date_list)]
-        df = df.pivot_table(columns="date",
-                            values=indicator, index="id")
 
         if aggregation_type == "Compare moving averages (last 3 months)":
 
             df[target_date] = df[date_list[:3]].mean(axis=1)
             df[reference_date] = df[date_list[3:]].mean(axis=1)
 
-        df[indicator] = ((df[target_date] - df[reference_date])
-                         / df[reference_date] * 100)
+        if compare:
 
-        df = df.replace([np.inf, -np.inf], np.nan)
+            df[indicator] = ((df[target_date] - df[reference_date])
+                             / df[reference_date] * 100)
 
-        df[indicator] = df[indicator].apply(lambda x: round(x, 2))
+            df = df.replace([np.inf, -np.inf], np.nan)
+
+            df[indicator] = df[indicator].apply(lambda x: round(x, 2))
+
+        else:
+
+            df[indicator] = df[target_date]
 
     df = df[[indicator]].reset_index()
-    df = df.set_index("id")
     df = df[~pd.isna(df[indicator])]
+
+    return df
+
+
+def get_reporting_rate_of_districts(df):
+
+    dates = list(df.columns)
+
+    df = df.reset_index()
+
+    reporting_df = pd.DataFrame({"id": list(df.id.unique())})
+
+    for c in dates:
+        reporting_df[c] = None
+        reporting = []
+        for district in df.id.unique():
+            district_df = df[df.id == district]
+            total_facilities = (district_df[c] != 0).sum()
+            reported_facilities = len(district_df[district_df[c] == 3])
+            report_rate = round((reported_facilities
+                                 / total_facilities) * 100, 2)
+            reporting.append(report_rate)
+        reporting_df[c] = reporting
+
+    reporting_df = reporting_df.set_index("id")
+
+    return reporting_df
+
+
+def get_period_compare(df, indicator,
+                       target_year, target_month,
+                       reference_year, reference_month, aggregation_type,
+                       compare=True, report=False, index=['id']):
+
+    (df,
+     target_date,
+     reference_date,
+     date_list) = get_pivot_df_by_date(df, indicator,
+                                       target_year, target_month,
+                                       reference_year, reference_month,
+                                       aggregation_type)
+
+    if report:
+        df = get_reporting_rate_of_districts(df)
+
+    df = get_delta_over_period(df, indicator,
+                               target_date, reference_date, date_list,
+                               aggregation_type, compare, index)
 
     return df
 
@@ -291,7 +360,7 @@ def get_report_perc(data, **controls):
 
         try:
             reported_positive = data\
-                .get("Reported a positive number")\
+                .get("Reported one or above for selected indicator")\
                 .loc[date_reporting][0]
         except Exception:
             reported_positive = 0
@@ -305,7 +374,7 @@ def get_report_perc(data, **controls):
 
         try:
             reported_negative = data\
-                .get("Did not report a positive number")\
+                .get("Reported a null or zero for selected indicator")\
                 .loc[date_reporting][0]
         except Exception:
             reported_negative = 0

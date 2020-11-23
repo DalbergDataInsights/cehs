@@ -10,7 +10,7 @@ def map_country_dated_plot(data):
 
     data = data.get("dated")
 
-    data_out = {f"Change between reference and target date": data}
+    data_out = {"Change between reference and target date": data}
 
     return data_out
 

@@ -3,7 +3,7 @@ from store import (
     filter_by_district,
     get_ratio,
     Database,
-    map_between_dates
+    get_period_compare
 )
 
 import pandas as pd
@@ -77,9 +77,9 @@ def map_bar_country_dated_data(
 
     df = get_ratio(df, indicator, agg_level='district')[0]
 
-    df = map_between_dates(df, indicator,
-                           target_year, target_month,
-                           reference_year, reference_month, aggregation_type)  # "Compare moving averages (last 3 months)")
+    df = get_period_compare(df, indicator,
+                            target_year, target_month,
+                            reference_year, reference_month, aggregation_type)
 
     title = f'Percentage change of {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
     df = df.rename(columns={indicator: title})
@@ -122,6 +122,7 @@ def tree_map_district_dated_data(
     target_month,
     reference_year,
     reference_month,
+    aggregation_type,
     **kwargs,
 
 
@@ -135,13 +136,20 @@ def tree_map_district_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
+    df = filter_by_district(df, district)
+
     df = get_ratio(df, indicator, agg_level='facility')[0]
 
-    df_district_dated = filter_df_by_dates(
-        df, target_year, target_month, reference_year, reference_month, keep_target_only=True
-    )
+    # df_district_dated = filter_df_by_dates(
+    #     df, target_year, target_month, reference_year, reference_month, keep_target_only=True
+    # )
 
-    df_district_dated = filter_by_district(df_district_dated, district)
+    df_district_dated = get_period_compare(df, indicator,
+                                           target_year, target_month,
+                                           reference_year, reference_month, aggregation_type,
+                                           compare=False, index=['id', 'facility_name'])
+
+    #df_district_dated = filter_by_district(df_district_dated, district)
 
     title = f'"Contribution of individual facilities to {db.get_indicator_view(indicator)} in {district} district'
 
@@ -213,6 +221,7 @@ def map_reporting_dated_data(
     target_month,
     reference_year,
     reference_month,
+    aggregation_type,
     **kwargs,
 ):
 
@@ -224,8 +233,13 @@ def map_reporting_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
-    df = filter_df_by_dates(df, target_year, target_month,
-                            reference_year, reference_month, keep_target_only=True)
+    # df = filter_df_by_dates(df, target_year, target_month,
+    # reference_year, reference_month, keep_target_only=True)
+
+    df = get_period_compare(df, indicator,
+                            target_year, target_month,
+                            reference_year, reference_month, aggregation_type,
+                            report=True)
 
     title = f'Percentage of reporting facilities that reported a non-zero number for {db.get_indicator_view(indicator)} by district on {target_month}-{target_year}'
 

@@ -17,13 +17,13 @@ def tree_map_district_dated_plot(data):
     val_col = data_in.columns[-1]
     data_in[val_col] = data_in[val_col].apply(
         lambda x: int(x) if pd.notna(x) else 0)
-    data_in = data_in.reset_index()
-    data_in = data_in[data_in.date == data_in.date.max()].reset_index()
+    #data_in = data_in.reset_index()
+    #data_in = data_in[data_in.date == data_in.date.max()].reset_index()
     district_name = data_in.id[0]
-    data_tree = data_in.pivot_table(
-        values=val_col, index=["facility_name"], columns="date", aggfunc=np.sum
-    )
-    data_out = {district_name: data_tree}
+    # data_tree = data_in.pivot_table(
+    #     values=val_col, index=["facility_name"], columns="date", aggfunc=np.sum
+    # )
+    data_out = {district_name: data_in}
     return data_out
 
 
