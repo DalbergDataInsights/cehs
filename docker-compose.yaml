@@ -1,0 +1,13 @@
+# current implementation of compose does not forward the ports in a right way
+# TODO figure out if we want to attach reddis/other services
+version: '3.8'
+services:
+  viz:
+    build: .
+    ports:
+      - "8050:8050"
+    volumes:
+      - type: bind
+        source: ./
+        target: /app/
+    command: bash -c "pip install -r requirements.txt && python app.py"

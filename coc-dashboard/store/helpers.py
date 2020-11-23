@@ -3,22 +3,7 @@ from time import time
 from datetime import datetime
 import pandas as pd
 import numpy as np
-
-month_order = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-]
-
+import calendar
 
 # Filtering methods for data transform functions
 
@@ -32,14 +17,12 @@ def filter_df_by_dates(df, target_year, target_month, reference_year, reference_
 
     df = df.sort_values(["date"])
 
-    if target_year and target_month:
-        target_date = datetime(
-            int(target_year), int(month_order.index(target_month) + 1), 1
-        )
-    if reference_year and reference_month:
-        reference_date = datetime(
-            int(reference_year), int(month_order.index(reference_month) + 1), 1
-        )
+    target_date = datetime.strptime(
+        f"{target_month} 1 {target_year}", "%b %d %Y")
+    reference_date = datetime.strptime(
+        f"{reference_month} 1 {reference_year}", "%b %d %Y"
+    )
+
     if reference_date <= target_date:
         max_date = target_date
         min_date = reference_date
@@ -47,12 +30,13 @@ def filter_df_by_dates(df, target_year, target_month, reference_year, reference_
         max_date = reference_date
         min_date = target_date
         reverse = True
-    if min_date:
-        min_mask = df.date >= min_date
-        df = df.loc[min_mask].reset_index(drop=True)
-    if max_date:
-        max_mask = df.date <= max_date
-        df = df.loc[max_mask].reset_index(drop=True)
+
+    min_mask = df.date >= min_date
+    df = df.loc[min_mask].reset_index(drop=True)
+
+    max_mask = df.date <= max_date
+    df = df.loc[max_mask].reset_index(drop=True)
+
     if reverse:
         df = df.reindex(index=df.index[::-1])
     return df
@@ -64,7 +48,7 @@ def filter_by_district(df, district):
     return df
 
 
-def get_sub_dfs(df, select_index, values, new_index, order=None):
+def get_sub_dfs(df, select_index, values, new_index):
     """
     Extract and return a dictionary of dictionaries splitting each original dictionary df entry into traces based on values
     """
@@ -73,8 +57,7 @@ def get_sub_dfs(df, select_index, values, new_index, order=None):
     for value in values:
         sub_df = df[df.index.get_level_values(select_index) == value]
         sub_df = sub_df.groupby(new_index).sum()
-        if order:
-            sub_df = sub_df.reindex(order)
+        sub_df = sub_df.reindex(calendar.month_abbr[1:], axis=0)
         traces[value] = sub_df
 
     return traces
@@ -110,8 +93,8 @@ def reporting_count_transform(data):
     df_no_form_report = get_num(data, 1)
 
     data = {
-        "Reported a positive number": df_positive,
-        "Did not report a positive number": df_no_positive,
+        "Reported one or above for selected indicator": df_positive,
+        "Reported a null or zero for selected indicator": df_no_positive,
         "Did not report on their 105:1 form": df_no_form_report,
     }
     return data
@@ -132,53 +115,40 @@ def get_year_and_month_cols(df):
 # Data cleaning methods for dataset selection and callbacks
 
 
-# def parse_target_pop(df, indicator):
-
-
-def get_percentage(df, pop, pop_tgt, indicator_group, indicator, all_country=False):
+def get_ratio(df, indicator, agg_level):
     """
-    Transforms the data using percentage of a target population, and group it by district or country
+    Aggregates the ratio properly using weights
+
     """
+    # TODO Link to the index_columns defined in the database object
+    # TODO find a way to delete the hardcoded name mapping step
 
-    # Pick what to grouby and index on : either district level or national level
-    merge = ["id", "year"]
-    index = ["id", "date"]
+    index = ["date", "id", "facility_name"]
 
-    if all_country == True:
-        merge = merge[1:]
-        index = index[1:]
+    if agg_level == 'country':
+        index = [index[0]]
 
-    ind_type = indicator_group.split("(")[-1][:-1]
+    if agg_level == 'district':
+        index = index[:2]
 
-    # Return the data as is, with a simple grouby if we are showing absolute numbers
+    df = df.groupby(index, as_index=False).sum()
 
-    if ind_type != "coverage":
-        return df.groupby(index).agg({indicator: "sum"})
+    col_count = len(set(df.columns).difference(set(index)))
 
-    # Else get target population, merge it and calculate percentage
+    if col_count == 2:
 
-    elif ind_type == "coverage":
+        weighted_ratio = [
+            x for x in df.columns if x.endswith('__wr')][0]
+        weight = [x for x in df.columns if x.endswith('__w')][0]
 
-        target = pop_tgt[pop_tgt.indicator == indicator]["cat"].values[0]
-        val_col = df.columns[-1]
+        df[indicator] = (df[weighted_ratio] / df[weight])*1000
 
-        columns = merge + [target]
+        df = df.replace([np.inf, -np.inf], np.nan)
 
-        pop_in = pop[columns].groupby(merge, as_index=False).sum()
+        df = df.drop(
+            columns=[weighted_ratio, weight])
 
-        data_in = df.groupby(index, as_index=False).sum()
-
-        data_in = get_year_and_month_cols(data_in).reset_index()
-
-        data_in = pd.merge(data_in, pop_in, how="left", left_on=merge, right_on=merge)
-
-        data_in[val_col] = (data_in[val_col] / data_in[target]) * 12
-
-        data_in.replace(np.inf, np.nan, inplace=True)
-
-        data_out = data_in.set_index(index)[[val_col]]
-
-        return data_out
+    return df, index
 
 
 def check_index(df, index=["id", "date", "facility_name"]):
@@ -186,18 +156,9 @@ def check_index(df, index=["id", "date", "facility_name"]):
     Check that the dataframe is formatted in the expected way, with expected indexes. Restructure the dataframe (set the indices) if this is not the case.
     """
     if df.index.values != index:
-        # print('Checking index')
-        # Set the indices
+
         df = df.reset_index(drop=True).set_index(index)
     return df
-
-
-def get_national_sum(df, indicator):
-    return df.groupby("date", as_index=False).agg({indicator: "sum"})
-
-
-def get_district_sum(df, indicator):
-    return df.groupby(["id", "date"], as_index=False).agg({indicator: "sum"})
 
 
 # Decorators
@@ -220,7 +181,7 @@ def timeit(f):
     return timed
 
 
-# Formattimg method
+# Data card title methods
 
 
 def get_perc_description(perc):
@@ -232,3 +193,93 @@ def get_perc_description(perc):
     elif perc <= 0.1:
         descrip = f"decreased by {perc_abs}%"
     return descrip
+
+
+def get_time_diff_perc(data, **controls):
+    """
+    Returns a string describing the percentage change difference between two dates 
+
+    """
+
+    target_year = controls.get("target_year")
+    target_month = controls.get("target_month")
+    reference_year = controls.get("reference_year")
+    reference_month = controls.get("reference_month")
+
+    try:
+
+        data_reference = data.get(int(reference_year))
+        data_target = data.get(int(target_year))
+        perc_first = round(
+            (
+                (
+                    data_target.loc[target_month][0]
+                    - data_reference.loc[reference_month][0]
+                )
+                / data_reference.loc[reference_month][0]
+            )
+            * 100
+        )
+        descrip = get_perc_description(perc_first)
+
+    except Exception as e:
+        print(e)
+        descrip = "changed by an unknown percentage"
+
+    return descrip
+
+
+def get_report_perc(data, **controls):
+    """
+    Returns two strings describing the percentage of reprting facilities, and non-zero reporting facilities
+
+    """
+    target_year = controls.get("target_year")
+    target_month = controls.get("target_month")
+
+    try:
+
+        date_reporting = datetime.strptime(
+            f"{target_month} 1 {target_year}", "%b %d %Y"
+        )
+
+        try:
+            reported_positive = data\
+                .get("Reported one or above for selected indicator")\
+                .loc[date_reporting][0]
+        except Exception:
+            reported_positive = 0
+
+        try:
+            did_not_report = data\
+                .get("Did not report on their 105:1 form")\
+                .loc[date_reporting][0]
+        except Exception:
+            did_not_report = 0
+
+        try:
+            reported_negative = data\
+                .get("Reported a null or zero for selected indicator")\
+                .loc[date_reporting][0]
+        except Exception:
+            reported_negative = 0
+
+        reported_perc = round(
+            (
+                (reported_positive + reported_negative)
+                / (reported_positive + did_not_report + reported_negative)
+            )
+            * 100
+        )
+        reported_positive = round(
+            (reported_positive / (reported_positive + reported_negative)) * 100
+        )
+
+        descrip_reported = f'around {reported_perc} %'
+        descrip_positive = f'around {reported_positive} %'
+
+    except Exception:
+        descrip_reported = "an unknown percentage"
+        descrip_positive = "an unknown percentage"
+
+    return descrip_reported, descrip_positive

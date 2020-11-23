@@ -3,6 +3,8 @@
 .ipynb_checkpoints
 .vscode
 .env
+*debug*
 .vscode
 coc-dashboard/data/*
 coc-dashboard/testing/*
+

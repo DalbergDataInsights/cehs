@@ -8,7 +8,8 @@ from store import timeit
 
 
 class NestedDropdownGroup:
-    def __init__(self, dataframe, title=None, vertical=True):
+    def __init__(self, dataframe, title=None, vertical=True, info=None, defaults=None):
+        self.info = info
         try:
             for col in dataframe.columns:
                 dataframe[col] = dataframe[col].astype(str)
@@ -19,6 +20,7 @@ class NestedDropdownGroup:
         self.dropdowns = {}
         self.title = title
         self.vertical = vertical
+        self.defaults = defaults or {}
         self.define_dropdowns()
 
         self.callbacks = [
@@ -50,6 +52,7 @@ class NestedDropdownGroup:
                 options=self.dataframe[name].unique().tolist(),
                 visible_id=False,
                 clearable=False,
+                value=self.defaults.get(name),
             )
 
             if parent:
@@ -62,15 +65,47 @@ class NestedDropdownGroup:
 
     @property
     def layout(self):
+
+        tooltip = (
+            [
+                html.Span(
+                    "info",
+                    className="material-icons align-middle",
+                    style={
+                        "color": "white",
+                        "font-size": "1.2rem",
+                        "float": "right",
+                        "cursor": "help",
+                    },
+                    id=f"{self.title.lower().replace(' ', '-')}__info",
+                ),
+                dbc.Tooltip(
+                    self.info,
+                    target=f"{self.title.lower().replace(' ', '-')}__info",
+                    placement="right",
+                ),
+            ]
+            if self.info
+            else []
+        )
+
         layout = dbc.Col(
             [
                 dbc.Row(
-                    html.P(
-                        self.title,
-                        className="text-center",
+                    dbc.Col(
+                        html.P(
+                            [self.title] + tooltip,
+                            className="text-left",
+                            style={
+                                "border-bottom": "0.5px solid white",
+                                "margin-left": "5px",
+                                "margin-right": "5px",
+                                "margin-bottom": "3px",
+                                "color": "white",
+                                "font-size": "1.6vh",
+                            },
+                        ),
                         style={
-                            "border-bottom": "0.5px solid gray",
-                            "font-weidht": "bold",
                             "width": "100%",
                         },
                     )
@@ -78,8 +113,7 @@ class NestedDropdownGroup:
                 if self.title
                 else None
             ]
-            + self.get_orientation(self.dropdown_objects,
-                                   vertical=self.vertical),
+            + self.get_orientation(self.dropdown_objects, vertical=self.vertical),
             className="p-3 m-12",
         )
         return layout
@@ -89,8 +123,7 @@ class NestedDropdownGroup:
 
     def get_orientation(self, elements, vertical=True):
         elements = [e.get_layout() for e in elements]
-        layout = [dbc.Row(e) for e in elements] if vertical else [
-            dbc.Row(elements)]
+        layout = [dbc.Row(e) for e in elements] if vertical else [dbc.Row(elements)]
         return layout
 
     @timeit

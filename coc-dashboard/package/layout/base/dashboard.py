@@ -8,6 +8,7 @@ from dash import Dash
 from dash.dependencies import Output, Input
 from pprint import pprint
 from package.layout.base.data_card import DataCard
+from dash_extensions import Download
 
 
 class Dashboard:
@@ -23,7 +24,10 @@ class Dashboard:
         if mode == "jupyter":
             self.app = JupyterDash(external_stylesheets=external_stylesheets)
         else:
-            self.app = Dash(external_stylesheets=external_stylesheets)
+            self.app = Dash(
+                external_stylesheets=external_stylesheets,
+                prevent_initial_callbacks=True,
+            )
 
         app = self.app  # For referencing with the decorator (see line below)
         app.title = "CEHS Uganda"
@@ -71,27 +75,33 @@ class Dashboard:
             if x._requires_dropdown():
                 for callback in x.callbacks:
                     self.register_callback(
-                        callback.get("input"),
-                        callback.get("output"),
-                        callback.get("func"),
+                        function=callback.get("func"),
+                        input_element_params=callback.get("input", []),
+                        output_elements_params=callback.get("output", []),
                     )
         for x in self.ind_elements:  # FIXME
             if x._requires_dropdown():
                 for callback in x.callbacks:
                     self.register_callback(
-                        callback.get("input"),
-                        callback.get("output"),
-                        callback.get("func"),
+                        function=callback.get("func"),
+                        input_element_params=callback.get("input", []),
+                        output_elements_params=callback.get("output", []),
                     )
 
-    def register_callback(self, input_element_params, output_elements_params, function):
-        out_set, in_set = self.__define_callback_set(
-            output_elements_params, input_element_params
+    def register_callback(
+        self,
+        function,
+        input_element_params,
+        output_elements_params=[],
+        download_elements_params=[],
+    ):
+        callback_set = self.__define_callback_set(
+            input_element_params, output_elements_params
         )
 
         callback_function = self.__process_callback_function(function)
 
-        self.app.callback(inputs=in_set, output=out_set)(callback_function)
+        self.app.callback(*callback_set)(callback_function)
 
     def __process_callback_function(self, function):
         def callback_wrapper(*input_values):
@@ -101,7 +111,7 @@ class Dashboard:
         return callback_wrapper
 
     def __define_callback_set(
-        self, output_elements_id_prop: [(str, str)], input_element_id_prop: [(str, str)]
+        self, input_element_id_prop: list, output_elements_id_prop: list = []
     ):
 
         callback_set_outputs = [
@@ -114,4 +124,8 @@ class Dashboard:
             for component_id, component_prop in input_element_id_prop
         ]
 
-        return (callback_set_outputs, callback_set_input)
+        callback_set = [
+            x for x in [callback_set_outputs, callback_set_input] if len(x) > 0
+        ]
+
+        return callback_set
