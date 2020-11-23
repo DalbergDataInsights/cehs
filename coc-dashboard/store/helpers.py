@@ -263,6 +263,8 @@ def get_period_compare(df, indicator,
                                target_date, reference_date, date_list,
                                aggregation_type, compare, index)
 
+    df = df.set_index(index)
+
     return df
 
 

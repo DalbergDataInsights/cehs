@@ -151,7 +151,7 @@ def tree_map_district_dated_data(
 
     #df_district_dated = filter_by_district(df_district_dated, district)
 
-    title = f'"Contribution of individual facilities to {db.get_indicator_view(indicator)} in {district} district'
+    title = f'Contribution of individual facilities to {db.get_indicator_view(indicator)} in {district} district'
 
     df_district_dated = df_district_dated.rename(columns={indicator: title})
 
