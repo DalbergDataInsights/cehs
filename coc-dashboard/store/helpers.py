@@ -144,7 +144,7 @@ def filter_df_by_dates(df, target_year,
 def get_pivot_df_by_date(df, indicator,
                          target_year, target_month,
                          reference_year, reference_month,
-                         aggregation_type):
+                         aggregation_type, pivot=True):
 
     target_date = datetime.strptime(f"1 {target_month} {target_year}",
                                     "%d %b %Y")
@@ -172,12 +172,13 @@ def get_pivot_df_by_date(df, indicator,
     elif aggregation_type == "Compare moving averages (last 3 months)":
         df = df[df.date.isin(date_list)]
 
-    if "facility_name" in list(df.columns):
-        df = df.pivot_table(columns="date",
-                            values=indicator, index=['id', 'facility_name'])
-    else:
-        df = df.pivot_table(columns="date",
-                            values=indicator, index=['id'])
+    if pivot:
+        if "facility_name" in list(df.columns):
+            df = df.pivot_table(columns="date",
+                                values=indicator, index=['id', 'facility_name'])
+        else:
+            df = df.pivot_table(columns="date",
+                                values=indicator, index=['id'])
 
     return df, target_date, reference_date, date_list
 
@@ -318,26 +319,43 @@ def get_time_diff_perc(data, **controls):
 
     """
 
+    data = data.reset_index()
+    indicator = data.columns[-1]
     target_year = controls.get("target_year")
     target_month = controls.get("target_month")
     reference_year = controls.get("reference_year")
     reference_month = controls.get("reference_month")
+    aggregation_type = controls.get("aggregation_type")
 
+    df, target_date, reference_date, date_list = get_pivot_df_by_date(data, indicator,
+                                                                      target_year, target_month,
+                                                                      reference_year, reference_month,
+                                                                      aggregation_type, pivot=False)
     try:
 
-        data_reference = data.get(int(reference_year))
-        data_target = data.get(int(target_year))
-        perc_first = round(
-            (
-                (
-                    data_target.loc[target_month][0]
-                    - data_reference.loc[reference_month][0]
-                )
-                / data_reference.loc[reference_month][0]
-            )
-            * 100
-        )
-        descrip = get_perc_description(perc_first)
+        if aggregation_type == "Average over period":
+            number = int(round(next(iter(df.mean(axis=0))), 0))
+            descrip = f"was on average {number}"
+
+        else:
+
+            if aggregation_type == "Compare moving averages (last 3 months)":
+
+                target = next(
+                    iter(df[df.date.isin(date_list[:3])].mean(axis=0)))
+                reference = next(
+                    iter(df[df.date.isin(date_list[3:])].mean(axis=0)))
+
+            else:
+                target = next(
+                    iter(df[df.date == target_date][indicator].values))
+                reference = next(
+                    iter(df[df.date == reference_date][indicator].values))
+
+            number = round((target - reference)
+                           / reference * 100, 1)
+
+            descrip = get_perc_description(number)
 
     except Exception as e:
         print(e)

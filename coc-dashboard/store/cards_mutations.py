@@ -140,16 +140,10 @@ def tree_map_district_dated_data(
 
     df = get_ratio(df, indicator, agg_level='facility')[0]
 
-    # df_district_dated = filter_df_by_dates(
-    #     df, target_year, target_month, reference_year, reference_month, keep_target_only=True
-    # )
-
     df_district_dated = get_period_compare(df, indicator,
                                            target_year, target_month,
                                            reference_year, reference_month, aggregation_type,
                                            compare=False, index=['id', 'facility_name'])
-
-    #df_district_dated = filter_by_district(df_district_dated, district)
 
     title = f'Contribution of individual facilities to {db.get_indicator_view(indicator)} in {district} district'
 

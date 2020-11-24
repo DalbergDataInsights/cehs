@@ -118,15 +118,16 @@ def change_titles_trends(indicator_view_name, indicator_view_name_vetted, contro
 
     print(f"Starting updates for trend titles with {controls['indicator']}")
 
-    # TODO data = db.datasets.get('country')
+    db = Database()
 
-    country_overview_scatter.title = get_title_country_overview(country_overview_scatter.data,
+    country_overview_scatter.title = get_title_country_overview(db.datasets.get('country'),
                                                                 indicator_view_name,
                                                                 **controls)
 
-    district_overview_scatter.title = get_title_district_overview(district_overview_scatter.data,
+    district_overview_scatter.title = get_title_district_overview(db.datasets.get('district'),
                                                                   indicator_view_name,
                                                                   **controls)
+    # TODO NEED TO UPDATE TREEMAP TITLE
 
     tree_map_district.title = get_title_district_treemap(indicator_view_name_vetted,
                                                          **controls)
