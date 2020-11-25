@@ -38,11 +38,11 @@ def get_title_district_overview(data, indicator_view_name, **controls):
     quarter = ''
 
     if controls.get("aggregation_type") == "Compare moving averages (last 3 months)":
-        quarter = ', comparing three months moving averages'
+        quarter = 'the three months periods ending in '
 
     title = f'''Deep-dive in {controls.get('district')} district: the {indicator_view_name} {district_descrip} 
-            between {controls.get('reference_month')}-{controls.get('reference_year')} 
-            and {controls.get('target_month')}-{controls.get('target_year')}{quarter}'''
+            between {quarter}{controls.get('reference_month')}-{controls.get('reference_year')} 
+            and {controls.get('target_month')}-{controls.get('target_year')}'''
 
     return title
 

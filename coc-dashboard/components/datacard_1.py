@@ -37,11 +37,11 @@ def get_title_country_overview(data, indicator_view_name, **controls):
     quarter = ''
 
     if controls.get("aggregation_type") == "Compare moving averages (last 3 months)":
-        quarter = ', comparing three months moving averages'
+        quarter = 'the three months periods ending in '
 
     title = f'''Overview: Across the country, the {indicator_view_name} {country_descrip} 
-            between {controls.get('reference_month')}-{controls.get('reference_year')} 
-            and {controls.get('target_month')}-{controls.get('target_year')}{quarter}'''
+            between {quarter}{controls.get('reference_month')}-{controls.get('reference_year')} 
+            and {controls.get('target_month')}-{controls.get('target_year')}'''
 
     return title
 

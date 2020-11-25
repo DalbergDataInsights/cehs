@@ -45,8 +45,20 @@ def get_title_district_treemap(indicator_view_name, **controls):
     """
     get title for the third section based on a percentage calcution and the inputs
     """
+
+    if controls.get("aggregation_type") == "Compare two months":
+        date = f"on {controls.get('target_month')}-{controls.get('target_year')}"
+    elif controls.get("aggregation_type") == "Compare moving averages (last 3 months)":
+        date = f"on average in the three months period ending in {controls.get('target_month')}-{controls.get('target_year')}"
+    elif controls.get("aggregation_type") == "Average over period":
+        date = f'''on average between {controls.get('reference_month')}-{controls.get('reference_year')} and
+            {controls.get('target_month')}-{controls.get('target_year')}'''
+    else:
+        date = f'''in total between {controls.get('reference_month')}-{controls.get('reference_year')} and
+            {controls.get('target_month')}-{controls.get('target_year')}'''
+
     title = f'''Contribution of individual facilities in {controls.get('district')} district to the {indicator_view_name}
-            on {controls.get('target_month')}-{controls.get('target_year')}'''
+            {date}'''
 
     return title
 

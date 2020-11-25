@@ -20,6 +20,7 @@ DEFAULTS = {
     "target_month": os.environ["TARGET_MONTH"],
     "reference_year": os.environ["REFERENCE_YEAR"],
     "reference_month": os.environ["REFERENCE_MONTH"],
+    "aggregation_type": os.environ["AGGREGATION_TYPE"]
 }
 
 
@@ -32,12 +33,13 @@ def initiate_dropdowns():
     entries = pd.DataFrame({"aggregation_type": [
         "Compare two months",
         "Compare moving averages (last 3 months)",
-        "Average over period"]})
+        "Average over period",
+        "Sum over period"]})
 
     aggregation_dropdown = NestedDropdownGroup(
         entries,
         title="SELECT AN ANALYSIS TIMEFRAME",
-        defaults={"aggregation_type": "Compare two months"},
+        defaults={"aggregation_type": DEFAULTS.get("aggregation_type")},
     )
 
     # Initiate date dropdown layout

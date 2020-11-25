@@ -103,10 +103,12 @@ def global_story_callback(*inputs):
 @timeit
 def change_titles_reporting(indicator_view_name, controls):
 
+    db = Database()
+
     print(
         f"Starting updates for reporting titles with {controls['indicator']}")
 
-    stacked_bar_reporting_country.title = get_title_reporting_country(stacked_bar_reporting_country.data,
+    stacked_bar_reporting_country.title = get_title_reporting_country(db.datasets.get("reporting_country"),
                                                                       indicator_view_name,
                                                                       **controls)
 

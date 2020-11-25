@@ -81,7 +81,20 @@ def map_bar_country_dated_data(
                             target_year, target_month,
                             reference_year, reference_month, aggregation_type)
 
-    title = f'Percentage change of {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
+    if aggregation_type in ["Compare two months", "Compare moving averages (last 3 months)"]:
+        data = 'Percentage change of'
+    elif aggregation_type == "Average over period":
+        data = 'Average'
+    else:
+        data = 'Total'
+
+    if aggregation_type == "Compare moving averages (last 3 months)":
+        quarter = 'the three months periods ending in '
+    else:
+        quarter = ''
+
+    title = f'{data} {db.get_indicator_view(indicator)} between {quarter}{reference_month}-{reference_year} and {target_month}-{target_year}'
+
     df = df.rename(columns={indicator: title})
 
     return df
@@ -235,7 +248,19 @@ def map_reporting_dated_data(
                             reference_year, reference_month, aggregation_type,
                             report=True)
 
-    title = f'Percentage of reporting facilities that reported a non-zero number for {db.get_indicator_view(indicator)} by district on {target_month}-{target_year}'
+    if aggregation_type in ["Compare two months", "Compare moving averages (last 3 months)"]:
+        data = 'Percentage change in'
+    else:
+        data = 'Average'
+
+    if aggregation_type == "Compare moving averages (last 3 months)":
+        average = 'the three months periods ending in '
+    else:
+        average = ''
+
+    title = f'''{data} proportion of reporting facilities that reported a non-zero number for 
+            {db.get_indicator_view(indicator)} by district between 
+            {average}{reference_month}-{reference_year} and {target_month}-{target_year}'''
 
     df = df.rename(columns={indicator: title})
 

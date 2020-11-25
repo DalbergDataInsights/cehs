@@ -144,7 +144,7 @@ def filter_df_by_dates(df, target_year,
 def get_pivot_df_by_date(df, indicator,
                          target_year, target_month,
                          reference_year, reference_month,
-                         aggregation_type, pivot=True):
+                         aggregation_type, pivot=True, target_only=False):
 
     target_date = datetime.strptime(f"1 {target_month} {target_year}",
                                     "%d %b %Y")
@@ -152,7 +152,8 @@ def get_pivot_df_by_date(df, indicator,
                                        "%d %b %Y")
     data_min_date = min(df.date) + relativedelta(months=+2)
 
-    min_date = min([data_min_date, target_date, reference_date])
+    min_date = max([data_min_date, min([target_date, reference_date])])
+    max_date = max([target_date, reference_date])
 
     df = df.sort_values(["date"])
 
@@ -163,14 +164,20 @@ def get_pivot_df_by_date(df, indicator,
                  reference_date - relativedelta(months=+1),
                  reference_date - relativedelta(months=+2)]
 
-    if aggregation_type == "Average over period":
-        df = df[(df.date >= min_date)]
+    if aggregation_type in ["Average over period", "Sum over period"]:
+        df = df[(df.date >= min_date) & (df.date <= max_date)]
 
     elif aggregation_type == "Compare two months":
-        df = df[df.date.isin([date_list[0], date_list[3]])]
+        if target_only:
+            df = df[df.date == target_date]
+        else:
+            df = df[df.date.isin([target_date, reference_date])]
 
     elif aggregation_type == "Compare moving averages (last 3 months)":
-        df = df[df.date.isin(date_list)]
+        if target_only:
+            df = df[df.date.isin(date_list[:3])]
+        else:
+            df = df[df.date.isin(date_list)]
 
     if pivot:
         if "facility_name" in list(df.columns):
@@ -187,11 +194,20 @@ def get_delta_over_period(df, indicator,
                           target_date,
                           reference_date, date_list,
                           aggregation_type,
-                          compare=True, index=['id']):
+                          compare=True, index=['id'], report=False):
+
+    # df = df.groupby(index).sum()
+
+    print('check here')
 
     if aggregation_type == "Average over period":
-        df = df.groupby(index).mean()
         df[indicator] = df[df.columns].mean(axis=1)
+
+    elif aggregation_type == "Sum over period":
+        if report:
+            df[indicator] = df[df.columns].mean(axis=1)
+        else:
+            df[indicator] = df[df.columns].sum(axis=1)
 
     else:
 
@@ -262,7 +278,7 @@ def get_period_compare(df, indicator,
 
     df = get_delta_over_period(df, indicator,
                                target_date, reference_date, date_list,
-                               aggregation_type, compare, index)
+                               aggregation_type, compare, index, report)
 
     df = df.set_index(index)
 
@@ -334,8 +350,14 @@ def get_time_diff_perc(data, **controls):
     try:
 
         if aggregation_type == "Average over period":
-            number = int(round(next(iter(df.mean(axis=0))), 0))
+            number = int(
+                round(next(iter(df[[df.columns[-1]]].mean(axis=0))), 0))
             descrip = f"was on average {number}"
+
+        elif aggregation_type == "Sum over period":
+            number = int(
+                round(next(iter(df[[df.columns[-1]]].sum(axis=0))), 0))
+            descrip = f"was in total {number}"
 
         else:
 
@@ -369,33 +391,38 @@ def get_report_perc(data, **controls):
     Returns two strings describing the percentage of reprting facilities, and non-zero reporting facilities
 
     """
+    data = data.reset_index()
+    indicator = data.columns[-1]
     target_year = controls.get("target_year")
     target_month = controls.get("target_month")
+    reference_year = controls.get("reference_year")
+    reference_month = controls.get("reference_month")
+    aggregation_type = controls.get("aggregation_type")
+
+    df = get_pivot_df_by_date(data, indicator,
+                              target_year, target_month,
+                              reference_year, reference_month,
+                              aggregation_type, pivot=False, target_only=True)[0]
+
+    df = reporting_count_transform(df)
 
     try:
 
-        date_reporting = datetime.strptime(
-            f"{target_month} 1 {target_year}", "%b %d %Y"
-        )
-
         try:
-            reported_positive = data\
-                .get("Reported one or above for selected indicator")\
-                .loc[date_reporting][0]
+            reported_positive = df\
+                .get("Reported one or above for selected indicator")[indicator].sum(axis=0)
         except Exception:
             reported_positive = 0
 
         try:
-            did_not_report = data\
-                .get("Did not report on their 105:1 form")\
-                .loc[date_reporting][0]
+            did_not_report = df\
+                .get("Did not report on their 105:1 form")[indicator].sum(axis=0)
         except Exception:
             did_not_report = 0
 
         try:
-            reported_negative = data\
-                .get("Reported a null or zero for selected indicator")\
-                .loc[date_reporting][0]
+            reported_negative = df\
+                .get("Reported a null or zero for selected indicator")[indicator].sum(axis=0)
         except Exception:
             reported_negative = 0
 
@@ -406,12 +433,12 @@ def get_report_perc(data, **controls):
             )
             * 100
         )
-        reported_positive = round(
+        positive_perc = round(
             (reported_positive / (reported_positive + reported_negative)) * 100
         )
 
         descrip_reported = f'around {reported_perc} %'
-        descrip_positive = f'around {reported_positive} %'
+        descrip_positive = f'around {positive_perc} %'
 
     except Exception:
         descrip_reported = "an unknown percentage"
