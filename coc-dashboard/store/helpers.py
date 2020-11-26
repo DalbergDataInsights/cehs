@@ -102,7 +102,11 @@ def get_ratio(df, indicator, agg_level):
 
     col_count = len(set(df.columns).difference(set(index)))
 
+    isratio = False
+
     if col_count == 2:
+
+        isratio = True
 
         weighted_ratio = [
             x for x in df.columns if x.endswith('__wr')][0]
@@ -115,7 +119,7 @@ def get_ratio(df, indicator, agg_level):
         df = df.drop(
             columns=[weighted_ratio, weight])
 
-    return df, index
+    return df, index, isratio
 
 
 def filter_df_by_dates(df, target_year,
@@ -194,7 +198,7 @@ def get_delta_over_period(df, indicator,
                           target_date,
                           reference_date, date_list,
                           aggregation_type,
-                          compare=True, index=['id'], report=False):
+                          compare=True, index=['id'], report=False, isratio=False):
 
     # df = df.groupby(index).sum()
 
@@ -204,7 +208,7 @@ def get_delta_over_period(df, indicator,
         df[indicator] = df[df.columns].mean(axis=1)
 
     elif aggregation_type == "Sum over period":
-        if report:
+        if report | isratio:
             df[indicator] = df[df.columns].mean(axis=1)
         else:
             df[indicator] = df[df.columns].sum(axis=1)
@@ -263,7 +267,7 @@ def get_reporting_rate_of_districts(df):
 def get_period_compare(df, indicator,
                        target_year, target_month,
                        reference_year, reference_month, aggregation_type,
-                       compare=True, report=False, index=['id']):
+                       compare=True, report=False, index=['id'], isratio=False):
 
     (df,
      target_date,
@@ -278,7 +282,7 @@ def get_period_compare(df, indicator,
 
     df = get_delta_over_period(df, indicator,
                                target_date, reference_date, date_list,
-                               aggregation_type, compare, index, report)
+                               aggregation_type, compare, index, report, isratio)
 
     df = df.set_index(index)
 
@@ -347,6 +351,11 @@ def get_time_diff_perc(data, **controls):
                                                                       target_year, target_month,
                                                                       reference_year, reference_month,
                                                                       aggregation_type, pivot=False)
+
+    # TODO: find a less manual way of doing that
+
+    ratio_markers = ['overage', 'ncidence', 'ercentage', ' per ']
+
     try:
 
         if aggregation_type == "Average over period":
@@ -355,9 +364,14 @@ def get_time_diff_perc(data, **controls):
             descrip = f"was on average {number}"
 
         elif aggregation_type == "Sum over period":
-            number = int(
-                round(next(iter(df[[df.columns[-1]]].sum(axis=0))), 0))
-            descrip = f"was in total {number}"
+            if any(map(indicator.__contains__, ratio_markers)):
+                number = int(
+                    round(next(iter(df[[df.columns[-1]]].mean(axis=0))), 0))
+                descrip = f"was on average {number}"
+            else:
+                number = int(
+                    round(next(iter(df[[df.columns[-1]]].sum(axis=0))), 0))
+                descrip = f"was in total {number}"
 
         else:
 

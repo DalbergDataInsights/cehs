@@ -45,7 +45,7 @@ def scatter_country_data(*, indicator, **kwargs):
 
     df = db.filter_by_indicator(df, indicator)
 
-    df, index = get_ratio(df, indicator, agg_level='country')
+    df, index = get_ratio(df, indicator, agg_level='country')[0:2]
 
     df = df.set_index(index)
 
@@ -77,16 +77,21 @@ def map_bar_country_dated_data(
 
     df = get_ratio(df, indicator, agg_level='district')[0]
 
+    isratio = get_ratio(df, indicator, agg_level='district')[2]
+
     df = get_period_compare(df, indicator,
                             target_year, target_month,
-                            reference_year, reference_month, aggregation_type)
+                            reference_year, reference_month, aggregation_type, isratio=isratio)
 
     if aggregation_type in ["Compare two months", "Compare moving averages (last 3 months)"]:
         data = 'Percentage change of'
     elif aggregation_type == "Average over period":
         data = 'Average'
     else:
-        data = 'Total'
+        if isratio:
+            data = 'Average'
+        else:
+            data = 'Total'
 
     if aggregation_type == "Compare moving averages (last 3 months)":
         quarter = 'the three months periods ending in '
@@ -113,7 +118,7 @@ def scatter_district_data(*,  indicator, district, **kwargs):
 
     df = filter_by_district(df, district)
 
-    df, index = get_ratio(df, indicator, agg_level='district')
+    df, index = get_ratio(df, indicator, agg_level='district')[0:2]
 
     df = df.set_index(index)
 
@@ -153,10 +158,12 @@ def tree_map_district_dated_data(
 
     df = get_ratio(df, indicator, agg_level='facility')[0]
 
+    isratio = get_ratio(df, indicator, agg_level='facility')[2]
+
     df_district_dated = get_period_compare(df, indicator,
                                            target_year, target_month,
                                            reference_year, reference_month, aggregation_type,
-                                           compare=False, index=['id', 'facility_name'])
+                                           compare=False, index=['id', 'facility_name'], isratio=isratio)
 
     title = f'Contribution of individual facilities to {db.get_indicator_view(indicator)} in {district} district'
 
@@ -177,7 +184,7 @@ def scatter_facility_data(*, indicator, district, facility, **kwargs):
 
     df = filter_by_district(df, district)
 
-    df, index = get_ratio(df, indicator, agg_level='facility')
+    df, index = get_ratio(df, indicator, agg_level='facility')[0:2]
 
     if not facility:
         facility = (
@@ -239,9 +246,6 @@ def map_reporting_dated_data(
     indicator = db.switch_indic_to_numerator(indicator, popcheck=False)
 
     df = db.filter_by_indicator(df, indicator)
-
-    # df = filter_df_by_dates(df, target_year, target_month,
-    # reference_year, reference_month, keep_target_only=True)
 
     df = get_period_compare(df, indicator,
                             target_year, target_month,
