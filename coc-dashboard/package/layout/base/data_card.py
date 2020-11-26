@@ -44,12 +44,12 @@ class DataCard:
         # Style
         self.__colors = self.default_colors.copy()
         self.set_colors(kwargs.get("colors", self.default_colors.copy()))
-        self.center_value = (kwargs.get("center_value", 0))
-        self.excl_outliers_colorscale = (kwargs.get("excl_outliers_colorscale",
-                                                    True))
+        self.center_value = kwargs.get("center_value", 0)
+        self.excl_outliers_colorscale = kwargs.get("excl_outliers_colorscale", True)
 
         # Layout
         # Orientation
+        self.dropdown = kwargs.get("dropdown")
         self.orientation_left = kwargs.get("orientation_left", True)
         self.orientation_vertical = kwargs.get("orientation_vertical", False)
 
@@ -103,8 +103,7 @@ class DataCard:
         assert (
             type(value) == dict
         ), "Data should be dict with pandas DataFrame as values"
-        self.__data = self.data_transform(
-            value) if self.data_transform else value
+        self.__data = self.data_transform(value) if self.data_transform else value
 
     @property
     def figure(self):
@@ -159,8 +158,7 @@ class DataCard:
         """Get the static plotly layout of a data card"""
         els = [
             self.__get_figure_layout() if self.data or self.figure else None,
-            self.__get_text_layout(
-                self.key_points) if self.key_points else None,
+            self.__get_text_layout(self.key_points) if self.key_points else None,
         ]
 
         layout = dbc.Col(
@@ -200,10 +198,9 @@ class DataCard:
         layout = dbc.Col(
             [
                 dbc.Row(self.__get_figure_title_layout()),
-                # dbc.Row(
-                #     self.__get_dropdown_layout(),
-                #     className='dropdown-section'
-                # ),
+                dbc.Row(self.dropdown.get_layout(), className="dropdown-section")
+                if self.dropdown
+                else None,
                 dbc.Row(
                     dbc.Col(
                         dcc.Graph(
@@ -287,8 +284,7 @@ class DataCard:
     def __get_orientation(self, els):
         els = els if self.orientation_left else els[::-1]
         return (
-            [dbc.Row(e) for e in els] if self.orientation_vertical else [
-                dbc.Row(els)]
+            [dbc.Row(e) for e in els] if self.orientation_vertical else [dbc.Row(els)]
         )
 
     ## TEXT SECTION ##
@@ -300,8 +296,7 @@ class DataCard:
                     dbc.Col(
                         html.Div(
                             [
-                                self.__unwrap_section_and_points(
-                                    section, points)
+                                self.__unwrap_section_and_points(section, points)
                                 for section, points in text.items()
                             ],
                             className="h-90 w-75 text-section",
@@ -341,8 +336,7 @@ class DataCard:
                 html.Div(
                     html.Ul(
                         [
-                            html.Li(
-                                html.P(self.__format_string(item, self.data)))
+                            html.Li(html.P(self.__format_string(item, self.data)))
                             for item in points
                         ]
                     ),
@@ -401,43 +395,47 @@ class DataCard:
     def get_custom_colorscale(self, name, range):
 
         # TODO Find more stable fix, not using name
-        colorscale = list(self.colors.get('fig').values())[0]
+        colorscale = list(self.colors.get("fig").values())[0]
         colorlist = [x[-1] for x in colorscale]
         min_color_nb = 0
         max_color_nb = -1
 
         colorlist_lenght = len(colorlist)
         assert colorlist_lenght in [
-            2, 3, 5], "Color list should include 2,3, or 5 colors"
+            2,
+            3,
+            5,
+        ], "Color list should include 2,3, or 5 colors"
 
         lower_bound, upper_bound = range
 
         if colorlist_lenght == 2:
             colorscale = [
                 [0.0, colorlist[min_color_nb]],
-                [1.0, colorlist[max_color_nb]]
+                [1.0, colorlist[max_color_nb]],
             ]
 
         else:
 
             if lower_bound <= self.center_value <= upper_bound:
-                center_norm = (self.center_value-lower_bound) / \
-                    (upper_bound-lower_bound)
+                center_norm = (self.center_value - lower_bound) / (
+                    upper_bound - lower_bound
+                )
                 colorscale = [
                     [0.0, colorlist[min_color_nb]],
-                    [center_norm/2, colorlist[1]],
+                    [center_norm / 2, colorlist[1]],
                     [center_norm, colorlist[2]],
-                    [center_norm+(1-center_norm)/2, colorlist[3]],
-                    [1.0, colorlist[max_color_nb]]
+                    [center_norm + (1 - center_norm) / 2, colorlist[3]],
+                    [1.0, colorlist[max_color_nb]],
                 ]
             else:
                 if self.center_value <= lower_bound:
-                    min_color_nb = math.floor(colorlist_lenght/2)
+                    min_color_nb = math.floor(colorlist_lenght / 2)
                 else:
-                    max_color_nb = math.floor(colorlist_lenght/2)
+                    max_color_nb = math.floor(colorlist_lenght / 2)
                 colorscale = [
                     [0.0, colorlist[min_color_nb]],
-                    [1.0, colorlist[max_color_nb]]
+                    [1.0, colorlist[max_color_nb]],
                 ]
 
         colorscale = [x for x in colorscale if x]
@@ -462,8 +460,7 @@ class DataCard:
 
             # deal with complex labels
             while "$" in formatted_string:
-                sub = self.__get_substring_between_elements(
-                    formatted_string, "$")
+                sub = self.__get_substring_between_elements(formatted_string, "$")
 
                 try:
                     if "trace" in sub:
@@ -493,8 +490,7 @@ class DataCard:
     def __get_substring_between_elements(self, string, element, closing_element="$"):
         try:
             out = string.split(element, 1)[1]
-            out = out.split(closing_element, 1)[
-                0] if closing_element in out else None
+            out = out.split(closing_element, 1)[0] if closing_element in out else None
         except IndexError as e:
             out = None
             print(e)

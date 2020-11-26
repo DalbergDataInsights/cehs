@@ -1,13 +1,16 @@
 import numpy as np
 import pandas as pd
-from store import (timeit,
-                   get_sub_dfs,
-                   init_data_set,
-                   get_year_and_month_cols,
-                   DEFAULTS,
-                   Database)
+from store import (
+    timeit,
+    get_sub_dfs,
+    init_data_set,
+    get_year_and_month_cols,
+    DEFAULTS,
+    Database,
+)
 from package.layout.area_card import AreaDataCard
 from package.layout.chart_card import ChartDataCard
+from package.elements.nested_dropdown import NestedDropdown
 
 
 @timeit
@@ -15,8 +18,7 @@ def tree_map_district_dated_plot(data):
 
     data_in = data.get("district_dated")
     val_col = data_in.columns[-1]
-    data_in[val_col] = data_in[val_col].apply(
-        lambda x: int(x) if pd.notna(x) else 0)
+    data_in[val_col] = data_in[val_col].apply(lambda x: int(x) if pd.notna(x) else 0)
     data_in = data_in.reset_index()
     data_in = data_in[data_in.date == data_in.date.max()].reset_index()
     district_name = data_in.id[0]
@@ -44,8 +46,8 @@ def get_title_district_treemap(indicator_view_name, **controls):
     """
     get title for the third section based on a percentage calcution and the inputs
     """
-    title = f'''Contribution of individual facilities in {controls.get('district')} district to the {indicator_view_name}
-            on {controls.get('target_month')}-{controls.get('target_year')}'''
+    title = f"""Contribution of individual facilities in {controls.get('district')} district to the {indicator_view_name}
+            on {controls.get('target_month')}-{controls.get('target_year')}"""
 
     return title
 
@@ -54,14 +56,22 @@ def get_title_district_treemap(indicator_view_name, **controls):
 
 db = Database()
 
+dropdown = NestedDropdown(
+    id="area-map-dropdown",
+    options=["1", "2", "3", "4"],
+    # visible_id=False
+)
+
 default_title = get_title_district_treemap(
-    db.get_indicator_view(DEFAULTS.get('indicator')), **DEFAULTS)
+    db.get_indicator_view(DEFAULTS.get("indicator")), **DEFAULTS
+)
 
 tree_map_district = AreaDataCard(
     title=default_title,
     data=init_data_set,
     data_transform=tree_map_district_dated_plot,
     fig_object="Treemap",
+    dropdown=dropdown,
 )
 
 tree_map_district.set_colors({"fig": ["#e2d5d1", "#96c0e0", "#3c6792"]})

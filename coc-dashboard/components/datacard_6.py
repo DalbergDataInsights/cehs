@@ -24,15 +24,12 @@ def map_reporting_dated_plot(data):
     for district in last_date_df.id.unique():
         districtal_df = last_date_df[last_date_df.id == district]
         total_facilities = (districtal_df[val_col] != 0).sum()
-        reported_facilities = len(
-            districtal_df[districtal_df[val_col] == 3]
-        )
+        reported_facilities = len(districtal_df[districtal_df[val_col] == 3])
         report_rate = round((reported_facilities / total_facilities) * 100, 2)
         districts.append(district)
         reporting.append(report_rate)
 
-    reporting_df = pd.DataFrame(
-        {"id": districts, f'{data_in.columns[-1]}': reporting})
+    reporting_df = pd.DataFrame({"id": districts, f"{data_in.columns[-1]}": reporting})
     reporting_df = reporting_df.set_index("id")
 
     data_out = {
@@ -43,6 +40,7 @@ def map_reporting_dated_plot(data):
 
 
 # DATACARD 6 #
+
 
 reporting_map = MapDataCard(
     data=init_data_set,
