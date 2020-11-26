@@ -18,11 +18,12 @@ def map_reporting_dated_plot(data):
 
 # DATACARD 6 #
 
+
 reporting_map = MapDataCard(
     data=init_data_set,
     data_transform=map_reporting_dated_plot,
     fig_title="$label$",
-   #center_value=50,
+    # center_value=50,
     excl_outliers_colorscale=False,
     geodata=shapefile,
     locations="id",
