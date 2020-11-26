@@ -11,7 +11,6 @@ from components import (
     district_overview_scatter,
     get_title_district_overview,
     facility_scatter,
-    get_title_district_treemap,
     stacked_bar_district,
     stacked_bar_reporting_country,
     get_title_reporting_country,
@@ -78,10 +77,6 @@ def global_story_callback(*inputs):
         db.switch_indic_to_numerator(CONTROLS['indicator'],
                                      popcheck=False))
 
-    indicator_view_if_pop_dependant = db.get_indicator_view(
-        db.switch_indic_to_numerator(CONTROLS['indicator'],
-                                     popcheck=True))
-
     try:
         change_titles_reporting(indicator_view_if_ratio,
                                 CONTROLS)
@@ -91,7 +86,6 @@ def global_story_callback(*inputs):
 
     try:
         change_titles_trends(indicator_view,
-                             indicator_view_if_pop_dependant,
                              CONTROLS)
 
     except:
@@ -103,12 +97,10 @@ def global_story_callback(*inputs):
 @timeit
 def change_titles_reporting(indicator_view_name, controls):
 
-    db = Database()
-
     print(
         f"Starting updates for reporting titles with {controls['indicator']}")
 
-    stacked_bar_reporting_country.title = get_title_reporting_country(db.datasets.get("reporting_country"),
+    stacked_bar_reporting_country.title = get_title_reporting_country(stacked_bar_reporting_country.data,
                                                                       indicator_view_name,
                                                                       **controls)
 
@@ -116,23 +108,17 @@ def change_titles_reporting(indicator_view_name, controls):
 
 
 @timeit
-def change_titles_trends(indicator_view_name, indicator_view_name_vetted, controls):
+def change_titles_trends(indicator_view_name, controls):
 
     print(f"Starting updates for trend titles with {controls['indicator']}")
 
-    db = Database()
-
-    country_overview_scatter.title = get_title_country_overview(db.datasets.get('country'),
+    country_overview_scatter.title = get_title_country_overview(country_overview_scatter.data,
                                                                 indicator_view_name,
                                                                 **controls)
 
-    district_overview_scatter.title = get_title_district_overview(db.datasets.get('district'),
+    district_overview_scatter.title = get_title_district_overview(district_overview_scatter.data,
                                                                   indicator_view_name,
                                                                   **controls)
-    # TODO NEED TO UPDATE TREEMAP TITLE
-
-    tree_map_district.title = get_title_district_treemap(indicator_view_name_vetted,
-                                                         **controls)
 
     print(f"Updated trend titles with {controls['indicator']} with")
 

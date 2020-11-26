@@ -27,21 +27,14 @@ def scatter_country_plot(df):
 
 
 def get_title_country_overview(data, indicator_view_name, **controls):
-
-    # TODO: update title to adapt to agg_type
     """
     get title for the first section based on a percentage calcution and the inputs
     """
     country_descrip = get_time_diff_perc(data, **controls)
 
-    quarter = ''
-
-    if controls.get("aggregation_type") == "Compare moving averages (last 3 months)":
-        quarter = 'the three months periods ending in '
-
     title = f'''Overview: Across the country, the {indicator_view_name} {country_descrip} 
-            between {quarter}{controls.get('reference_month')}-{controls.get('reference_year')} 
-            and {controls.get('target_month')}-{controls.get('target_year')}'''
+            between {controls.get('reference_month')}-{controls.get('reference_year')} 
+            and {controls.get('target_month')}-{controls.get('target_year')} '''
 
     return title
 
@@ -52,7 +45,7 @@ db = Database()
 
 # TODO The class would need to include this title function by default to avoid repetition
 
-default_title = get_title_country_overview(init_data_set.get('country'),
+default_title = get_title_country_overview(scatter_country_plot(init_data_set),
                                            db.get_indicator_view(
                                                DEFAULTS.get('indicator')),
                                            **DEFAULTS)

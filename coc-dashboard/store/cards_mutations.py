@@ -165,7 +165,8 @@ def tree_map_district_dated_data(
                                            reference_year, reference_month, aggregation_type,
                                            compare=False, index=['id', 'facility_name'], isratio=isratio)
 
-    title = f'Contribution of individual facilities to {db.get_indicator_view(indicator)} in {district} district'
+    title = f'''Contribution of individual facilities in {district} district to 
+            {db.get_indicator_view(indicator)} on {target_month}-{target_year}'''
 
     df_district_dated = df_district_dated.rename(columns={indicator: title})
 

@@ -35,14 +35,9 @@ def get_title_district_overview(data, indicator_view_name, **controls):
     """
     district_descrip = get_time_diff_perc(data, **controls)
 
-    quarter = ''
-
-    if controls.get("aggregation_type") == "Compare moving averages (last 3 months)":
-        quarter = 'the three months periods ending in '
-
     title = f'''Deep-dive in {controls.get('district')} district: the {indicator_view_name} {district_descrip} 
-            between {quarter}{controls.get('reference_month')}-{controls.get('reference_year')} 
-            and {controls.get('target_month')}-{controls.get('target_year')}'''
+            between {controls.get('reference_month')}-{controls.get('reference_year')} 
+            and {controls.get('target_month')}-{controls.get('target_year')} '''
 
     return title
 
@@ -51,7 +46,7 @@ def get_title_district_overview(data, indicator_view_name, **controls):
 
 db = Database()
 
-default_title = get_title_district_overview(init_data_set.get('district'),
+default_title = get_title_district_overview(scatter_district_plot(init_data_set),
                                             db.get_indicator_view(
                                                 DEFAULTS.get('indicator')),
                                             **DEFAULTS)

@@ -23,25 +23,18 @@ def get_title_reporting_country(data, indicator_view_name, **controls):
     """
     descrip_reported, descrip_positive = get_report_perc(data, **controls)
 
-    if controls.get("aggregation_type") == "Compare two months":
-        date = f"on {controls.get('target_month')}-{controls.get('target_year')}"
-    elif controls.get("aggregation_type") == "Compare moving averages (last 3 months)":
-        date = f"on average in the three months period ending in {controls.get('target_month')}-{controls.get('target_year')}"
-    else:
-        date = f'''on average between {controls.get('reference_month')}-{controls.get('reference_year')} and
-            {controls.get('target_month')}-{controls.get('target_year')}'''
-
-    title = f'''Reporting: {date}, {descrip_reported} of facilities reported on their 105:1 form, and, out of those, 
+    title = f'''Reporting: {controls.get('target_month')}-{controls.get('target_year')}, 
+            {descrip_reported} of facilities reported on their 105:1 form, and, out of those, 
             {descrip_positive} reported for {indicator_view_name}'''
 
     return title
 
-
 # DATACARD 5 #
+
 
 db = Database()
 
-default_title = get_title_reporting_country(init_data_set.get("reporting_country"),
+default_title = get_title_reporting_country(bar_reporting_country_plot(init_data_set),
                                             db.get_indicator_view(
                                                 DEFAULTS.get('indicator')),
                                             **DEFAULTS)
