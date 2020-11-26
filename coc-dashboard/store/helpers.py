@@ -341,59 +341,26 @@ def get_time_diff_perc(data, **controls):
 
     """
 
-    data = data.reset_index()
-    indicator = data.columns[-1]
     target_year = controls.get("target_year")
     target_month = controls.get("target_month")
     reference_year = controls.get("reference_year")
     reference_month = controls.get("reference_month")
-    aggregation_type = controls.get("aggregation_type")
-
-    df, target_date, reference_date, date_list = get_pivot_df_by_date(data, indicator,
-                                                                      target_year, target_month,
-                                                                      reference_year, reference_month,
-                                                                      aggregation_type, pivot=False)
-
-    # TODO: find a less manual way of doing that
-
-    ratio_markers = ['overage', 'ncidence', 'ercentage', ' per ']
 
     try:
 
-        if aggregation_type == "Average over period":
-            number = int(
-                round(next(iter(df[[df.columns[-1]]].mean(axis=0))), 0))
-            descrip = f"was on average {number}"
-
-        elif aggregation_type == "Sum over period":
-            if any(map(indicator.__contains__, ratio_markers)):
-                number = int(
-                    round(next(iter(df[[df.columns[-1]]].mean(axis=0))), 0))
-                descrip = f"was on average {number}"
-            else:
-                number = int(
-                    round(next(iter(df[[df.columns[-1]]].sum(axis=0))), 0))
-                descrip = f"was in total {number}"
-
-        else:
-
-            if aggregation_type == "Compare moving averages (last 3 months)":
-
-                target = next(
-                    iter(df[df.date.isin(date_list[:3])].mean(axis=0)))
-                reference = next(
-                    iter(df[df.date.isin(date_list[3:])].mean(axis=0)))
-
-            else:
-                target = next(
-                    iter(df[df.date == target_date][indicator].values))
-                reference = next(
-                    iter(df[df.date == reference_date][indicator].values))
-
-            number = round((target - reference)
-                           / reference * 100, 1)
-
-            descrip = get_perc_description(number)
+        data_reference = data.get(int(reference_year))
+        data_target = data.get(int(target_year))
+        perc_first = round(
+            (
+                (
+                    data_target.loc[target_month][0]
+                    - data_reference.loc[reference_month][0]
+                )
+                / data_reference.loc[reference_month][0]
+            )
+            * 100
+        )
+        descrip = get_perc_description(perc_first)
 
     except Exception as e:
         print(e)
@@ -407,38 +374,33 @@ def get_report_perc(data, **controls):
     Returns two strings describing the percentage of reprting facilities, and non-zero reporting facilities
 
     """
-    data = data.reset_index()
-    indicator = data.columns[-1]
     target_year = controls.get("target_year")
     target_month = controls.get("target_month")
-    reference_year = controls.get("reference_year")
-    reference_month = controls.get("reference_month")
-    aggregation_type = controls.get("aggregation_type")
-
-    df = get_pivot_df_by_date(data, indicator,
-                              target_year, target_month,
-                              reference_year, reference_month,
-                              aggregation_type, pivot=False, target_only=True)[0]
-
-    df = reporting_count_transform(df)
 
     try:
 
+        date_reporting = datetime.strptime(
+            f"{target_month} 1 {target_year}", "%b %d %Y"
+        )
+
         try:
-            reported_positive = df\
-                .get("Reported one or above for selected indicator")[indicator].sum(axis=0)
+            reported_positive = data\
+                .get("Reported one or above for selected indicator")\
+                .loc[date_reporting][0]
         except Exception:
             reported_positive = 0
 
         try:
-            did_not_report = df\
-                .get("Did not report on their 105:1 form")[indicator].sum(axis=0)
+            did_not_report = data\
+                .get("Did not report on their 105:1 form")\
+                .loc[date_reporting][0]
         except Exception:
             did_not_report = 0
 
         try:
-            reported_negative = df\
-                .get("Reported a null or zero for selected indicator")[indicator].sum(axis=0)
+            reported_negative = data\
+                .get("Reported a null or zero for selected indicator")\
+                .loc[date_reporting][0]
         except Exception:
             reported_negative = 0
 
@@ -449,12 +411,12 @@ def get_report_perc(data, **controls):
             )
             * 100
         )
-        positive_perc = round(
+        reported_positive = round(
             (reported_positive / (reported_positive + reported_negative)) * 100
         )
 
         descrip_reported = f'around {reported_perc} %'
-        descrip_positive = f'around {positive_perc} %'
+        descrip_positive = f'around {reported_positive} %'
 
     except Exception:
         descrip_reported = "an unknown percentage"
