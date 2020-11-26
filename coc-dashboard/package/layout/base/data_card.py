@@ -533,10 +533,12 @@ class DataCard:
 
     def __download_graph_data(self, *inputs):
         """Download data associated with a figure"""
-        print("Download callback fired")
-        print(inputs)
 
         # prep data file
-        df = pd.concat(self.data.values()).reset_index()
-
+        to_concat = []
+        for trace_name, df in self.data.items():
+            df_to_concat = df.copy()
+            df_to_concat.insert(0, "trace", trace_name)
+            to_concat.append(df_to_concat)
+        df = pd.concat(to_concat).reset_index()
         return [send_data_frame(df.to_excel, f"{df.columns[-1]}.xlsx")]
