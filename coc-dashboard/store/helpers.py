@@ -150,6 +150,8 @@ def get_pivot_df_by_date(df, indicator,
                          reference_year, reference_month,
                          aggregation_type, pivot=True, target_only=False):
 
+    # get dates
+
     target_date = datetime.strptime(f"1 {target_month} {target_year}",
                                     "%d %b %Y")
     reference_date = datetime.strptime(f"1 {reference_month} {reference_year}",
@@ -168,6 +170,8 @@ def get_pivot_df_by_date(df, indicator,
                  reference_date - relativedelta(months=+1),
                  reference_date - relativedelta(months=+2)]
 
+    # filter
+
     if aggregation_type in ["Average over period", "Sum over period"]:
         df = df[(df.date >= min_date) & (df.date <= max_date)]
 
@@ -182,6 +186,8 @@ def get_pivot_df_by_date(df, indicator,
             df = df[df.date.isin(date_list[:3])]
         else:
             df = df[df.date.isin(date_list)]
+
+    # pivot
 
     if pivot:
         if "facility_name" in list(df.columns):
@@ -199,10 +205,6 @@ def get_delta_over_period(df, indicator,
                           reference_date, date_list,
                           aggregation_type,
                           compare=True, index=['id'], report=False, isratio=False):
-
-    # df = df.groupby(index).sum()
-
-    print('check here')
 
     if aggregation_type == "Average over period":
         df[indicator] = df[df.columns].mean(axis=1)
