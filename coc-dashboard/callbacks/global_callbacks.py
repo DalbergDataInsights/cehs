@@ -126,7 +126,7 @@ def change_titles_trends(indicator_view_name, controls):
 @timeit
 def update_on_click(*inputs):
 
-    inp = inputs[0]
+    CONTROLS["trends_compare_map_agg"] = inputs[0]
 
     try:
 
@@ -149,3 +149,27 @@ def update_on_click(*inputs):
         print(e)
 
     return [facility_scatter.figure, facility_scatter.figure_title]
+
+
+@timeit
+def treemap_dropdown_callback(*inputs):
+
+    inp = inputs[0]
+
+    try:
+
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["trends_treemap_agg"] = inp
+        country_overview
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+
+        tree_map_district.data = ds
+        tree_map_district.figure = tree_map_district._get_figure(
+            tree_map_district.data)
+
+    except Exception as e:
+        print(e)
+
+    return [tree_map_district.figure]

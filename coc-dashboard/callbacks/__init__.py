@@ -24,6 +24,7 @@ from pprint import pprint as print
 from .global_callbacks import (
     global_story_callback,
     update_on_click,
+    treemap_dropdown_callback
 )
 
 
@@ -133,6 +134,14 @@ def define_callbacks(ds):
                 Output(f"{facility_scatter.my_name}_fig_title", "children"),
             ],
             "function": update_on_click,
+        },
+        # Datacard dropdowns
+        {
+            "inputs": [Input(f"{tree_map_district.my_name}_figure", "clickData")],
+            "outputs": [
+                Output(f"{tree_map_district.my_name}_figure", "figure"),
+            ],
+            "function": treemap_dropdown_callback,
         },
     ]
 

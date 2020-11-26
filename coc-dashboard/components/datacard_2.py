@@ -2,6 +2,7 @@ import pandas as pd
 from model import CardLayout
 from package.layout.chart_card import ChartDataCard
 from package.layout.map_card import MapDataCard
+from package.elements.nested_dropdown import NestedDropdown
 from store import shapefile, init_data_set, timeit
 
 
@@ -30,6 +31,10 @@ def bar_country_dated_plot(data):
 
 # DATACARD 2 #
 
+dropdown = NestedDropdown(
+    id="Select a way to compare data",
+    options=["Compare month on month",
+             "Compare three months moving average"])
 
 country_overview_map = MapDataCard(
     data=init_data_set,
@@ -49,4 +54,5 @@ bar_chart_ranks_bottom = ChartDataCard(
 country_overview = CardLayout(
     title="$label$",
     elements=[country_overview_map, bar_chart_ranks_bottom],
+    dropdown=dropdown
 )

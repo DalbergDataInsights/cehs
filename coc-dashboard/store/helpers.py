@@ -145,12 +145,9 @@ def filter_df_by_dates(df, target_year,
     return df
 
 
-def get_pivot_df_by_date(df, indicator,
-                         target_year, target_month,
-                         reference_year, reference_month,
-                         aggregation_type, pivot=True, target_only=False):
-
-    # get dates
+def get_dates_min_max(df,
+                      target_year, target_month,
+                      reference_year, reference_month):
 
     target_date = datetime.strptime(f"1 {target_month} {target_year}",
                                     "%d %b %Y")
@@ -161,7 +158,16 @@ def get_pivot_df_by_date(df, indicator,
     min_date = max([data_min_date, min([target_date, reference_date])])
     max_date = max([target_date, reference_date])
 
-    df = df.sort_values(["date"])
+    return min_date, max_date, target_date
+
+
+def get_date_list(target_year, target_month,
+                  reference_year, reference_month):
+
+    target_date = datetime.strptime(f"1 {target_month} {target_year}",
+                                    "%d %b %Y")
+    reference_date = datetime.strptime(f"1 {reference_month} {reference_year}",
+                                       "%d %b %Y")
 
     date_list = [target_date,
                  target_date - relativedelta(months=+1),
@@ -170,70 +176,76 @@ def get_pivot_df_by_date(df, indicator,
                  reference_date - relativedelta(months=+1),
                  reference_date - relativedelta(months=+2)]
 
-    # filter
+    return date_list
 
-    if aggregation_type in ["Average over period", "Sum over period"]:
+
+def filter_df_for_compare(df, date_list, aggregation_type):
+
+    if aggregation_type == "Compare three months moving average":
+        df = df[df.date.isin(date_list)]
+    else:
+        df = df[df.date.isin([date_list[0], date_list[3]])]
+
+    return df
+
+
+def filter_df_for_period(df, min_date, max_date, target_date, aggregation_type):
+
+    if aggregation_type == "Show only month of interest":
+        df = df[df.date == target_date]
+    else:
         df = df[(df.date >= min_date) & (df.date <= max_date)]
 
-    elif aggregation_type == "Compare two months":
-        if target_only:
-            df = df[df.date == target_date]
-        else:
-            df = df[df.date.isin([target_date, reference_date])]
-
-    elif aggregation_type == "Compare moving averages (last 3 months)":
-        if target_only:
-            df = df[df.date.isin(date_list[:3])]
-        else:
-            df = df[df.date.isin(date_list)]
-
-    # pivot
-
-    if pivot:
-        if "facility_name" in list(df.columns):
-            df = df.pivot_table(columns="date",
-                                values=indicator, index=['id', 'facility_name'])
-        else:
-            df = df.pivot_table(columns="date",
-                                values=indicator, index=['id'])
-
-    return df, target_date, reference_date, date_list
+    return df
 
 
-def get_delta_over_period(df, indicator,
+def pivot_df_for_figure(df, indicator):
+
+    if "facility_name" in list(df.columns):
+        df = df.pivot_table(columns="date",
+                            values=indicator, index=['id', 'facility_name'])
+    else:
+        df = df.pivot_table(columns="date",
+                            values=indicator, index=['id'])
+    return df
+
+
+def calculate_over_period(df, indicator,
                           target_date,
-                          reference_date, date_list,
                           aggregation_type,
-                          compare=True, index=['id'], report=False, isratio=False):
+                          report=False, isratio=False):
 
-    if aggregation_type == "Average over period":
+    if aggregation_type == "Show average over period":
         df[indicator] = df[df.columns].mean(axis=1)
 
-    elif aggregation_type == "Sum over period":
+    elif aggregation_type == "Show sum over period":
         if report | isratio:
             df[indicator] = df[df.columns].mean(axis=1)
         else:
             df[indicator] = df[df.columns].sum(axis=1)
-
     else:
+        df[indicator] = df[target_date]
 
-        if aggregation_type == "Compare moving averages (last 3 months)":
+    df = df[[indicator]].reset_index()
+    df = df[~pd.isna(df[indicator])]
 
-            df[target_date] = df[date_list[:3]].mean(axis=1)
-            df[reference_date] = df[date_list[3:]].mean(axis=1)
+    return df
 
-        if compare:
 
-            df[indicator] = ((df[target_date] - df[reference_date])
-                             / df[reference_date] * 100)
+def compare_between_dates(df, indicator, date_list,
+                          aggregation_type):
 
-            df = df.replace([np.inf, -np.inf], np.nan)
+    if aggregation_type == "Compare three months moving average":
 
-            df[indicator] = df[indicator].apply(lambda x: round(x, 2))
+        df[date_list[0]] = df[date_list[:3]].mean(axis=1)
+        df[date_list[3]] = df[date_list[3:]].mean(axis=1)
 
-        else:
+    df[indicator] = ((df[date_list[0]] - df[date_list[3]])
+                     / df[date_list[3]] * 100)
 
-            df[indicator] = df[target_date]
+    df = df.replace([np.inf, -np.inf], np.nan)
+
+    df[indicator] = df[indicator].apply(lambda x: round(x, 2))
 
     df = df[[indicator]].reset_index()
     df = df[~pd.isna(df[indicator])]
@@ -266,25 +278,50 @@ def get_reporting_rate_of_districts(df):
     return reporting_df
 
 
-def get_period_compare(df, indicator,
-                       target_year, target_month,
-                       reference_year, reference_month, aggregation_type,
-                       compare=True, report=False, index=['id'], isratio=False):
+def get_df_compare(df, indicator,
+                   target_year, target_month,
+                   reference_year, reference_month, aggregation_type,
+                   report=False, index=['id']):
 
-    (df,
-     target_date,
-     reference_date,
-     date_list) = get_pivot_df_by_date(df, indicator,
-                                       target_year, target_month,
-                                       reference_year, reference_month,
-                                       aggregation_type)
+    date_list = get_date_list(target_year, target_month,
+                              reference_year, reference_month)
+
+    df = filter_df_for_compare(df, date_list, aggregation_type)
+
+    df = pivot_df_for_figure(df, indicator)
 
     if report:
         df = get_reporting_rate_of_districts(df)
 
-    df = get_delta_over_period(df, indicator,
-                               target_date, reference_date, date_list,
-                               aggregation_type, compare, index, report, isratio)
+    df = compare_between_dates(df, indicator, date_list,
+                               aggregation_type)
+
+    df = df.set_index(index)
+
+    return df
+
+
+def get_df_period(df, indicator,
+                  target_year, target_month,
+                  reference_year, reference_month, aggregation_type,
+                  report=False, index=['id'], isratio=False):
+
+    min_date, max_date, target_date = get_dates_min_max(df,
+                                                        target_year, target_month,
+                                                        reference_year, reference_month)
+
+    df = filter_df_for_period(df, min_date, max_date,
+                              target_date, aggregation_type)
+
+    df = pivot_df_for_figure(df, indicator)
+
+    if report:
+        df = get_reporting_rate_of_districts(df)
+
+    df = calculate_over_period(df, indicator,
+                               target_date,
+                               aggregation_type,
+                               report=report, isratio=isratio)
 
     df = df.set_index(index)
 

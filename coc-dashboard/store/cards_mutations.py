@@ -3,7 +3,8 @@ from store import (
     filter_by_district,
     get_ratio,
     Database,
-    get_period_compare
+    get_df_compare,
+    get_df_period
 )
 
 import pandas as pd
@@ -77,28 +78,25 @@ def map_bar_country_dated_data(
 
     df = get_ratio(df, indicator, agg_level='district')[0]
 
-    isratio = get_ratio(df, indicator, agg_level='district')[2]
+    df = get_df_compare(df, indicator,
+                        target_year, target_month,
+                        reference_year, reference_month, aggregation_type)
 
-    df = get_period_compare(df, indicator,
-                            target_year, target_month,
-                            reference_year, reference_month, aggregation_type, isratio=isratio)
-
-    if aggregation_type in ["Compare two months", "Compare moving averages (last 3 months)"]:
-        data = 'Percentage change of'
-    elif aggregation_type == "Average over period":
-        data = 'Average'
-    else:
-        if isratio:
-            data = 'Average'
-        else:
-            data = 'Total'
-
-    if aggregation_type == "Compare moving averages (last 3 months)":
+    # if aggregation_type in ["Compare two months", "Compare moving averages (last 3 months)"]:
+    #     data = 'Percentage change of'
+    # elif aggregation_type == "Average over period":
+    #     data = 'Average'
+    # else:
+    #     if isratio:
+    #         data = 'Average'
+    #     else:
+    #         data = 'Total'
+    if aggregation_type == "Compare three months moving average":
         quarter = 'the three months periods ending in '
     else:
         quarter = ''
 
-    title = f'{data} {db.get_indicator_view(indicator)} between {quarter}{reference_month}-{reference_year} and {target_month}-{target_year}'
+    title = f'Percentage change in {db.get_indicator_view(indicator)} between {quarter}{reference_month}-{reference_year} and {target_month}-{target_year}'
 
     df = df.rename(columns={indicator: title})
 
@@ -160,13 +158,25 @@ def tree_map_district_dated_data(
 
     isratio = get_ratio(df, indicator, agg_level='facility')[2]
 
-    df_district_dated = get_period_compare(df, indicator,
-                                           target_year, target_month,
-                                           reference_year, reference_month, aggregation_type,
-                                           compare=False, index=['id', 'facility_name'], isratio=isratio)
+    df_district_dated = get_df_period(df, indicator,
+                                      target_year, target_month,
+                                      reference_year, reference_month, aggregation_type,
+                                      index=['id', 'facility_name'], isratio=isratio)
 
-    title = f'''Contribution of individual facilities in {district} district to 
-            {db.get_indicator_view(indicator)} on {target_month}-{target_year}'''
+    # TODO FOR MAps : incl if statement on isratio for sum maps
+
+    if aggregation_type == "Show only month of interest":
+        agg = 'Contribution'
+        period = f'on {target_month}-{target_year}'
+    elif aggregation_type == "Show sum over period":
+        agg = 'Total contribution'
+        period = f'between {reference_month}-{reference_year} and {target_month}-{target_year}'
+    else:
+        agg = 'Average contribution'
+        period = f'on {target_month}-{target_year}'
+
+    title = f'''{agg} of individual facilities in {district} district to 
+            {db.get_indicator_view(indicator)} {period}'''
 
     df_district_dated = df_district_dated.rename(columns={indicator: title})
 
@@ -248,24 +258,18 @@ def map_reporting_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
-    df = get_period_compare(df, indicator,
-                            target_year, target_month,
-                            reference_year, reference_month, aggregation_type,
-                            report=True)
+    df = get_df_compare(df, indicator,
+                        target_year, target_month,
+                        reference_year, reference_month, aggregation_type, report=True)
 
-    if aggregation_type in ["Compare two months", "Compare moving averages (last 3 months)"]:
-        data = 'Percentage change in'
+    if aggregation_type == "Compare three months moving average":
+        quarter = 'the three months periods ending in '
     else:
-        data = 'Average'
+        quarter = ''
 
-    if aggregation_type == "Compare moving averages (last 3 months)":
-        average = 'the three months periods ending in '
-    else:
-        average = ''
-
-    title = f'''{data} proportion of reporting facilities that reported a non-zero number for 
+    title = f'''Percentage change in proportion of reporting facilities that reported a non-zero number for 
             {db.get_indicator_view(indicator)} by district between 
-            {average}{reference_month}-{reference_year} and {target_month}-{target_year}'''
+            {quarter}{reference_month}-{reference_year} and {target_month}-{target_year}'''
 
     df = df.rename(columns={indicator: title})
 

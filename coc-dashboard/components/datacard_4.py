@@ -48,10 +48,10 @@ def scatter_facility_plot(data):
 db = Database()
 
 dropdown = NestedDropdown(
-    id="area-map-dropdown",
-    options=["1", "2", "3", "4"],
-    # visible_id=False
-)
+    id="Select a way to aggregate data",
+    options=["Show only month of interest",
+             "Show sum over period",
+             "Show average over period"])
 
 tree_map_district = AreaDataCard(
     title='$label$',
