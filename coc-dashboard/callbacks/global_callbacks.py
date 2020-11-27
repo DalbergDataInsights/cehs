@@ -16,9 +16,14 @@ from components import (
     stacked_bar_reporting_country,
     get_title_reporting_country,
     tree_map_district,
+<< << << < HEAD
     reporting_map_compare,
     reporting_map_period,
     overview
+== == ===
+    reporting_map,
+    overview,
+>>>>>> > d3f53bf0a0bf5d76c20c600df50d0f198f43b548
 )
 
 from store import (
@@ -75,22 +80,20 @@ def global_story_callback(*inputs):
     except:
         print(f"Error updating global callback for {CONTROLS['indicator']}")
 
-    indicator_view = db.get_indicator_view(CONTROLS['indicator'])
+    indicator_view = db.get_indicator_view(CONTROLS["indicator"])
 
     indicator_view_if_ratio = db.get_indicator_view(
-        db.switch_indic_to_numerator(CONTROLS['indicator'],
-                                     popcheck=False))
+        db.switch_indic_to_numerator(CONTROLS["indicator"], popcheck=False)
+    )
 
     try:
-        change_titles_reporting(indicator_view_if_ratio,
-                                CONTROLS)
+        change_titles_reporting(indicator_view_if_ratio, CONTROLS)
 
     except:
         print(f"Error updating reporting title for {CONTROLS['indicator']}")
 
     try:
-        change_titles_trends(indicator_view,
-                             CONTROLS)
+        change_titles_trends(indicator_view, CONTROLS)
 
     except:
         print(f"Error updating trend title for {CONTROLS['indicator']}")
@@ -104,9 +107,9 @@ def change_titles_reporting(indicator_view_name, controls):
     print(
         f"Starting updates for reporting titles with {controls['indicator']}")
 
-    stacked_bar_reporting_country.title = get_title_reporting_country(stacked_bar_reporting_country.data,
-                                                                      indicator_view_name,
-                                                                      **controls)
+    stacked_bar_reporting_country.title = get_title_reporting_country(
+        stacked_bar_reporting_country.data, indicator_view_name, **controls
+    )
 
     print(f"Updated reporting titles with {controls['indicator']}")
 
@@ -116,13 +119,13 @@ def change_titles_trends(indicator_view_name, controls):
 
     print(f"Starting updates for trend titles with {controls['indicator']}")
 
-    country_overview_scatter.title = get_title_country_overview(country_overview_scatter.data,
-                                                                indicator_view_name,
-                                                                **controls)
+    country_overview_scatter.title = get_title_country_overview(
+        country_overview_scatter.data, indicator_view_name, **controls
+    )
 
-    district_overview_scatter.title = get_title_district_overview(district_overview_scatter.data,
-                                                                  indicator_view_name,
-                                                                  **controls)
+    district_overview_scatter.title = get_title_district_overview(
+        district_overview_scatter.data, indicator_view_name, **controls
+    )
 
     print(f"Updated trend titles with {controls['indicator']} with")
 
@@ -130,11 +133,9 @@ def change_titles_trends(indicator_view_name, controls):
 @timeit
 def update_on_click(*inputs):
 
-    CONTROLS["trends_compare_map_agg"] = inputs[0]
-
     try:
 
-        label = inp.get("points")[0].get("label")
+        label = inputs[0].get("points")[0].get("label")
 
         LAST_CONTROLS = CONTROLS.copy()
 
@@ -158,13 +159,16 @@ def update_on_click(*inputs):
 @timeit
 def treemap_dropdown_callback(*inputs):
 
-    inp = inputs[0]
-
     try:
 
         LAST_CONTROLS = CONTROLS.copy()
 
+
+<< << << < HEAD
         CONTROLS["trends_treemap_agg"] = inp
+== == == =
+        CONTROLS["trends_treemap_agg"] = inputs[0]
+>>>>>> > d3f53bf0a0bf5d76c20c600df50d0f198f43b548
 
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 

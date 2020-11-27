@@ -15,7 +15,7 @@ from store import (
     district_control_group,
     indicator_dropdown_group,
     outlier_policy_dropdown_group,
-    aggregation_dropdown
+    aggregation_dropdown,
 )
 
 from pprint import pprint as print
@@ -23,7 +23,7 @@ from pprint import pprint as print
 from .global_callbacks import (
     global_story_callback,
     update_on_click,
-    treemap_dropdown_callback
+    treemap_dropdown_callback,
 )
 
 
@@ -41,7 +41,7 @@ callback_ids = {
     "date_from": "value",
     "date_to": "value",
     district_control_group.dropdown_ids[-1]: "value",  # District
-    aggregation_dropdown.dropdown_ids[0]: "value"
+    aggregation_dropdown.dropdown_ids[0]: "value",
 }
 
 dropdown_style = [
@@ -132,7 +132,7 @@ def define_callbacks(ds):
                 Output("nav-buttons", "children"),
                 Output("dash-title", "children"),
             ]
-            + [Output(x+"_container", "className") for x in dropdown_style],
+            + [Output(x + "_container", "className") for x in dropdown_style],
             "function": change_page,
         },
         # N-click callbacks
@@ -146,7 +146,7 @@ def define_callbacks(ds):
         },
         # Datacard dropdowns
         {
-            "inputs": [Input(f"{tree_map_district.my_name}_figure", "clickData")],
+            "inputs": [Input("Select a way to aggregate data", "value")],
             "outputs": [
                 Output(f"{tree_map_district.my_name}_figure", "figure"),
             ],
