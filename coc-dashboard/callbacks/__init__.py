@@ -23,7 +23,7 @@ from pprint import pprint as print
 from .global_callbacks import (
     global_story_callback,
     update_on_click,
-    treemap_dropdown_callback,
+    # treemap_dropdown_callback,
 )
 
 
@@ -145,13 +145,14 @@ def define_callbacks(ds):
             "function": update_on_click,
         },
         # Datacard dropdowns
-        {
-            "inputs": [Input("Select a way to aggregate data", "value")],
-            "outputs": [
-                Output(f"{tree_map_district.my_name}_figure", "figure"),
-            ],
-            "function": treemap_dropdown_callback,
-        },
+        # {
+        #     "inputs": [Input("Select a way to aggregate data", "value")],
+        #     "outputs": [
+        #         Output(f"{tree_map_district.my_name}_figure", "figure"),
+        #         Output(f"{facility_scatter.my_name}_fig_title", "children"),
+        #     ],
+        #     "function": treemap_dropdown_callback,
+        # },
     ]
 
     print("==Registering callbacks==")

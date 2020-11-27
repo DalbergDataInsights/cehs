@@ -160,18 +160,14 @@ def treemap_dropdown_callback(*inputs):
 
         LAST_CONTROLS = CONTROLS.copy()
 
-
-<< << << < HEAD
-        CONTROLS["trends_treemap_agg"] = inp
-== == == =
         CONTROLS["trends_treemap_agg"] = inputs[0]
->>>>>> > d3f53bf0a0bf5d76c20c600df50d0f198f43b548
 
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         tree_map_district.data = ds
         tree_map_district.figure = tree_map_district._get_figure(
             tree_map_district.data)
+        tree_map_district.figure_title = ("$label$")
 
     except Exception as e:
         print(e)
