@@ -7,7 +7,8 @@ import pandas as pd
 from components import (
     country_overview_scatter,
     get_title_country_overview,
-    country_overview,
+    country_overview_compare,
+    country_overview_period,
     district_overview_scatter,
     get_title_district_overview,
     facility_scatter,
@@ -15,7 +16,8 @@ from components import (
     stacked_bar_reporting_country,
     get_title_reporting_country,
     tree_map_district,
-    reporting_map,
+    reporting_map_compare,
+    reporting_map_period,
     overview
 )
 
@@ -54,13 +56,15 @@ def global_story_callback(*inputs):
         df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         for x in [country_overview_scatter,
-                  country_overview,
+                  country_overview_compare,
+                  country_overview_period,
                   district_overview_scatter,
                   facility_scatter,
                   stacked_bar_district,
                   stacked_bar_reporting_country,
                   tree_map_district,
-                  reporting_map,
+                  reporting_map_compare,
+                  reporting_map_period,
                   overview]:
             try:
                 x.data = df
@@ -161,7 +165,6 @@ def treemap_dropdown_callback(*inputs):
         LAST_CONTROLS = CONTROLS.copy()
 
         CONTROLS["trends_treemap_agg"] = inp
-        country_overview
 
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 

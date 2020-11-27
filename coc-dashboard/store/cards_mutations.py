@@ -59,7 +59,7 @@ def scatter_country_data(*, indicator, **kwargs):
 
 # CARD 2
 
-def map_bar_country_dated_data(
+def map_bar_country_compare_data(
     *,
     indicator,
     target_year,
@@ -82,15 +82,6 @@ def map_bar_country_dated_data(
                         target_year, target_month,
                         reference_year, reference_month, aggregation_type)
 
-    # if aggregation_type in ["Compare two months", "Compare moving averages (last 3 months)"]:
-    #     data = 'Percentage change of'
-    # elif aggregation_type == "Average over period":
-    #     data = 'Average'
-    # else:
-    #     if isratio:
-    #         data = 'Average'
-    #     else:
-    #         data = 'Total'
     if aggregation_type == "Compare three months moving average":
         quarter = 'the three months periods ending in '
     else:
@@ -102,6 +93,49 @@ def map_bar_country_dated_data(
 
     return df
 
+
+def map_bar_country_period_data(
+    *,
+    indicator,
+    target_year,
+    target_month,
+    reference_year,
+    reference_month,
+    aggregation_type,
+    **kwargs,
+):
+
+    db = Database()
+
+    df = db.raw_data
+
+    df = db.filter_by_indicator(df, indicator)
+
+    df = get_ratio(df, indicator, agg_level='district')[0]
+
+    isratio = get_ratio(df, indicator, agg_level='district')[2]
+
+    df = get_df_period(df, indicator,
+                       target_year, target_month,
+                       reference_year, reference_month, aggregation_type, isratio=isratio)
+
+    if aggregation_type == "Show only month of interest":
+        title = title = f'Total {db.get_indicator_view(indicator)} on {reference_month}-{reference_year} by district'
+
+    else:
+        if aggregation_type == "Show sum over period":
+            if isratio:
+                data = 'Average'
+            else:
+                data = 'Total'
+        else:
+            data = 'Average'
+
+        title = f'{data} {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
+
+    df = df.rename(columns={indicator: title})
+
+    return df
 
 # CARD 3
 
@@ -237,10 +271,8 @@ def bar_reporting_country_data(*, outlier, indicator, **kwargs):
 
 # CARD 6
 
-
-def map_reporting_dated_data(
+def map_reporting_compare_data(
     *,
-    outlier,
     indicator,
     target_year,
     target_month,
@@ -270,6 +302,42 @@ def map_reporting_dated_data(
     title = f'''Percentage change in proportion of reporting facilities that reported a non-zero number for 
             {db.get_indicator_view(indicator)} by district between 
             {quarter}{reference_month}-{reference_year} and {target_month}-{target_year}'''
+
+    df = df.rename(columns={indicator: title})
+
+    return df
+
+
+def map_reporting_period_data(
+    *,
+    indicator,
+    target_year,
+    target_month,
+    reference_year,
+    reference_month,
+    aggregation_type,
+    **kwargs,
+):
+
+    db = Database()
+
+    df = db.rep_data
+
+    indicator = db.switch_indic_to_numerator(indicator, popcheck=False)
+
+    df = db.filter_by_indicator(df, indicator)
+
+    df = get_df_period(df, indicator,
+                       target_year, target_month,
+                       reference_year, reference_month, aggregation_type, report=True)
+
+    if aggregation_type == "Show only month of interest":
+        title = f'''Proportion of reporting facilities that reported a non-zero number for 
+            {db.get_indicator_view(indicator)} on {reference_month}-{reference_year}'''
+
+    else:
+        title = f'''Average proportion of reporting facilities that reported a non-zero number for 
+            {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'''
 
     df = df.rename(columns={indicator: title})
 

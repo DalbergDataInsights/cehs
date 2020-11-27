@@ -7,9 +7,9 @@ from store import shapefile, init_data_set, timeit
 
 
 @timeit
-def map_country_dated_plot(data):
+def map_country_compare_plot(data):
 
-    data = data.get("dated")
+    data = data.get("dated_compare")
 
     data_out = {"Change between reference and target date": data}
 
@@ -17,9 +17,9 @@ def map_country_dated_plot(data):
 
 
 @timeit
-def bar_country_dated_plot(data):
+def bar_country_compare_plot(data):
 
-    data = data.get("dated")
+    data = data.get("dated_compare")
 
     data["rank"] = data[data.columns[-1]].rank(ascending=True, method='min')
     data = data[data["rank"] < 11].sort_values(by="rank")
@@ -38,7 +38,7 @@ dropdown = NestedDropdown(
 
 country_overview_map = MapDataCard(
     data=init_data_set,
-    data_transform=map_country_dated_plot,
+    data_transform=map_country_compare_plot,
     geodata=shapefile,
     locations="id",
     map_tolerance=0.005,
@@ -46,12 +46,12 @@ country_overview_map = MapDataCard(
 
 bar_chart_ranks_bottom = ChartDataCard(
     data=init_data_set,
-    data_transform=bar_country_dated_plot,
+    data_transform=bar_country_compare_plot,
     fig_object="Bar",
     bar_mode="overlay",
 )
 
-country_overview = CardLayout(
+country_overview_compare = CardLayout(
     title="$label$",
     elements=[country_overview_map, bar_chart_ranks_bottom],
     dropdown=dropdown

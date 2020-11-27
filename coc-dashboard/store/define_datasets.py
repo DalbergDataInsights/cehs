@@ -6,12 +6,14 @@ from store.database import Database
 
 from .cards_mutations import (
     scatter_country_data,
-    map_bar_country_dated_data,
+    map_bar_country_compare_data,
+    map_bar_country_period_data,
     scatter_district_data,
     tree_map_district_dated_data,
     scatter_facility_data,
     bar_reporting_country_data,
-    map_reporting_dated_data,
+    map_reporting_compare_data,
+    map_reporting_period_data,
     scatter_reporting_district_data,
     overview_data,
     # indicator_group,
@@ -25,12 +27,14 @@ from .cards_mutations import (
 FUNC_DICT = {
     "country": scatter_country_data,
     "date_filter": overview_data,
-    "dated": map_bar_country_dated_data,
+    "dated_compare": map_bar_country_compare_data,
+    "dated_period": map_bar_country_period_data,
     "district": scatter_district_data,
     "district_dated": tree_map_district_dated_data,
     "facility": scatter_facility_data,
     "reporting_country": bar_reporting_country_data,
-    "reporting_dated": map_reporting_dated_data,
+    "reporting_dated_compare": map_reporting_compare_data,
+    "reporting_dated_period": map_reporting_period_data,
     "reporting_district": scatter_reporting_district_data,
 }
 

@@ -1,12 +1,11 @@
 from components import (
-    country_overview_scatter,
-    district_overview_scatter,
     facility_scatter,
     stacked_bar_district,
     stacked_bar_reporting_country,
     tree_map_district,
     stacked_bar_district,
-    reporting_map,
+    reporting_map_compare,
+    reporting_map_period,
     stacked_bar_reporting_country,
 )
 
@@ -80,13 +79,23 @@ def define_callbacks(ds):
         },
         {
             "inputs": [
-                Input(id, prop) for id, prop in reporting_map.callbacks[0].get("input")
+                Input(id, prop) for id, prop in reporting_map_compare.callbacks[0].get("input")
             ],
             "outputs": [
                 Output(id, prop)
-                for id, prop in reporting_map.callbacks[0].get("output")
+                for id, prop in reporting_map_compare.callbacks[0].get("output")
             ],
-            "function": reporting_map.callbacks[0].get("func"),
+            "function": reporting_map_compare.callbacks[0].get("func"),
+        },
+        {
+            "inputs": [
+                Input(id, prop) for id, prop in reporting_map_period.callbacks[0].get("input")
+            ],
+            "outputs": [
+                Output(id, prop)
+                for id, prop in reporting_map_period.callbacks[0].get("output")
+            ],
+            "function": reporting_map_period.callbacks[0].get("func"),
         },
         {
             "inputs": [
