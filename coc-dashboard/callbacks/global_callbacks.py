@@ -16,14 +16,11 @@ from components import (
     stacked_bar_reporting_country,
     get_title_reporting_country,
     tree_map_district,
-<< << << < HEAD
     reporting_map_compare,
     reporting_map_period,
     overview
-== == ===
     reporting_map,
     overview,
->>>>>> > d3f53bf0a0bf5d76c20c600df50d0f198f43b548
 )
 
 from store import (
