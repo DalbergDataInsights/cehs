@@ -66,7 +66,7 @@ def map_bar_country_compare_data(
     target_month,
     reference_year,
     reference_month,
-    aggregation_type,
+    trends_map_compare_agg,
     **kwargs,
 ):
 
@@ -80,9 +80,9 @@ def map_bar_country_compare_data(
 
     df = get_df_compare(df, indicator,
                         target_year, target_month,
-                        reference_year, reference_month, aggregation_type)
+                        reference_year, reference_month, trends_map_compare_agg)
 
-    if aggregation_type == "Compare three months moving average":
+    if trends_map_compare_agg == "Compare three months moving average":
         quarter = 'the three months periods ending in '
     else:
         quarter = ''
@@ -101,7 +101,7 @@ def map_bar_country_period_data(
     target_month,
     reference_year,
     reference_month,
-    aggregation_type,
+    trends_map_period_agg,
     **kwargs,
 ):
 
@@ -117,13 +117,13 @@ def map_bar_country_period_data(
 
     df = get_df_period(df, indicator,
                        target_year, target_month,
-                       reference_year, reference_month, aggregation_type, isratio=isratio)
+                       reference_year, reference_month, trends_map_period_agg, isratio=isratio)
 
-    if aggregation_type == "Show only month of interest":
+    if trends_map_period_agg == "Show only month of interest":
         title = title = f'Total {db.get_indicator_view(indicator)} on {reference_month}-{reference_year} by district'
 
     else:
-        if aggregation_type == "Show sum over period":
+        if trends_map_period_agg == "Show sum over period":
             if isratio:
                 data = 'Average'
             else:
@@ -172,9 +172,8 @@ def tree_map_district_dated_data(
     target_month,
     reference_year,
     reference_month,
-    aggregation_type,
+    trends_treemap_agg,
     **kwargs,
-
 
 ):
 
@@ -194,17 +193,19 @@ def tree_map_district_dated_data(
 
     df_district_dated = get_df_period(df, indicator,
                                       target_year, target_month,
-                                      reference_year, reference_month, aggregation_type,
+                                      reference_year, reference_month, trends_treemap_agg,
                                       index=['id', 'facility_name'], isratio=isratio)
 
-    # TODO FOR MAps : incl if statement on isratio for sum maps
-
-    if aggregation_type == "Show only month of interest":
+    if trends_treemap_agg == "Show only month of interest":
         agg = 'Contribution'
         period = f'on {target_month}-{target_year}'
-    elif aggregation_type == "Show sum over period":
-        agg = 'Total contribution'
-        period = f'between {reference_month}-{reference_year} and {target_month}-{target_year}'
+    elif trends_treemap_agg == "Show sum over period":
+        if isratio:
+            agg = 'Average contribution'
+            period = f'on {target_month}-{target_year}'
+        else:
+            agg = 'Total contribution'
+            period = f'between {reference_month}-{reference_year} and {target_month}-{target_year}'
     else:
         agg = 'Average contribution'
         period = f'on {target_month}-{target_year}'
@@ -252,7 +253,7 @@ def scatter_facility_data(*, indicator, district, facility, **kwargs):
 # CARD 5
 
 
-def bar_reporting_country_data(*, outlier, indicator, **kwargs):
+def bar_reporting_country_data(*, indicator, **kwargs):
 
     db = Database()
 
@@ -271,6 +272,7 @@ def bar_reporting_country_data(*, outlier, indicator, **kwargs):
 
 # CARD 6
 
+
 def map_reporting_compare_data(
     *,
     indicator,
@@ -278,7 +280,7 @@ def map_reporting_compare_data(
     target_month,
     reference_year,
     reference_month,
-    aggregation_type,
+    report_map_compare_agg,
     **kwargs,
 ):
 
@@ -292,9 +294,9 @@ def map_reporting_compare_data(
 
     df = get_df_compare(df, indicator,
                         target_year, target_month,
-                        reference_year, reference_month, aggregation_type, report=True)
+                        reference_year, reference_month, report_map_compare_agg, report=True)
 
-    if aggregation_type == "Compare three months moving average":
+    if report_map_compare_agg == "Compare three months moving average":
         quarter = 'the three months periods ending in '
     else:
         quarter = ''
@@ -315,7 +317,7 @@ def map_reporting_period_data(
     target_month,
     reference_year,
     reference_month,
-    aggregation_type,
+    report_map_period_agg,
     **kwargs,
 ):
 
@@ -329,9 +331,9 @@ def map_reporting_period_data(
 
     df = get_df_period(df, indicator,
                        target_year, target_month,
-                       reference_year, reference_month, aggregation_type, report=True)
+                       reference_year, reference_month, report_map_period_agg, report=True)
 
-    if aggregation_type == "Show only month of interest":
+    if report_map_period_agg == "Show only month of interest":
         title = f'''Proportion of reporting facilities that reported a non-zero number for 
             {db.get_indicator_view(indicator)} on {reference_month}-{reference_year}'''
 

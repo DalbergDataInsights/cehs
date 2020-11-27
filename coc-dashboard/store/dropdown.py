@@ -20,7 +20,12 @@ DEFAULTS = {
     "target_month": os.environ["TARGET_MONTH"],
     "reference_year": os.environ["REFERENCE_YEAR"],
     "reference_month": os.environ["REFERENCE_MONTH"],
-    "aggregation_type": os.environ["AGGREGATION_TYPE"]
+    "aggregation_type": os.environ["AGGREGATION_TYPE"],
+    "trends_map_compare_agg": os.environ["COMPARE_AGG"],
+    "trends_map_period_agg": os.environ["PERIOD_AGG"],
+    "trends_treemap_agg": os.environ["PERIOD_AGG"],
+    "report_map_compare_agg": os.environ["COMPARE_AGG"],
+    "report_map_period_agg": os.environ["PERIOD_AGG"],
 }
 
 

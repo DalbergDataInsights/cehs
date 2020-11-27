@@ -48,7 +48,7 @@ def scatter_facility_plot(data):
 db = Database()
 
 dropdown = NestedDropdown(
-    id="Select a way to aggregate data",
+    id="Select a way to aggregate facility data for this indicator",
     options=["Show only month of interest",
              "Show sum over period",
              "Show average over period"])

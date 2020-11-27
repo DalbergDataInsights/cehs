@@ -32,7 +32,7 @@ def bar_country_dated_plot(data):
 # DATACARD 2 #
 
 dropdown = NestedDropdown(
-    id="Select a way to aggregate data",
+    id="Select a way to aggregate data for this indicator",
     options=["Show only month of interest",
              "Show sum over period",
              "Show average over period"])

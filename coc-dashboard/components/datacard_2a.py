@@ -32,7 +32,7 @@ def bar_country_compare_plot(data):
 # DATACARD 2 #
 
 dropdown = NestedDropdown(
-    id="Select a way to compare data",
+    id="Select a way to compare data for this indicator",
     options=["Compare month on month",
              "Compare three months moving average"])
 

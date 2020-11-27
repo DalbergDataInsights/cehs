@@ -36,7 +36,11 @@ CONTROLS = dict(
     facility=None,
     indicator_group=indicator_dropdown_group.dropdown_objects[0].value,
     aggregation_type=aggregation_dropdown.dropdown_objects[0].value,
-    trends_treemap_agg="Compare month on month"
+    trends_map_compare_agg=DEFAULTS.get("trends_map_compare_agg"),
+    trends_map_period_agg=DEFAULTS.get("trends_map_period_agg"),
+    trends_treemap_agg=DEFAULTS.get("trends_treemap_agg"),
+    report_map_compare_agg=DEFAULTS.get("report_map_compare_agg"),
+    report_map_period_agg=DEFAULTS.get("report_map_period_agg"),
 )
 
 print("Init control dict")

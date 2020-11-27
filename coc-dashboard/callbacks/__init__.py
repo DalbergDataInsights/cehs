@@ -23,9 +23,7 @@ from pprint import pprint as print
 from .global_callbacks import (
     global_story_callback,
     update_on_click,
-    # treemap_dropdown_callback,
 )
-
 
 from .user_interface import (
     change_page,
@@ -36,12 +34,16 @@ from .user_interface import (
 # Input(id, property), Output(id, property)
 callback_ids = {
     outlier_policy_dropdown_group.dropdown_ids[-1]: "value",  # Outlier policy
-    # indicator_dropdown_group.dropdown_ids[0]: "value",  # Indicator group
     indicator_dropdown_group.dropdown_ids[-1]: "value",  # Indicator
     "date_from": "value",
     "date_to": "value",
     district_control_group.dropdown_ids[-1]: "value",  # District
     aggregation_dropdown.dropdown_ids[0]: "value",
+    "Select a way to compare data for this indicator": "value",
+    "Select a way to aggregate data for this indicator": "value",
+    "Select a way to aggregate facility data for this indicator": "value",
+    # "Select a way to compare reporting data": "value",
+    # "Select a way to aggregate reporting data": "value",
 }
 
 dropdown_style = [
@@ -59,12 +61,6 @@ def define_callbacks(ds):
     app = ds.app
 
     callbacks = [
-        # Global callbacks
-        {
-            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
-            "outputs": [Output("ds-container", "children")],
-            "function": global_story_callback,
-        },
         # Data cards
         {
             "inputs": [
@@ -108,6 +104,12 @@ def define_callbacks(ds):
             ],
             "function": stacked_bar_reporting_country.callbacks[0].get("func"),
         },
+        # Global callbacks
+        {
+            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
+            "outputs": [Output("ds-container", "children")],
+            "function": global_story_callback,
+        },
         # User interface
         {
             "inputs": [Input("side-nav__menu-button", "n_clicks")],
@@ -144,15 +146,6 @@ def define_callbacks(ds):
             ],
             "function": update_on_click,
         },
-        # Datacard dropdowns
-        # {
-        #     "inputs": [Input("Select a way to aggregate data", "value")],
-        #     "outputs": [
-        #         Output(f"{tree_map_district.my_name}_figure", "figure"),
-        #         Output(f"{facility_scatter.my_name}_fig_title", "children"),
-        #     ],
-        #     "function": treemap_dropdown_callback,
-        # },
     ]
 
     print("==Registering callbacks==")

@@ -20,7 +20,7 @@ def map_reporting_period_plot(data):
 # DATACARD 6 #
 
 dropdown = NestedDropdown(
-    id="Select a way to aggregate data",
+    id="Select a way to aggregate reporting data",
     options=["Show only month of interest",
              "Show average over period"])
 

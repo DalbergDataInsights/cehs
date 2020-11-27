@@ -18,8 +18,7 @@ from components import (
     tree_map_district,
     reporting_map_compare,
     reporting_map_period,
-    overview
-    reporting_map,
+    overview,
     overview,
 )
 
@@ -52,6 +51,11 @@ def global_story_callback(*inputs):
         CONTROLS["reference_year"] = inputs[2].split(" ")[1]
         CONTROLS["reference_month"] = inputs[2].split(" ")[0]
         CONTROLS["aggregation_type"] = inputs[5]
+        CONTROLS["trends_map_compare_agg"] = inputs[6]
+        CONTROLS["trends_map_period_agg"] = inputs[7]
+        CONTROLS["trends_treemap_agg"] = inputs[8]
+        # CONTROLS["report_map_compare_agg"] = inputs[9]
+        # CONTROLS["report_map_period_agg"] = inputs[10]
 
         db.filter_by_policy(CONTROLS["outlier"])
 
@@ -151,25 +155,3 @@ def update_on_click(*inputs):
         print(e)
 
     return [facility_scatter.figure, facility_scatter.figure_title]
-
-
-@timeit
-def treemap_dropdown_callback(*inputs):
-
-    try:
-
-        LAST_CONTROLS = CONTROLS.copy()
-
-        CONTROLS["trends_treemap_agg"] = inputs[0]
-
-        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
-
-        tree_map_district.data = ds
-        tree_map_district.figure = tree_map_district._get_figure(
-            tree_map_district.data)
-        tree_map_district.figure_title = ("$label$")
-
-    except Exception as e:
-        print(e)
-
-    return [tree_map_district.figure]
