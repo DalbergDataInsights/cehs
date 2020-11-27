@@ -17,6 +17,7 @@ class CardLayout:
         self.els = elements
         self.title = kwargs.get("title", "")
         self.column_width = []
+        self.dropdown = kwargs.get("dropdown")
 
         self.__callbacks = []
         for x in self.els:
@@ -42,6 +43,9 @@ class CardLayout:
                         else None
                     ]
                 )
+            ),
+            dbc.Row(
+                self.dropdown.get_layout()
             ),
             dbc.Row(
                 [
