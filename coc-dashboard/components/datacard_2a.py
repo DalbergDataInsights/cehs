@@ -49,6 +49,13 @@ bar_chart_ranks_bottom = ChartDataCard(
     data_transform=bar_country_compare_plot,
     fig_object="Bar",
     bar_mode="overlay",
+    fig_orientation="h",
+    trace_params={
+        "textposition": "inside",
+        "texttemplate": "%{x:}",
+        "marker": {"color": "blue"},
+        "showlegend": False,
+    },
 )
 
 country_overview_compare = CardLayout(
