@@ -51,9 +51,9 @@ def global_story_callback(*inputs):
         CONTROLS["reference_year"] = inputs[2].split(" ")[1]
         CONTROLS["reference_month"] = inputs[2].split(" ")[0]
         CONTROLS["aggregation_type"] = inputs[5]
-        CONTROLS["trends_map_compare_agg"] = inputs[6]
-        CONTROLS["trends_map_period_agg"] = inputs[7]
-        CONTROLS["trends_treemap_agg"] = inputs[8]
+        # CONTROLS["trends_map_compare_agg"] = inputs[6]
+        # CONTROLS["trends_map_period_agg"] = inputs[7]
+        # CONTROLS["trends_treemap_agg"] = inputs[8]
         # CONTROLS["report_map_compare_agg"] = inputs[9]
         # CONTROLS["report_map_period_agg"] = inputs[10]
 
@@ -61,17 +61,19 @@ def global_story_callback(*inputs):
 
         df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
-        for x in [country_overview_scatter,
-                  country_overview_compare,
-                  country_overview_period,
-                  district_overview_scatter,
-                  facility_scatter,
-                  stacked_bar_district,
-                  stacked_bar_reporting_country,
-                  tree_map_district,
-                  reporting_map_compare,
-                  reporting_map_period,
-                  overview]:
+        for x in [
+            country_overview_scatter,
+            country_overview_compare,
+            country_overview_period,
+            district_overview_scatter,
+            facility_scatter,
+            stacked_bar_district,
+            stacked_bar_reporting_country,
+            tree_map_district,
+            reporting_map_compare,
+            reporting_map_period,
+            overview,
+        ]:
             try:
                 x.data = df
             except Exception as e:
@@ -105,8 +107,7 @@ def global_story_callback(*inputs):
 @timeit
 def change_titles_reporting(indicator_view_name, controls):
 
-    print(
-        f"Starting updates for reporting titles with {controls['indicator']}")
+    print(f"Starting updates for reporting titles with {controls['indicator']}")
 
     stacked_bar_reporting_country.title = get_title_reporting_country(
         stacked_bar_reporting_country.data, indicator_view_name, **controls
@@ -145,8 +146,7 @@ def update_on_click(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         facility_scatter.data = ds
-        facility_scatter.figure = facility_scatter._get_figure(
-            facility_scatter.data)
+        facility_scatter.figure = facility_scatter._get_figure(facility_scatter.data)
         facility_scatter.figure_title = (
             f"Evolution of $label$ in {label} (click on the graph above to filter)"
         )
@@ -158,23 +158,43 @@ def update_on_click(*inputs):
 
 
 @timeit
-def update_report_map_test(*inputs):
+def update_report_map_compare(*inputs):
 
     try:
+        LAST_CONTROLS = CONTROLS.copy()
 
         CONTROLS["report_map_compare_agg"] = inputs[0]
-
-        LAST_CONTROLS = CONTROLS.copy()
 
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         reporting_map_compare.data = ds
         reporting_map_compare.figure = reporting_map_compare._get_figure(
-            reporting_map_compare.data)
-        reporting_map_compare.figure_title = ("$label$"
-                                              )
+            reporting_map_compare.data
+        )
+        reporting_map_compare.figure_title = "$label$"
 
     except Exception as e:
         print(e)
 
     return [reporting_map_compare.figure, reporting_map_compare.figure_title]
+
+
+@timeit
+def update_tree_map_district(*inputs):
+
+    try:
+
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["trends_treemap_agg"] = inputs[0]
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+
+        tree_map_district.data = ds
+        tree_map_district.figure = tree_map_district._get_figure(tree_map_district.data)
+        tree_map_district.figure_title = "$label$"
+
+    except Exception as e:
+        print(e)
+
+    return [tree_map_district.figure, tree_map_district.figure_title]

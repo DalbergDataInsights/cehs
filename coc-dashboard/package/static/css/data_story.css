@@ -191,3 +191,24 @@ body {
     opacity: 0.5;
     pointer-events: none;
 }
+
+/* Restyling dropdowns back */
+
+#treemap-agg-dropdown .Select-control, #trends-map-compare-dropdown .Select-control {
+    background-color: white !important;
+    border: 1px solid rgb(85, 85, 85) !important;
+}
+
+#treemap-agg-dropdown .Select-value-label, #trends-map-compare-dropdown .Select-value-label {
+        color: rgb(85, 85, 85) !important;
+        font-size: 1.2vh;
+    }
+
+#treemap-agg-dropdown .Select-menu-outer,  #trends-map-compare-dropdown .Select-menu-outer {
+        background-color: white !important;
+        color: black !important;
+        font-size: 1.2vh !important;
+    }
+#treemap-agg-dropdown .Select-arrow, #trends-map-compare-dropdown .Select-arrow {
+        color: black !important;
+    }

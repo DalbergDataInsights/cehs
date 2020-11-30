@@ -18,15 +18,14 @@ def tree_map_district_dated_plot(data):
 
     data_in = data.get("district_dated")
     val_col = data_in.columns[-1]
-    data_in[val_col] = data_in[val_col].apply(
-        lambda x: int(x) if pd.notna(x) else 0)
+    data_in[val_col] = data_in[val_col].apply(lambda x: int(x) if pd.notna(x) else 0)
     data_in = data_in.reset_index()
     district_name = data_in.id[0]
     # data_tree = data_in.pivot_table(
     #     values=val_col, index=["facility_name"], columns="date", aggfunc=np.sum
     # )
 
-    data_in = data_in.drop('id', axis=1).set_index("facility_name")
+    data_in = data_in.drop("id", axis=1).set_index("facility_name")
     data_out = {district_name: data_in}
     return data_out
 
@@ -48,13 +47,17 @@ def scatter_facility_plot(data):
 db = Database()
 
 dropdown = NestedDropdown(
-    id="Select a way to aggregate facility data for this indicator",
-    options=["Show only month of interest",
-             "Show sum over period",
-             "Show average over period"])
+    id="treemap-agg-dropdown",
+    options=[
+        "Show only month of interest",
+        "Show sum over period",
+        "Show average over period",
+    ],
+    visible_id=False,
+)
 
 tree_map_district = AreaDataCard(
-    title='$label$',
+    fig_title="$label$",
     data=init_data_set,
     data_transform=tree_map_district_dated_plot,
     fig_object="Treemap",

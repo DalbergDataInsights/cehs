@@ -24,7 +24,8 @@ from pprint import pprint as print
 from .global_callbacks import (
     global_story_callback,
     update_on_click,
-    update_report_map_test,
+    update_report_map_compare,
+    update_tree_map_district,
 )
 
 from .user_interface import (
@@ -41,9 +42,9 @@ callback_ids = {
     "date_to": "value",
     district_control_group.dropdown_ids[-1]: "value",  # District
     aggregation_dropdown.dropdown_ids[0]: "value",
-    "Select a way to compare data for this indicator": "value",
-    "Select a way to aggregate data for this indicator": "value",
-    "Select a way to aggregate facility data for this indicator": "value",
+    # "Select a way to compare data for this indicator": "value",
+    # "Select a way to aggregate data for this indicator": "value",
+    # "Select a way to aggregate facility data for this indicator": "value",
     # "Select a way to compare reporting data": "value",
     # "Select a way to aggregate reporting data": "value",
 }
@@ -77,17 +78,20 @@ def define_callbacks(ds):
         },
         {
             "inputs": [
-                Input(id, prop) for id, prop in reporting_map_compare.callbacks[0].get("input")
+                Input(id, prop)
+                for id, prop in reporting_map_compare.callbacks[0].get("input")
             ],
             "outputs": [
                 Output(id, prop)
                 for id, prop in reporting_map_compare.callbacks[0].get("output")
             ],
             "function": reporting_map_compare.callbacks[0].get("func"),
+            "group": "reporting-map-compare",
         },
         {
             "inputs": [
-                Input(id, prop) for id, prop in reporting_map_period.callbacks[0].get("input")
+                Input(id, prop)
+                for id, prop in reporting_map_period.callbacks[0].get("input")
             ],
             "outputs": [
                 Output(id, prop)
@@ -148,27 +152,44 @@ def define_callbacks(ds):
             ],
             "function": update_on_click,
         },
-        # Test rporting callback
+        # Dropdown callbacks
         {
             "inputs": [Input("Select a way to compare reporting data", "value")],
             "outputs": [
                 Output(f"{reporting_map_compare.my_name}_figure", "figure"),
                 Output(f"{reporting_map_compare.my_name}_fig_title", "children"),
             ],
-            "function": update_report_map_test,
-            "group": "my_group",
+            "function": update_report_map_compare,
+            "group": "reporting-map-compare",
         },
-
-
+        {
+            "inputs": [
+                Input(
+                    "treemap-agg-dropdown",
+                    "value",
+                )
+            ],
+            "outputs": [
+                Output(f"{tree_map_district.my_name}_figure", "figure"),
+                Output(f"{tree_map_district.my_name}_fig_title", "children"),
+            ],
+            "function": update_tree_map_district,
+            "group": "tree-map-update",
+        },
     ]
 
     print("==Registering callbacks==")
 
     for callback in callbacks:
         # print(callback)
-        app.callback(
-            output=callback.get("outputs", []),
-            inputs=callback.get("inputs", []),
-            state=callback.get("states", ()),
-            group=callback.get("group", ()),
-        )(callback.get("function"))
+
+        params = {
+            "output": callback.get("outputs", []),
+            "inputs": callback.get("inputs", []),
+            "state": callback.get("states", ()),
+        }
+
+        if callback.get("group"):
+            params["group"] = callback.get("group")
+
+        app.callback(**params)(callback.get("function"))
