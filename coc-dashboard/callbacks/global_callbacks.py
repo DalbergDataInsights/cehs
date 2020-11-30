@@ -155,3 +155,26 @@ def update_on_click(*inputs):
         print(e)
 
     return [facility_scatter.figure, facility_scatter.figure_title]
+
+
+@timeit
+def update_report_map_test(*inputs):
+
+    try:
+
+        CONTROLS["report_map_compare_agg"] = inputs[0]
+
+        LAST_CONTROLS = CONTROLS.copy()
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+
+        reporting_map_compare.data = ds
+        reporting_map_compare.figure = reporting_map_compare._get_figure(
+            reporting_map_compare.data)
+        reporting_map_compare.figure_title = ("$label$"
+                                              )
+
+    except Exception as e:
+        print(e)
+
+    return [reporting_map_compare.figure, reporting_map_compare.figure_title]

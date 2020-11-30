@@ -9,7 +9,8 @@ from components import (
     stacked_bar_reporting_country,
 )
 
-from dash.dependencies import Input, Output, State
+from dash_extensions.enrich import Input, Output
+
 
 from store import (
     district_control_group,
@@ -23,6 +24,7 @@ from pprint import pprint as print
 from .global_callbacks import (
     global_story_callback,
     update_on_click,
+    update_report_map_test,
 )
 
 from .user_interface import (
@@ -146,6 +148,18 @@ def define_callbacks(ds):
             ],
             "function": update_on_click,
         },
+        # Test rporting callback
+        {
+            "inputs": [Input("Select a way to compare reporting data", "value")],
+            "outputs": [
+                Output(f"{reporting_map_compare.my_name}_figure", "figure"),
+                Output(f"{reporting_map_compare.my_name}_fig_title", "children"),
+            ],
+            "function": update_report_map_test,
+            "group": "my_group",
+        },
+
+
     ]
 
     print("==Registering callbacks==")
@@ -156,4 +170,5 @@ def define_callbacks(ds):
             output=callback.get("outputs", []),
             inputs=callback.get("inputs", []),
             state=callback.get("states", ()),
+            group=callback.get("group", ()),
         )(callback.get("function"))
