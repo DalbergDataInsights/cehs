@@ -1,5 +1,5 @@
 from store import (timeit,
-                   reporting_count_transform,
+                   reporting_count_transform_test,
                    init_data_set,
                    get_report_perc,
                    DEFAULTS,
@@ -12,7 +12,7 @@ from package.layout.chart_card import ChartDataCard
 def bar_reporting_country_plot(data):
 
     data_in = data.get("reporting_country")
-    data_out = reporting_count_transform(data_in.copy())
+    data_out = reporting_count_transform_test(data_in.copy())
 
     return data_out
 
@@ -44,9 +44,21 @@ stacked_bar_reporting_country = ChartDataCard(
     data_transform=bar_reporting_country_plot,
     title=default_title,
     fig_title="$label$",
-    fig_object="Bar",
+    fig_object="Scatter",
 )
 
+# stacked_bar_reporting_country.set_colors(
+#     {"fig": ["rgb(42, 87, 131)", "rgb(247, 190, 178)", "rgb(211, 41, 61)"]}
+# )
+
+
 stacked_bar_reporting_country.set_colors(
-    {"fig": ["rgb(42, 87, 131)", "rgb(247, 190, 178)", "rgb(211, 41, 61)"]}
+    {
+        "fig": {
+            "Percentage of facilities expected to report which reported on their 105-1 form": "rgb(106, 155, 195)",
+            "Percentage of reporting facilities that reported a value of one or above for this indicator": "rgb(200, 19, 60)",
+        },
+        "title": "white",
+        "subtitle": "rgb(34, 94, 140)",
+    }
 )
