@@ -1,4 +1,8 @@
 from components import (
+    trends_map_compare,
+    compare_map,
+    trends_map_period,
+    period_map,
     facility_scatter,
     stacked_bar_district,
     stacked_bar_reporting_country,
@@ -24,8 +28,11 @@ from pprint import pprint as print
 from .global_callbacks import (
     global_story_callback,
     update_on_click,
-    update_report_map_compare,
+    update_trends_map_compare,
+    update_trends_map_period,
     update_tree_map_district,
+    update_report_map_compare,
+    update_report_map_period,
 )
 
 from .user_interface import (
@@ -42,11 +49,6 @@ callback_ids = {
     "date_to": "value",
     district_control_group.dropdown_ids[-1]: "value",  # District
     aggregation_dropdown.dropdown_ids[0]: "value",
-    # "Select a way to compare data for this indicator": "value",
-    # "Select a way to aggregate data for this indicator": "value",
-    # "Select a way to aggregate facility data for this indicator": "value",
-    # "Select a way to compare reporting data": "value",
-    # "Select a way to aggregate reporting data": "value",
 }
 
 dropdown_style = [
@@ -86,7 +88,7 @@ def define_callbacks(ds):
                 for id, prop in reporting_map_compare.callbacks[0].get("output")
             ],
             "function": reporting_map_compare.callbacks[0].get("func"),
-            "group": "reporting-map-compare",
+            "group": "report-map-compare-agg-update",
         },
         {
             "inputs": [
@@ -98,6 +100,7 @@ def define_callbacks(ds):
                 for id, prop in reporting_map_period.callbacks[0].get("output")
             ],
             "function": reporting_map_period.callbacks[0].get("func"),
+            "group":"report-map-period-agg-update"
         },
         {
             "inputs": [
@@ -153,29 +156,54 @@ def define_callbacks(ds):
             "function": update_on_click,
         },
         # Dropdown callbacks
-        {
-            "inputs": [Input("Select a way to compare reporting data", "value")],
-            "outputs": [
-                Output(f"{reporting_map_compare.my_name}_figure", "figure"),
-                Output(f"{reporting_map_compare.my_name}_fig_title", "children"),
-            ],
-            "function": update_report_map_compare,
-            "group": "reporting-map-compare",
-        },
-        {
-            "inputs": [
-                Input(
-                    "treemap-agg-dropdown",
-                    "value",
-                )
-            ],
-            "outputs": [
-                Output(f"{tree_map_district.my_name}_figure", "figure"),
-                Output(f"{tree_map_district.my_name}_fig_title", "children"),
-            ],
-            "function": update_tree_map_district,
-            "group": "tree-map-update",
-        },
+
+        # {
+        #     "inputs": [Input("trends-map-compare-agg-dropdown", "value")],
+        #     "outputs": [
+        #         Output(f"{compare_map.my_name}_figure", "figure"),
+        #         Output(f"{trends_map_compare.my_name}_title", "children"),
+        #     ],
+        #     "function": update_trends_map_compare,
+        #     "group": "trends-map-compare-agg-update",
+        # },
+        # {
+        #     "inputs": [Input("trends-map-period-agg-dropdown", "value")],
+        #     "outputs": [
+        #         Output(f"{period_map.my_name}_figure", "figure"),
+        #         Output(f"{trends_map_period.my_name}_title", "children"),
+        #     ],
+        #     "function": update_trends_map_period,
+        #     "group": "trends-map-period-agg-update",
+        # },
+        # {
+        #     "inputs": [
+        #         Input("treemap-agg-dropdown", "value")
+        #     ],
+        #     "outputs": [
+        #         Output(f"{tree_map_district.my_name}_figure", "figure"),
+        #         Output(f"{tree_map_district.my_name}_fig_title", "children"),
+        #     ],
+        #     "function": update_tree_map_district,
+        #     "group": "treemap-agg-update",
+        # },
+        # {
+        #     "inputs": [Input("report-map-compare-agg-dropdown", "value")],
+        #     "outputs": [
+        #         Output(f"{reporting_map_compare.my_name}_figure", "figure"),
+        #         Output(f"{reporting_map_compare.my_name}_fig_title", "children"),
+        #     ],
+        #     "function": update_report_map_compare,
+        #     "group": "report-map-compare-agg-update",
+        # },
+        # {
+        #     "inputs": [Input("report-map-period-agg-dropdown", "value")],
+        #     "outputs": [
+        #         Output(f"{reporting_map_period.my_name}_figure", "figure"),
+        #         Output(f"{reporting_map_period.my_name}_fig_title", "children"),
+        #     ],
+        #     "function": update_report_map_period,
+        #     "group": "report-map-period-agg-update",
+        # },
     ]
 
     print("==Registering callbacks==")
@@ -191,5 +219,7 @@ def define_callbacks(ds):
 
         if callback.get("group"):
             params["group"] = callback.get("group")
+
+        print(params)
 
         app.callback(**params)(callback.get("function"))

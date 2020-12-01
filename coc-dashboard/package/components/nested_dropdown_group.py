@@ -1,10 +1,10 @@
+from store import timeit
+from package.elements.nested_dropdown import NestedDropdown
+import pandas as pd
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 import dash_core_components as dcc
-from dash.dependencies import Input, Output
-import pandas as pd
-from package.elements.nested_dropdown import NestedDropdown
-from store import timeit
+from dash_extensions.enrich import Input, Output
 
 
 class NestedDropdownGroup:
@@ -113,7 +113,8 @@ class NestedDropdownGroup:
                 if self.title
                 else None
             ]
-            + self.get_orientation(self.dropdown_objects, vertical=self.vertical),
+            + self.get_orientation(self.dropdown_objects,
+                                   vertical=self.vertical),
             className="p-3 m-12",
         )
         return layout
@@ -123,7 +124,8 @@ class NestedDropdownGroup:
 
     def get_orientation(self, elements, vertical=True):
         elements = [e.get_layout() for e in elements]
-        layout = [dbc.Row(e) for e in elements] if vertical else [dbc.Row(elements)]
+        layout = [dbc.Row(e) for e in elements] if vertical else [
+            dbc.Row(elements)]
         return layout
 
     @timeit

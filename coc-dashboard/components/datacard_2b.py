@@ -32,15 +32,16 @@ def bar_country_dated_plot(data):
 # DATACARD 2 #
 
 dropdown = NestedDropdown(
-    id="Select a way to aggregate data for this indicator",
+    id="trends-map-period-agg-dropdown",
     options=[
         "Show only month of interest",
         "Show sum over period",
         "Show average over period",
     ],
+    visible_id=False,
 )
 
-country_overview_map = MapDataCard(
+period_map = MapDataCard(
     data=init_data_set,
     data_transform=map_country_dated_plot,
     geodata=shapefile,
@@ -56,8 +57,8 @@ bar_chart_ranks_bottom = ChartDataCard(
     trace_param={"showlegend": False},
 )
 
-country_overview_period = CardLayout(
+trends_map_period = CardLayout(
     title="$label$",
-    elements=[country_overview_map, bar_chart_ranks_bottom],
+    elements=[period_map, bar_chart_ranks_bottom],
     dropdown=dropdown,
 )

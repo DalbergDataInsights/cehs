@@ -18,7 +18,8 @@ def tree_map_district_dated_plot(data):
 
     data_in = data.get("district_dated")
     val_col = data_in.columns[-1]
-    data_in[val_col] = data_in[val_col].apply(lambda x: int(x) if pd.notna(x) else 0)
+    data_in[val_col] = data_in[val_col].apply(
+        lambda x: int(x) if pd.notna(x) else 0)
     data_in = data_in.reset_index()
     district_name = data_in.id[0]
     # data_tree = data_in.pivot_table(

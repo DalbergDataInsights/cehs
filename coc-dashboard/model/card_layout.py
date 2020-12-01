@@ -22,6 +22,13 @@ class CardLayout:
         self.__callbacks = []
         for x in self.els:
             self.__callbacks.extend(x.callbacks)
+        self.__name = None
+
+    @property
+    def my_name(self):
+        if self.__name is None:
+            self.__name = str(self).split(">")[0][-11:]
+        return self.__name
 
     @property
     def layout(self):
@@ -37,6 +44,7 @@ class CardLayout:
                                     "text-align": "center",
                                     "width": "100%",
                                 },
+                                id=f"{self.my_name}_title",
                             )
                         )
                         if self.title != ""
@@ -87,7 +95,8 @@ class CardLayout:
 
             # deal with complex labels
             while "$" in formatted_string:
-                sub = self.__get_substring_between_elements(formatted_string, "$")
+                sub = self.__get_substring_between_elements(
+                    formatted_string, "$")
 
                 try:
                     if "trace" in sub:
@@ -117,7 +126,8 @@ class CardLayout:
     def __get_substring_between_elements(self, string, element, closing_element="$"):
         try:
             out = string.split(element, 1)[1]
-            out = out.split(closing_element, 1)[0] if closing_element in out else None
+            out = out.split(closing_element, 1)[
+                0] if closing_element in out else None
         except IndexError as e:
             out = None
             print(e)

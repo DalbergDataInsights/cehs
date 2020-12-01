@@ -32,11 +32,12 @@ def bar_country_compare_plot(data):
 # DATACARD 2 #
 
 dropdown = NestedDropdown(
-    id="trends-map-compare-dropdown",
+    id="trends-map-compare-agg-dropdown",
     options=["Compare month on month", "Compare three months moving average"],
+    visible_id=False,
 )
 
-country_overview_map = MapDataCard(
+compare_map = MapDataCard(
     data=init_data_set,
     data_transform=map_country_compare_plot,
     geodata=shapefile,
@@ -58,8 +59,8 @@ bar_chart_ranks_bottom = ChartDataCard(
     },
 )
 
-country_overview_compare = CardLayout(
+trends_map_compare = CardLayout(
     title="$label$",
-    elements=[country_overview_map, bar_chart_ranks_bottom],
+    elements=[compare_map, bar_chart_ranks_bottom],
     dropdown=dropdown,
 )
