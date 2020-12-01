@@ -19,7 +19,6 @@ from .geopopulation import shapefile  # NOQA: E402
     side_nav,
     outlier_policy_dropdown_group,
     indicator_dropdown_group,
-    aggregation_dropdown,
     date_dropdowns,
     district_control_group,
 ) = initiate_dropdowns()
@@ -35,7 +34,6 @@ CONTROLS = dict(
     reference_month=date_dropdowns.from_date.value.split(" ")[0],
     facility=None,
     indicator_group=indicator_dropdown_group.dropdown_objects[0].value,
-    aggregation_type=aggregation_dropdown.dropdown_objects[0].value,
     trends_map_compare_agg=DEFAULTS.get("trends_map_compare_agg"),
     trends_map_period_agg=DEFAULTS.get("trends_map_period_agg"),
     trends_treemap_agg=DEFAULTS.get("trends_treemap_agg"),

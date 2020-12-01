@@ -20,7 +20,6 @@ from store import (
     district_control_group,
     indicator_dropdown_group,
     outlier_policy_dropdown_group,
-    aggregation_dropdown,
 )
 
 from pprint import pprint as print
@@ -48,14 +47,12 @@ callback_ids = {
     "date_from": "value",
     "date_to": "value",
     district_control_group.dropdown_ids[-1]: "value",  # District
-    aggregation_dropdown.dropdown_ids[0]: "value",
 }
 
 dropdown_style = [
     "config_group",
     "config_indicator",
     "SELECT A DISTRICT",
-    "aggregation_type",
     "date_from",
     "date_to",
 ]
