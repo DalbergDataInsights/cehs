@@ -3,12 +3,10 @@ from flask import send_from_directory
 from package import here
 from dash_bootstrap_components.themes import BOOTSTRAP
 from jupyter_dash import JupyterDash
-import dash
-from dash import Dash
-from dash.dependencies import Output, Input
 from pprint import pprint
 from package.layout.base.data_card import DataCard
 from dash_extensions import Download
+from dash_extensions.enrich import Dash, Output, Input
 
 
 class Dashboard:

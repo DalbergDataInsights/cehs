@@ -17,10 +17,18 @@ class CardLayout:
         self.els = elements
         self.title = kwargs.get("title", "")
         self.column_width = []
+        self.dropdown = kwargs.get("dropdown")
 
         self.__callbacks = []
         for x in self.els:
             self.__callbacks.extend(x.callbacks)
+        self.__name = None
+
+    @property
+    def my_name(self):
+        if self.__name is None:
+            self.__name = str(self).split(">")[0][-11:]
+        return self.__name
 
     @property
     def layout(self):
@@ -36,6 +44,7 @@ class CardLayout:
                                     "text-align": "center",
                                     "width": "100%",
                                 },
+                                id=f"{self.my_name}_title",
                             )
                         )
                         if self.title != ""
@@ -44,14 +53,19 @@ class CardLayout:
                 )
             ),
             dbc.Row(
-                [
-                    dbc.Col(self.els[0].layout, className="m-24", width=7),
-                    dbc.Col(self.els[1].layout, className="m-24", width=5),
-                ]
+                self.dropdown.get_layout()
+            ),
+            dbc.Row(
+                self._get_figure(),
+                id=f"{self.my_name}_figure"
             ),
         ]
         # layout = [dbc.Col(x.layout, className='m-24') for x in self.els]
         return dbc.Col(layout)
+
+    def _get_figure(self, data=None):
+        return [dbc.Col(self.els[0].layout, className="m-24", width=7),
+                dbc.Col(self.els[1].layout, className="m-24", width=5)]
 
     @property
     def data(self):
@@ -83,7 +97,8 @@ class CardLayout:
 
             # deal with complex labels
             while "$" in formatted_string:
-                sub = self.__get_substring_between_elements(formatted_string, "$")
+                sub = self.__get_substring_between_elements(
+                    formatted_string, "$")
 
                 try:
                     if "trace" in sub:
@@ -113,7 +128,8 @@ class CardLayout:
     def __get_substring_between_elements(self, string, element, closing_element="$"):
         try:
             out = string.split(element, 1)[1]
-            out = out.split(closing_element, 1)[0] if closing_element in out else None
+            out = out.split(closing_element, 1)[
+                0] if closing_element in out else None
         except IndexError as e:
             out = None
             print(e)

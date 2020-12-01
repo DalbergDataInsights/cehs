@@ -2,15 +2,16 @@ import pandas as pd
 from model import CardLayout
 from package.layout.chart_card import ChartDataCard
 from package.layout.map_card import MapDataCard
+from package.elements.nested_dropdown import NestedDropdown
 from store import shapefile, init_data_set, timeit
 
 
 @timeit
 def map_country_dated_plot(data):
 
-    data = data.get("dated")
+    data = data.get("dated_period")
 
-    data_out = {f"Change between reference and target date": data}
+    data_out = {"Overview between reference and target date": data}
 
     return data_out
 
@@ -18,9 +19,7 @@ def map_country_dated_plot(data):
 @timeit
 def bar_country_dated_plot(data):
 
-    data = data.get("dated")
-
-    data[data.columns[-1]] = data[data.columns[-1]] / 100
+    data = data.get("dated_period")
 
     data["rank"] = data[data.columns[-1]].rank(ascending=True, method="min")
     data = data[data["rank"] < 11].sort_values(by="rank")
@@ -32,8 +31,17 @@ def bar_country_dated_plot(data):
 
 # DATACARD 2 #
 
+dropdown = NestedDropdown(
+    id="trends-map-period-agg-dropdown",
+    options=[
+        "Show only month of interest",
+        "Show sum over period",
+        "Show average over period",
+    ],
+    visible_id=False,
+)
 
-country_overview_map = MapDataCard(
+period_map = MapDataCard(
     data=init_data_set,
     data_transform=map_country_dated_plot,
     geodata=shapefile,
@@ -45,12 +53,18 @@ bar_chart_ranks_bottom = ChartDataCard(
     data=init_data_set,
     data_transform=bar_country_dated_plot,
     fig_object="Bar",
-    bar_mode="overlay",
+    fig_orientation="h",
+    trace_params={
+        "textposition": "inside",
+        "texttemplate": "%{x:,.0}",
+        "marker": {"color": "rgb(184, 190, 200)"},
+        "showlegend": False,
+        "hoverinfo": "none",
+    },
 )
 
-country_overview = CardLayout(
+trends_map_period = CardLayout(
     title="$label$",
-    elements=[country_overview_map, bar_chart_ranks_bottom],
+    elements=[period_map, bar_chart_ranks_bottom],
+    dropdown=dropdown,
 )
-
-# TODO Define common color scale for map and barchart

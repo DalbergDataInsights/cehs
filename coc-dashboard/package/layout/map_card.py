@@ -44,11 +44,10 @@ class MapDataCard(DataCard):
 
         choropleth_map = go.Choroplethmapbox()
 
-        for name, df in data.items():
+        for df in data.values():
 
-            lower_bound, upper_bound = self.get_range(df[df.columns[0]])
-            colorscale = self.get_custom_colorscale(name,
-                                                    (lower_bound, upper_bound))
+            lower_bound, upper_bound = self.get_range(df[df.columns[-1]])
+            colorscale = self.get_custom_colorscale((lower_bound, upper_bound))
 
             choropleth_map = go.Choroplethmapbox(
                 z=df[df.columns[0]],

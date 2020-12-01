@@ -32,11 +32,12 @@ def get_title_country_overview(data, indicator_view_name, **controls):
     """
     country_descrip = get_time_diff_perc(data, **controls)
 
-    title = f'''Overview: Across the country, the {indicator_view_name} {country_descrip} 
-            between {controls.get('reference_month')}-{controls.get('reference_year')} 
-            and {controls.get('target_month')}-{controls.get('target_year')} '''
+    title = f"""Overview: Across the country, the {indicator_view_name} {country_descrip}
+            between {controls.get('reference_month')}-{controls.get('reference_year')}
+            and {controls.get('target_month')}-{controls.get('target_year')} """
 
     return title
+
 
 # DATACARD 1 #
 
@@ -45,10 +46,11 @@ db = Database()
 
 # TODO The class would need to include this title function by default to avoid repetition
 
-default_title = get_title_country_overview(scatter_country_plot(init_data_set),
-                                           db.get_indicator_view(
-                                               DEFAULTS.get('indicator')),
-                                           **DEFAULTS)
+default_title = get_title_country_overview(
+    scatter_country_plot(init_data_set),
+    db.get_indicator_view(DEFAULTS.get("indicator")),
+    **DEFAULTS,
+)
 
 country_overview_scatter = ChartDataCard(
     title=default_title,

@@ -6,14 +6,16 @@ from store.database import Database
 
 from .cards_mutations import (
     scatter_country_data,
-    map_bar_country_dated_data,
+    map_bar_country_compare_data,
+    map_bar_country_period_data,
     scatter_district_data,
     tree_map_district_dated_data,
     scatter_facility_data,
     bar_reporting_country_data,
-    map_reporting_dated_data,
+    map_reporting_compare_data,
+    map_reporting_period_data,
     scatter_reporting_district_data,
-    apply_date_filter,
+    overview_data,
     # indicator_group,
 )
 
@@ -24,15 +26,16 @@ from .cards_mutations import (
 
 FUNC_DICT = {
     "country": scatter_country_data,
-    "date_filter": apply_date_filter,
-    "dated": map_bar_country_dated_data,
+    "date_filter": overview_data,
+    "dated_compare": map_bar_country_compare_data,
+    "dated_period": map_bar_country_period_data,
     "district": scatter_district_data,
     "district_dated": tree_map_district_dated_data,
     "facility": scatter_facility_data,
     "reporting_country": bar_reporting_country_data,
-    "reporting_dated": map_reporting_dated_data,
+    "reporting_dated_compare": map_reporting_compare_data,
+    "reporting_dated_period": map_reporting_period_data,
     "reporting_district": scatter_reporting_district_data,
-    # "indicator_group": indicator_group,
 }
 
 FUNC_DF = pd.DataFrame.from_dict(FUNC_DICT, orient="index").rename(
@@ -70,9 +73,11 @@ def define_datasets(controls, last_controls=None):
             args = set(FUNC_DF.loc[dataset_name, "args"])
             if len(args.intersection(changed_keys)) > 0:
                 db.include_dataset(
-                    dataset_name, FUNC_DF.loc[dataset_name, "function"](**controls)
+                    dataset_name, FUNC_DF.loc[dataset_name, "function"](
+                        **controls)
                 )
-                func_name = str(FUNC_DF.loc[dataset_name, "function"]).split(" ")[1]
+                func_name = str(
+                    FUNC_DF.loc[dataset_name, "function"]).split(" ")[1]
                 print(f"ran function {func_name}")
 
     return db.datasets

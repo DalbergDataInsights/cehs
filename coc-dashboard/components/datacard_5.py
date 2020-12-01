@@ -29,8 +29,8 @@ def get_title_reporting_country(data, indicator_view_name, **controls):
 
     return title
 
-
 # DATACARD 5 #
+
 
 db = Database()
 

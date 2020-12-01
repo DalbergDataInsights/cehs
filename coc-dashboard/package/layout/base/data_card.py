@@ -46,6 +46,7 @@ class DataCard:
         self.set_colors(kwargs.get("colors", self.default_colors.copy()))
         self.center_value = kwargs.get("center_value", 0)
         self.excl_outliers_colorscale = kwargs.get("excl_outliers_colorscale", True)
+        self.trace_params = kwargs.get("trace_params")
 
         # Layout
         # Orientation
@@ -120,6 +121,8 @@ class DataCard:
                 showlegend=True,
             )
             fig.update_yaxes(rangemode="tozero")
+            if self.trace_params:
+                fig.update_traces(**self.trace_params)
         self.__figure = fig
 
     @property
@@ -392,7 +395,7 @@ class DataCard:
 
         return (lower_bound, upper_bound)
 
-    def get_custom_colorscale(self, name, range):
+    def get_custom_colorscale(self, range):
 
         # TODO Find more stable fix, not using name
         colorscale = list(self.colors.get("fig").values())[0]

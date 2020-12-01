@@ -3,41 +3,19 @@ from store import (
     filter_by_district,
     get_ratio,
     Database,
+    get_df_compare,
+    get_df_period
 )
 
 import pandas as pd
 import numpy as np
 from datetime import datetime
 
-# CARD 1
 
+# Overview
 
-def scatter_country_data(*, indicator, **kwargs):
-
-    # dfs, static,
-
-    db = Database()
-
-    df = db.raw_data
-
-    df = db.filter_by_indicator(df, indicator)
-
-    df, index = get_ratio(df, indicator, agg_level='country')
-
-    df = df.set_index(index)
-
-    title = f'Total {db.get_indicator_view(indicator)} across the country'
-
-    df = df.rename(columns={indicator: title})
-
-    return df
-
-
-# CARD 2
-
-def apply_date_filter(
+def overview_data(
     *,
-    outlier,
     target_year,
     target_month,
     reference_year,
@@ -55,13 +33,40 @@ def apply_date_filter(
     return df
 
 
-def map_bar_country_dated_data(
+# CARD 1
+
+
+def scatter_country_data(*, indicator, **kwargs):
+
+    # dfs, static,
+
+    db = Database()
+
+    df = db.raw_data
+
+    df = db.filter_by_indicator(df, indicator)
+
+    df, index = get_ratio(df, indicator, agg_level='country')[0:2]
+
+    df = df.set_index(index)
+
+    title = f'Total {db.get_indicator_view(indicator)} across the country'
+
+    df = df.rename(columns={indicator: title})
+
+    return df
+
+
+# CARD 2
+
+def map_bar_country_compare_data(
     *,
     indicator,
     target_year,
     target_month,
     reference_year,
     reference_month,
+    trends_map_compare_agg,
     **kwargs,
 ):
 
@@ -73,42 +78,64 @@ def map_bar_country_dated_data(
 
     df = get_ratio(df, indicator, agg_level='district')[0]
 
-    data_in = filter_df_by_dates(
-        df, target_year, target_month, reference_year, reference_month
-    )
+    df = get_df_compare(df, indicator,
+                        target_year, target_month,
+                        reference_year, reference_month, trends_map_compare_agg)
 
-    # TODO updat teh filter by data function so that this step is no longer needed
+    if trends_map_compare_agg == "Compare three months moving average":
+        quarter = 'the three months periods ending in '
+    else:
+        quarter = ''
 
-    target_date = datetime.strptime(f"{target_month} 1 {target_year}",
-                                    "%b %d %Y")
-    reference_date = datetime.strptime(f"{reference_month} 1 {reference_year}",
-                                       "%b %d %Y")
+    title = f'Percentage change in {db.get_indicator_view(indicator)} between {quarter}{reference_month}-{reference_year} and {target_month}-{target_year}'
 
-    mask = (data_in.date == target_date) | (data_in.date == reference_date)
+    df = df.rename(columns={indicator: title})
 
-    data_in = data_in[mask]
+    return df
 
-    data_in = data_in.pivot_table(columns="date", values=indicator, index="id")
 
-    data_in[indicator] = (
-        (data_in[target_date] - data_in[reference_date])
-        / data_in[reference_date]
-        * 100
-    )
+def map_bar_country_period_data(
+    *,
+    indicator,
+    target_year,
+    target_month,
+    reference_year,
+    reference_month,
+    trends_map_period_agg,
+    **kwargs,
+):
 
-    data_in = data_in.replace([np.inf, -np.inf], np.nan)
+    db = Database()
 
-    data_in[indicator] = data_in[indicator].apply(lambda x: round(x, 2))
+    df = db.raw_data
 
-    data_in = data_in[[indicator]].reset_index()
-    data_in = data_in.set_index("id")
-    data_out = data_in[~pd.isna(data_in[indicator])]
+    df = db.filter_by_indicator(df, indicator)
 
-    title = f'Percentage change of {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
-    data_out = data_out.rename(columns={indicator: title})
+    df = get_ratio(df, indicator, agg_level='district')[0]
 
-    return data_out
+    isratio = get_ratio(df, indicator, agg_level='district')[2]
 
+    df = get_df_period(df, indicator,
+                       target_year, target_month,
+                       reference_year, reference_month, trends_map_period_agg, isratio=isratio)
+
+    if trends_map_period_agg == "Show only month of interest":
+        title = title = f'Total {db.get_indicator_view(indicator)} on {reference_month}-{reference_year} by district'
+
+    else:
+        if trends_map_period_agg == "Show sum over period":
+            if isratio:
+                data = 'Average'
+            else:
+                data = 'Total'
+        else:
+            data = 'Average'
+
+        title = f'{data} {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'
+
+    df = df.rename(columns={indicator: title})
+
+    return df
 
 # CARD 3
 
@@ -123,7 +150,7 @@ def scatter_district_data(*,  indicator, district, **kwargs):
 
     df = filter_by_district(df, district)
 
-    df, index = get_ratio(df, indicator, agg_level='district')
+    df, index = get_ratio(df, indicator, agg_level='district')[0:2]
 
     df = df.set_index(index)
 
@@ -145,8 +172,8 @@ def tree_map_district_dated_data(
     target_month,
     reference_year,
     reference_month,
+    trends_treemap_agg,
     **kwargs,
-
 
 ):
 
@@ -158,17 +185,33 @@ def tree_map_district_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
+    df = filter_by_district(df, district)
+
     df = get_ratio(df, indicator, agg_level='facility')[0]
 
-    # TODO check how the date function works such that it shows only target date
+    isratio = get_ratio(df, indicator, agg_level='facility')[2]
 
-    df_district_dated = filter_df_by_dates(
-        df, target_year, target_month, reference_year, reference_month
-    )
+    df_district_dated = get_df_period(df, indicator,
+                                      target_year, target_month,
+                                      reference_year, reference_month, trends_treemap_agg,
+                                      index=['id', 'facility_name'], isratio=isratio)
 
-    df_district_dated = filter_by_district(df_district_dated, district)
+    if trends_treemap_agg == "Show only month of interest":
+        agg = 'Contribution'
+        period = f'on {target_month}-{target_year}'
+    elif trends_treemap_agg == "Show sum over period":
+        if isratio:
+            agg = 'Average contribution'
+            period = f'on {target_month}-{target_year}'
+        else:
+            agg = 'Total contribution'
+            period = f'between {reference_month}-{reference_year} and {target_month}-{target_year}'
+    else:
+        agg = 'Average contribution'
+        period = f'on {target_month}-{target_year}'
 
-    title = f'"Contribution of individual facilities to {db.get_indicator_view(indicator)} in {district} district'
+    title = f'''{agg} of individual facilities in {district} district to 
+            {db.get_indicator_view(indicator)} {period}'''
 
     df_district_dated = df_district_dated.rename(columns={indicator: title})
 
@@ -187,9 +230,7 @@ def scatter_facility_data(*, indicator, district, facility, **kwargs):
 
     df = filter_by_district(df, district)
 
-    df, index = get_ratio(df, indicator, agg_level='facility')
-
-    # TODO Reorder such that its the one facility with the on selected data max value that shows
+    df, index = get_ratio(df, indicator, agg_level='facility')[0:2]
 
     if not facility:
         facility = (
@@ -212,7 +253,7 @@ def scatter_facility_data(*, indicator, district, facility, **kwargs):
 # CARD 5
 
 
-def bar_reporting_country_data(*, outlier, indicator, **kwargs):
+def bar_reporting_country_data(*, indicator, **kwargs):
 
     db = Database()
 
@@ -232,14 +273,14 @@ def bar_reporting_country_data(*, outlier, indicator, **kwargs):
 # CARD 6
 
 
-def map_reporting_dated_data(
+def map_reporting_compare_data(
     *,
-    outlier,
     indicator,
     target_year,
     target_month,
     reference_year,
     reference_month,
+    report_map_compare_agg,
     **kwargs,
 ):
 
@@ -251,11 +292,54 @@ def map_reporting_dated_data(
 
     df = db.filter_by_indicator(df, indicator)
 
-    df = filter_df_by_dates(
-        df, target_year, target_month, reference_year, reference_month
-    )
+    df = get_df_compare(df, indicator,
+                        target_year, target_month,
+                        reference_year, reference_month, report_map_compare_agg, report=True)
 
-    title = f'Percentage of reporting facilities that reported a non-zero number for {db.get_indicator_view(indicator)} by district on {target_month}-{target_year}'
+    if report_map_compare_agg == "Compare three months moving average":
+        quarter = 'the three months periods ending in '
+    else:
+        quarter = ''
+
+    title = f'''Percentage change in proportion of reporting facilities that reported a non-zero number for 
+            {db.get_indicator_view(indicator)} by district between 
+            {quarter}{reference_month}-{reference_year} and {target_month}-{target_year}'''
+
+    df = df.rename(columns={indicator: title})
+
+    return df
+
+
+def map_reporting_period_data(
+    *,
+    indicator,
+    target_year,
+    target_month,
+    reference_year,
+    reference_month,
+    report_map_period_agg,
+    **kwargs,
+):
+
+    db = Database()
+
+    df = db.rep_data
+
+    indicator = db.switch_indic_to_numerator(indicator, popcheck=False)
+
+    df = db.filter_by_indicator(df, indicator)
+
+    df = get_df_period(df, indicator,
+                       target_year, target_month,
+                       reference_year, reference_month, report_map_period_agg, report=True)
+
+    if report_map_period_agg == "Show only month of interest":
+        title = f'''Proportion of reporting facilities that reported a non-zero number for 
+            {db.get_indicator_view(indicator)} on {reference_month}-{reference_year}'''
+
+    else:
+        title = f'''Average proportion of reporting facilities that reported a non-zero number for 
+            {db.get_indicator_view(indicator)} between {reference_month}-{reference_year} and {target_month}-{target_year}'''
 
     df = df.rename(columns={indicator: title})
 
@@ -265,7 +349,7 @@ def map_reporting_dated_data(
 # CARD 7
 
 
-def scatter_reporting_district_data(*, outlier, indicator, district, **kwargs):
+def scatter_reporting_district_data(*, indicator, district, **kwargs):
 
     db = Database()
 

@@ -20,6 +20,12 @@ DEFAULTS = {
     "target_month": os.environ["TARGET_MONTH"],
     "reference_year": os.environ["REFERENCE_YEAR"],
     "reference_month": os.environ["REFERENCE_MONTH"],
+    "aggregation_type": os.environ["AGGREGATION_TYPE"],
+    "trends_map_compare_agg": os.environ["COMPARE_AGG"],
+    "trends_map_period_agg": os.environ["PERIOD_AGG"],
+    "trends_treemap_agg": os.environ["PERIOD_AGG"],
+    "report_map_compare_agg": os.environ["COMPARE_AGG"],
+    "report_map_period_agg": os.environ["PERIOD_AGG"],
 }
 
 
@@ -29,13 +35,22 @@ def initiate_dropdowns():
 
     # Initiate type of aggregation dropdown
 
-    entries = pd.DataFrame({"aggregation_type": ["Compare two months"]})
-
-    aggregation_type = NestedDropdownGroup(
-        entries,
-        title="SELECT AN ANALYSIS TIMEFRAME",
-        defaults={"aggregation_type": "Compare two months"},
+    entries = pd.DataFrame(
+        {
+            "aggregation_type": [
+                "Compare two months",
+                "Compare moving averages (last 3 months)",
+                "Average over period",
+                "Sum over period",
+            ]
+        }
     )
+
+    # aggregation_dropdown = NestedDropdownGroup(
+    #     entries,
+    #     title="SELECT AN ANALYSIS TIMEFRAME",
+    #     defaults={"aggregation_type": DEFAULTS.get("aggregation_type")},
+    # )
 
     # Initiate date dropdown layout
 
@@ -48,9 +63,7 @@ def initiate_dropdowns():
         from_default=DEFAULTS.get("reference_month")
         + " "
         + DEFAULTS.get("reference_year"),
-        to_default=DEFAULTS.get("target_month")
-        + " "
-        + DEFAULTS.get("target_year"),
+        to_default=DEFAULTS.get("target_month") + " " + DEFAULTS.get("target_year"),
     )
 
     # Initiate outlier policy dropdown
@@ -96,7 +109,6 @@ def initiate_dropdowns():
         elements=[
             indicator_dropdown_group,
             district_control_group,
-            aggregation_type,
             date_dropdowns,
             outlier_policy_dropdown_group,
         ],
@@ -121,7 +133,6 @@ def initiate_dropdowns():
         side_nav,
         outlier_policy_dropdown_group,
         indicator_dropdown_group,
-        aggregation_type,
         date_dropdowns,
         district_control_group,
     )
