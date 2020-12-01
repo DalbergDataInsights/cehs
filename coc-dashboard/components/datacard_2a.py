@@ -9,7 +9,9 @@ from store import shapefile, init_data_set, timeit
 @timeit
 def map_country_compare_plot(data):
 
-    data = data.get("dated_compare")
+    data = data.get("dated_compare").copy()
+
+    data[data.columns[-1]] = data[data.columns[-1]] * 100
 
     data_out = {"Change between reference and target date": data}
 
@@ -43,6 +45,7 @@ compare_map = MapDataCard(
     geodata=shapefile,
     locations="id",
     map_tolerance=0.005,
+    # trace_params={"texttemplate": "%{x:%}"},
 )
 
 bar_chart_ranks_bottom = ChartDataCard(
@@ -53,9 +56,10 @@ bar_chart_ranks_bottom = ChartDataCard(
     fig_orientation="h",
     trace_params={
         "textposition": "inside",
-        "texttemplate": "%{x:}",
-        "marker": {"color": "blue"},
+        "texttemplate": "%{x:%}",
+        "marker": {"color": "rgb(211, 41, 61)"},
         "showlegend": False,
+        "hoverinfo": "none",
     },
 )
 

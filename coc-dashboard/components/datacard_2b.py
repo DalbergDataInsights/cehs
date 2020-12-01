@@ -54,7 +54,13 @@ bar_chart_ranks_bottom = ChartDataCard(
     data_transform=bar_country_dated_plot,
     fig_object="Bar",
     fig_orientation="h",
-    trace_param={"showlegend": False},
+    trace_params={
+        "textposition": "inside",
+        "texttemplate": "%{x:,.0}",
+        "marker": {"color": "rgb(184, 190, 200)"},
+        "showlegend": False,
+        "hoverinfo": "none",
+    },
 )
 
 trends_map_period = CardLayout(

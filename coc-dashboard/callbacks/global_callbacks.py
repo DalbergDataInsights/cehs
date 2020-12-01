@@ -104,8 +104,7 @@ def global_story_callback(*inputs):
 @timeit
 def change_titles_reporting(indicator_view_name, controls):
 
-    print(
-        f"Starting updates for reporting titles with {controls['indicator']}")
+    print(f"Starting updates for reporting titles with {controls['indicator']}")
 
     stacked_bar_reporting_country.title = get_title_reporting_country(
         stacked_bar_reporting_country.data, indicator_view_name, **controls
@@ -144,8 +143,7 @@ def update_on_click(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         facility_scatter.data = ds
-        facility_scatter.figure = facility_scatter._get_figure(
-            facility_scatter.data)
+        facility_scatter.figure = facility_scatter._get_figure(facility_scatter.data)
         facility_scatter.figure_title = (
             f"Evolution of $label$ in {label} (click on the graph above to filter)"
         )
@@ -163,19 +161,14 @@ def update_trends_map_compare(*inputs):
         LAST_CONTROLS = CONTROLS.copy()
 
         CONTROLS["trends_map_compare_agg"] = inputs[0]
-
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
-
-        compare_map.data = ds
-        compare_map.figure = compare_map._get_figure(
-            compare_map.data
-        )
+        trends_map_compare.data = ds
         trends_map_compare.title = "$label$"
 
     except Exception as e:
         print(e)
 
-    return [compare_map.figure, trends_map_compare.title]
+    return [trends_map_compare._get_figure(), trends_map_compare.title]
 
 
 @timeit
@@ -187,17 +180,13 @@ def update_trends_map_period(*inputs):
         CONTROLS["trends_map_period_agg"] = inputs[0]
 
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
-
-        period_map.data = ds
-        period_map.figure = period_map._get_figure(
-            period_map.data
-        )
+        trends_map_period.data = ds
         trends_map_period.title = "$label$"
 
     except Exception as e:
         print(e)
 
-    return [period_map.figure, trends_map_period.title]
+    return [trends_map_period._get_figure(), trends_map_period.title]
 
 
 @timeit
@@ -212,8 +201,7 @@ def update_tree_map_district(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         tree_map_district.data = ds
-        tree_map_district.figure = tree_map_district._get_figure(
-            tree_map_district.data)
+        tree_map_district.figure = tree_map_district._get_figure(tree_map_district.data)
         tree_map_district.figure_title = "$label$"
 
     except Exception as e:

@@ -92,10 +92,10 @@ def get_ratio(df, indicator, agg_level):
 
     index = ["date", "id", "facility_name"]
 
-    if agg_level == 'country':
+    if agg_level == "country":
         index = [index[0]]
 
-    if agg_level == 'district':
+    if agg_level == "district":
         index = index[:2]
 
     df = df.groupby(index, as_index=False).sum()
@@ -108,30 +108,30 @@ def get_ratio(df, indicator, agg_level):
 
         isratio = True
 
-        weighted_ratio = [
-            x for x in df.columns if x.endswith('__wr')][0]
-        weight = [x for x in df.columns if x.endswith('__w')][0]
+        weighted_ratio = [x for x in df.columns if x.endswith("__wr")][0]
+        weight = [x for x in df.columns if x.endswith("__w")][0]
 
-        df[indicator] = (df[weighted_ratio] / df[weight])*1000
+        df[indicator] = (df[weighted_ratio] / df[weight]) * 1000
 
         df = df.replace([np.inf, -np.inf], np.nan)
 
-        df = df.drop(
-            columns=[weighted_ratio, weight])
+        df = df.drop(columns=[weighted_ratio, weight])
 
     return df, index, isratio
 
 
-def filter_df_by_dates(df, target_year,
-                       target_month,
-                       reference_year,
-                       reference_month,
-                       keep_target_only=False):
+def filter_df_by_dates(
+    df,
+    target_year,
+    target_month,
+    reference_year,
+    reference_month,
+    keep_target_only=False,
+):
 
     df = df.sort_values(["date"])
 
-    target_date = datetime.strptime(
-        f"{target_month} 1 {target_year}", "%b %d %Y")
+    target_date = datetime.strptime(f"{target_month} 1 {target_year}", "%b %d %Y")
     reference_date = datetime.strptime(
         f"{reference_month} 1 {reference_year}", "%b %d %Y"
     )
@@ -145,14 +145,12 @@ def filter_df_by_dates(df, target_year,
     return df
 
 
-def get_dates_min_max(df,
-                      target_year, target_month,
-                      reference_year, reference_month):
+def get_dates_min_max(df, target_year, target_month, reference_year, reference_month):
 
-    target_date = datetime.strptime(f"1 {target_month} {target_year}",
-                                    "%d %b %Y")
-    reference_date = datetime.strptime(f"1 {reference_month} {reference_year}",
-                                       "%d %b %Y")
+    target_date = datetime.strptime(f"1 {target_month} {target_year}", "%d %b %Y")
+    reference_date = datetime.strptime(
+        f"1 {reference_month} {reference_year}", "%d %b %Y"
+    )
     data_min_date = min(df.date) + relativedelta(months=+2)
 
     min_date = max([data_min_date, min([target_date, reference_date])])
@@ -161,20 +159,21 @@ def get_dates_min_max(df,
     return min_date, max_date, target_date
 
 
-def get_date_list(target_year, target_month,
-                  reference_year, reference_month):
+def get_date_list(target_year, target_month, reference_year, reference_month):
 
-    target_date = datetime.strptime(f"1 {target_month} {target_year}",
-                                    "%d %b %Y")
-    reference_date = datetime.strptime(f"1 {reference_month} {reference_year}",
-                                       "%d %b %Y")
+    target_date = datetime.strptime(f"1 {target_month} {target_year}", "%d %b %Y")
+    reference_date = datetime.strptime(
+        f"1 {reference_month} {reference_year}", "%d %b %Y"
+    )
 
-    date_list = [target_date,
-                 target_date - relativedelta(months=+1),
-                 target_date - relativedelta(months=+2),
-                 reference_date,
-                 reference_date - relativedelta(months=+1),
-                 reference_date - relativedelta(months=+2)]
+    date_list = [
+        target_date,
+        target_date - relativedelta(months=+1),
+        target_date - relativedelta(months=+2),
+        reference_date,
+        reference_date - relativedelta(months=+1),
+        reference_date - relativedelta(months=+2),
+    ]
 
     return date_list
 
@@ -202,18 +201,17 @@ def filter_df_for_period(df, min_date, max_date, target_date, aggregation_type):
 def pivot_df_for_figure(df, indicator):
 
     if "facility_name" in list(df.columns):
-        df = df.pivot_table(columns="date",
-                            values=indicator, index=['id', 'facility_name'])
+        df = df.pivot_table(
+            columns="date", values=indicator, index=["id", "facility_name"]
+        )
     else:
-        df = df.pivot_table(columns="date",
-                            values=indicator, index=['id'])
+        df = df.pivot_table(columns="date", values=indicator, index=["id"])
     return df
 
 
-def calculate_over_period(df, indicator,
-                          target_date,
-                          aggregation_type,
-                          report=False, isratio=False):
+def calculate_over_period(
+    df, indicator, target_date, aggregation_type, report=False, isratio=False
+):
 
     if aggregation_type == "Show average over period":
         df[indicator] = df[df.columns].mean(axis=1)
@@ -232,20 +230,18 @@ def calculate_over_period(df, indicator,
     return df
 
 
-def compare_between_dates(df, indicator, date_list,
-                          aggregation_type):
+def compare_between_dates(df, indicator, date_list, aggregation_type):
 
     if aggregation_type == "Compare three months moving average":
 
         df[date_list[0]] = df[date_list[:3]].mean(axis=1)
         df[date_list[3]] = df[date_list[3:]].mean(axis=1)
 
-    df[indicator] = ((df[date_list[0]] - df[date_list[3]])
-                     / df[date_list[3]] * 100)
+    df[indicator] = (df[date_list[0]] - df[date_list[3]]) / df[date_list[3]]
 
     df = df.replace([np.inf, -np.inf], np.nan)
 
-    df[indicator] = df[indicator].apply(lambda x: round(x, 2))
+    df[indicator] = df[indicator].apply(lambda x: round(x, 4))
 
     df = df[[indicator]].reset_index()
     df = df[~pd.isna(df[indicator])]
@@ -268,8 +264,7 @@ def get_reporting_rate_of_districts(df):
             district_df = df[df.id == district]
             total_facilities = (district_df[c] != 0).sum()
             reported_facilities = len(district_df[district_df[c] == 3])
-            report_rate = round((reported_facilities
-                                 / total_facilities) * 100, 2)
+            report_rate = round(reported_facilities / total_facilities, 4)
             reporting.append(report_rate)
         reporting_df[c] = reporting
 
@@ -278,13 +273,21 @@ def get_reporting_rate_of_districts(df):
     return reporting_df
 
 
-def get_df_compare(df, indicator,
-                   target_year, target_month,
-                   reference_year, reference_month, aggregation_type,
-                   report=False, index=['id']):
+def get_df_compare(
+    df,
+    indicator,
+    target_year,
+    target_month,
+    reference_year,
+    reference_month,
+    aggregation_type,
+    report=False,
+    index=["id"],
+):
 
-    date_list = get_date_list(target_year, target_month,
-                              reference_year, reference_month)
+    date_list = get_date_list(
+        target_year, target_month, reference_year, reference_month
+    )
 
     df = filter_df_for_compare(df, date_list, aggregation_type)
 
@@ -293,35 +296,40 @@ def get_df_compare(df, indicator,
     if report:
         df = get_reporting_rate_of_districts(df)
 
-    df = compare_between_dates(df, indicator, date_list,
-                               aggregation_type)
+    df = compare_between_dates(df, indicator, date_list, aggregation_type)
 
     df = df.set_index(index)
 
     return df
 
 
-def get_df_period(df, indicator,
-                  target_year, target_month,
-                  reference_year, reference_month, aggregation_type,
-                  report=False, index=['id'], isratio=False):
+def get_df_period(
+    df,
+    indicator,
+    target_year,
+    target_month,
+    reference_year,
+    reference_month,
+    aggregation_type,
+    report=False,
+    index=["id"],
+    isratio=False,
+):
 
-    min_date, max_date, target_date = get_dates_min_max(df,
-                                                        target_year, target_month,
-                                                        reference_year, reference_month)
+    min_date, max_date, target_date = get_dates_min_max(
+        df, target_year, target_month, reference_year, reference_month
+    )
 
-    df = filter_df_for_period(df, min_date, max_date,
-                              target_date, aggregation_type)
+    df = filter_df_for_period(df, min_date, max_date, target_date, aggregation_type)
 
     df = pivot_df_for_figure(df, indicator)
 
     if report:
         df = get_reporting_rate_of_districts(df)
 
-    df = calculate_over_period(df, indicator,
-                               target_date,
-                               aggregation_type,
-                               report=report, isratio=isratio)
+    df = calculate_over_period(
+        df, indicator, target_date, aggregation_type, report=report, isratio=isratio
+    )
 
     df = df.set_index(index)
 
@@ -374,7 +382,7 @@ def get_perc_description(perc):
 
 def get_time_diff_perc(data, **controls):
     """
-    Returns a string describing the percentage change difference between two dates 
+    Returns a string describing the percentage change difference between two dates
 
     """
 
@@ -394,8 +402,8 @@ def get_time_diff_perc(data, **controls):
                     - data_reference.loc[reference_month][0]
                 )
                 / data_reference.loc[reference_month][0]
-            )
-            * 100
+            ),
+            4,
         )
         descrip = get_perc_description(perc_first)
 
@@ -421,23 +429,23 @@ def get_report_perc(data, **controls):
         )
 
         try:
-            reported_positive = data\
-                .get("Reported one or above for selected indicator")\
-                .loc[date_reporting][0]
+            reported_positive = data.get(
+                "Reported one or above for selected indicator"
+            ).loc[date_reporting][0]
         except Exception:
             reported_positive = 0
 
         try:
-            did_not_report = data\
-                .get("Did not report on their 105:1 form")\
-                .loc[date_reporting][0]
+            did_not_report = data.get("Did not report on their 105:1 form").loc[
+                date_reporting
+            ][0]
         except Exception:
             did_not_report = 0
 
         try:
-            reported_negative = data\
-                .get("Reported a null or zero for selected indicator")\
-                .loc[date_reporting][0]
+            reported_negative = data.get(
+                "Reported a null or zero for selected indicator"
+            ).loc[date_reporting][0]
         except Exception:
             reported_negative = 0
 
@@ -445,15 +453,15 @@ def get_report_perc(data, **controls):
             (
                 (reported_positive + reported_negative)
                 / (reported_positive + did_not_report + reported_negative)
-            )
-            * 100
+            ),
+            4,
         )
         reported_positive = round(
-            (reported_positive / (reported_positive + reported_negative)) * 100
+            (reported_positive / (reported_positive + reported_negative)), 4
         )
 
-        descrip_reported = f'around {reported_perc} %'
-        descrip_positive = f'around {reported_positive} %'
+        descrip_reported = f"around {reported_perc} %"
+        descrip_positive = f"around {reported_positive} %"
 
     except Exception:
         descrip_reported = "an unknown percentage"
