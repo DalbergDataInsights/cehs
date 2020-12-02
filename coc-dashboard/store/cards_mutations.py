@@ -273,7 +273,7 @@ def bar_reporting_country_data(*, indicator, target_year, target_month,
 
     df = df[(df.date >= min_date) & (df.date <= max_date)]
 
-    title = f'Total number of facilities reporting on their 105:1 form, and reporting a non-zero number for {db.get_indicator_view(indicator)} across the country'
+    title = f'Percentages of facilities reporting on their 105:1 form, and percentage of reporting facilities that reported a value of one or above for {db.get_indicator_view(indicator)} across the country'
 
     df = df.rename(columns={indicator: title})
 
@@ -359,7 +359,8 @@ def map_reporting_period_data(
 # CARD 7
 
 
-def scatter_reporting_district_data(*, indicator, district, **kwargs):
+def scatter_reporting_district_data(*, indicator, district, target_year, target_month,
+                                    reference_year, reference_month, **kwargs):
 
     db = Database()
 
@@ -371,7 +372,15 @@ def scatter_reporting_district_data(*, indicator, district, **kwargs):
 
     df = filter_by_district(df, district)
 
-    title = f'Total number of facilities reporting on their 105:1 form, and reporting a non-zero number for {db.get_indicator_view(indicator)} in {district} district'
+    date_list = get_date_list(target_year, target_month,
+                              reference_year, reference_month)
+
+    min_date = min(date_list[0], date_list[3])
+    max_date = max(date_list[0], date_list[3])
+
+    df = df[(df.date >= min_date) & (df.date <= max_date)]
+
+    title = f'Percentages of facilities reporting on their 105:1 form, and percentage of reporting facilities that reported a value of one or above for {db.get_indicator_view(indicator)} in {district} district'
 
     df = df.rename(columns={indicator: title})
 

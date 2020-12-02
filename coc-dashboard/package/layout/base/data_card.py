@@ -45,7 +45,8 @@ class DataCard:
         self.__colors = self.default_colors.copy()
         self.set_colors(kwargs.get("colors", self.default_colors.copy()))
         self.center_value = kwargs.get("center_value", 0)
-        self.excl_outliers_colorscale = kwargs.get("excl_outliers_colorscale", True)
+        self.excl_outliers_colorscale = kwargs.get(
+            "excl_outliers_colorscale", True)
         self.trace_params = kwargs.get("trace_params")
 
         # Layout
@@ -104,7 +105,8 @@ class DataCard:
         assert (
             type(value) == dict
         ), "Data should be dict with pandas DataFrame as values"
-        self.__data = self.data_transform(value) if self.data_transform else value
+        self.__data = self.data_transform(
+            value) if self.data_transform else value
 
     @property
     def figure(self):
@@ -161,7 +163,8 @@ class DataCard:
         """Get the static plotly layout of a data card"""
         els = [
             self.__get_figure_layout() if self.data or self.figure else None,
-            self.__get_text_layout(self.key_points) if self.key_points else None,
+            self.__get_text_layout(
+                self.key_points) if self.key_points else None,
         ]
 
         layout = dbc.Col(
@@ -201,7 +204,8 @@ class DataCard:
         layout = dbc.Col(
             [
                 dbc.Row(self.__get_figure_title_layout()),
-                dbc.Row(self.dropdown.get_layout(), className="dropdown-section")
+                dbc.Row(self.dropdown.get_layout(),
+                        className="dropdown-section")
                 if self.dropdown
                 else None,
                 dbc.Row(
@@ -287,7 +291,8 @@ class DataCard:
     def __get_orientation(self, els):
         els = els if self.orientation_left else els[::-1]
         return (
-            [dbc.Row(e) for e in els] if self.orientation_vertical else [dbc.Row(els)]
+            [dbc.Row(e) for e in els] if self.orientation_vertical else [
+                dbc.Row(els)]
         )
 
     ## TEXT SECTION ##
@@ -299,7 +304,8 @@ class DataCard:
                     dbc.Col(
                         html.Div(
                             [
-                                self.__unwrap_section_and_points(section, points)
+                                self.__unwrap_section_and_points(
+                                    section, points)
                                 for section, points in text.items()
                             ],
                             className="h-90 w-75 text-section",
@@ -339,7 +345,8 @@ class DataCard:
                 html.Div(
                     html.Ul(
                         [
-                            html.Li(html.P(self.__format_string(item, self.data)))
+                            html.Li(
+                                html.P(self.__format_string(item, self.data)))
                             for item in points
                         ]
                     ),
@@ -463,7 +470,8 @@ class DataCard:
 
             # deal with complex labels
             while "$" in formatted_string:
-                sub = self.__get_substring_between_elements(formatted_string, "$")
+                sub = self.__get_substring_between_elements(
+                    formatted_string, "$")
 
                 try:
                     if "trace" in sub:
@@ -493,7 +501,8 @@ class DataCard:
     def __get_substring_between_elements(self, string, element, closing_element="$"):
         try:
             out = string.split(element, 1)[1]
-            out = out.split(closing_element, 1)[0] if closing_element in out else None
+            out = out.split(closing_element, 1)[
+                0] if closing_element in out else None
         except IndexError as e:
             out = None
             print(e)

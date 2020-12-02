@@ -1,5 +1,5 @@
 from store import (timeit,
-                   reporting_count_transform_test,
+                   reporting_count_transform,
                    init_data_set,
                    get_report_perc,
                    DEFAULTS,
@@ -12,7 +12,7 @@ from package.layout.chart_card import ChartDataCard
 def bar_reporting_country_plot(data):
 
     data_in = data.get("reporting_country")
-    data_out = reporting_count_transform_test(data_in.copy())
+    data_out = reporting_count_transform(data_in.copy())
 
     return data_out
 
@@ -23,9 +23,9 @@ def get_title_reporting_country(data, indicator_view_name, **controls):
     """
     descrip_reported, descrip_positive = get_report_perc(data, **controls)
 
-    title = f'''Reporting: {controls.get('target_month')}-{controls.get('target_year')}, 
+    title = f'''Reporting: on {controls.get('target_month')}-{controls.get('target_year')}, 
             {descrip_reported} of facilities reported on their 105:1 form, and, out of those, 
-            {descrip_positive} reported for {indicator_view_name}'''
+            {descrip_positive} reported one or above for {indicator_view_name}'''
 
     return title
 

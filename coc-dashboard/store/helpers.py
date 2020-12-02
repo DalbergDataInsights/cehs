@@ -44,7 +44,7 @@ def get_num(df, value=3):
     return new_df
 
 
-def reporting_count_transform(data):
+def reporting_count_transform_tooltip(data):
     """
     Counts occurrence of type of reporting label for each date, returning dictionary
     """
@@ -68,7 +68,7 @@ def reporting_count_transform(data):
     return data
 
 
-def reporting_count_transform_test(data):
+def reporting_count_transform(data):
     """
     Counts occurrence of type of reporting label for each date, returning dictionary
     """
@@ -164,7 +164,8 @@ def filter_df_by_dates(
 
     df = df.sort_values(["date"])
 
-    target_date = datetime.strptime(f"{target_month} 1 {target_year}", "%b %d %Y")
+    target_date = datetime.strptime(
+        f"{target_month} 1 {target_year}", "%b %d %Y")
     reference_date = datetime.strptime(
         f"{reference_month} 1 {reference_year}", "%b %d %Y"
     )
@@ -180,7 +181,8 @@ def filter_df_by_dates(
 
 def get_dates_min_max(df, target_year, target_month, reference_year, reference_month):
 
-    target_date = datetime.strptime(f"1 {target_month} {target_year}", "%d %b %Y")
+    target_date = datetime.strptime(
+        f"1 {target_month} {target_year}", "%d %b %Y")
     reference_date = datetime.strptime(
         f"1 {reference_month} {reference_year}", "%d %b %Y"
     )
@@ -194,7 +196,8 @@ def get_dates_min_max(df, target_year, target_month, reference_year, reference_m
 
 def get_date_list(target_year, target_month, reference_year, reference_month):
 
-    target_date = datetime.strptime(f"1 {target_month} {target_year}", "%d %b %Y")
+    target_date = datetime.strptime(
+        f"1 {target_month} {target_year}", "%d %b %Y")
     reference_date = datetime.strptime(
         f"1 {reference_month} {reference_year}", "%d %b %Y"
     )
@@ -353,7 +356,8 @@ def get_df_period(
         df, target_year, target_month, reference_year, reference_month
     )
 
-    df = filter_df_for_period(df, min_date, max_date, target_date, aggregation_type)
+    df = filter_df_for_period(df, min_date, max_date,
+                              target_date, aggregation_type)
 
     df = pivot_df_for_figure(df, indicator)
 
@@ -501,8 +505,8 @@ def get_report_perc(data, **controls):
             .get("Percentage of reporting facilities that reported a value of one or above for this indicator")\
             .loc[date_reporting][0]
 
-        descrip_reported = f"around {reported_perc} %"
-        descrip_positive = f"around {reported_positive} %"
+        descrip_reported = f"around {int(reported_perc)} %"
+        descrip_positive = f"around {int(reported_positive)} %"
 
     except Exception:
         descrip_reported = "an unknown percentage"

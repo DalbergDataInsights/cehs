@@ -18,9 +18,20 @@ stacked_bar_district = ChartDataCard(
     data=init_data_set,
     data_transform=scatter_reporting_district_plot,
     fig_title="$label$",
-    fig_object="Bar",  # Relies on the 'overlay' layout barmode parameter for stacking
+    fig_object="Scatter",  # Relies on the 'overlay' layout barmode parameter for stacking
 )
 
+# stacked_bar_district.set_colors(
+#     {"fig": ["rgb(42, 87, 131)", "rgb(247, 190, 178)", "rgb(211, 41, 61)"]}
+# )
+
 stacked_bar_district.set_colors(
-    {"fig": ["rgb(42, 87, 131)", "rgb(247, 190, 178)", "rgb(211, 41, 61)"]}
+    {
+        "fig": {
+            "Percentage of facilities expected to report which reported on their 105-1 form": "rgb(106, 155, 195)",
+            "Percentage of reporting facilities that reported a value of one or above for this indicator": "rgb(200, 19, 60)",
+        },
+        "title": "white",
+        "subtitle": "rgb(34, 94, 140)",
+    }
 )
