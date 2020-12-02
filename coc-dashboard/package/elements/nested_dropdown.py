@@ -14,7 +14,8 @@ class NestedDropdown:
         self.id = id
         self.options = self.list_to_options(options)
         self.__value = None
-        self.value = kwargs.pop("value", options[0])
+        value = kwargs.pop("value", None)
+        self.value = value or options[0]
 
         self.parents = []
         self.children = []
@@ -58,7 +59,7 @@ class NestedDropdown:
                 persistence=True,
                 persistence_type="session",
                 className="m-1",
-                **kwargs
+                **kwargs,
             ),
         ]
         self.layout = dbc.Col(

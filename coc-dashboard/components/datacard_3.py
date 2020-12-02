@@ -35,9 +35,9 @@ def get_title_district_overview(data, indicator_view_name, **controls):
     """
     district_descrip = get_time_diff_perc(data, **controls)
 
-    title = f'''Deep-dive in {controls.get('district')} district: the {indicator_view_name} {district_descrip} 
-            between {controls.get('reference_month')}-{controls.get('reference_year')} 
-            and {controls.get('target_month')}-{controls.get('target_year')} '''
+    title = f"""Deep-dive in {controls.get('district')} district: the {indicator_view_name} {district_descrip}
+            between {controls.get('reference_month')}-{controls.get('reference_year')}
+            and {controls.get('target_month')}-{controls.get('target_year')} """
 
     return title
 
@@ -46,10 +46,11 @@ def get_title_district_overview(data, indicator_view_name, **controls):
 
 db = Database()
 
-default_title = get_title_district_overview(scatter_district_plot(init_data_set),
-                                            db.get_indicator_view(
-                                                DEFAULTS.get('indicator')),
-                                            **DEFAULTS)
+default_title = get_title_district_overview(
+    scatter_district_plot(init_data_set),
+    db.get_indicator_view(DEFAULTS.get("indicator")),
+    **DEFAULTS,
+)
 
 district_overview_scatter = ChartDataCard(
     title=default_title,

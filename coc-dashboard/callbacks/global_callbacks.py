@@ -52,7 +52,6 @@ def global_story_callback(*inputs):
         CONTROLS["target_month"] = inputs[3].split(" ")[0]
         CONTROLS["reference_year"] = inputs[2].split(" ")[1]
         CONTROLS["reference_month"] = inputs[2].split(" ")[0]
-        CONTROLS["aggregation_type"] = inputs[5]
 
         db.filter_by_policy(CONTROLS["outlier"])
 
@@ -74,11 +73,15 @@ def global_story_callback(*inputs):
             try:
                 x.data = df
             except Exception as e:
+                print(f"Error updating dataset for {x}")
                 print(e)
 
         print(f"Datasets updated for {CONTROLS['indicator']}")
-    except:
+    except Exception as e:
+        print(e)
         print(f"Error updating global callback for {CONTROLS['indicator']}")
+        print(CONTROLS)
+        print(LAST_CONTROLS)
 
     indicator_view = db.get_indicator_view(CONTROLS["indicator"])
 
@@ -98,7 +101,7 @@ def global_story_callback(*inputs):
     except:
         print(f"Error updating trend title for {CONTROLS['indicator']}")
 
-    return [ds.get_layout()]
+    return ds.get_layout()
 
 
 @timeit
@@ -182,6 +185,8 @@ def update_trends_map_period(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
         trends_map_period.data = ds
         trends_map_period.title = "$label$"
+
+        print(trends_map_period.title)
 
     except Exception as e:
         print(e)
