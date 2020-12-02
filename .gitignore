@@ -7,4 +7,4 @@
 .vscode
 coc-dashboard/data/*
 coc-dashboard/testing/*
-
+file_system_store*

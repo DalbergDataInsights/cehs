@@ -7,8 +7,10 @@ import pandas as pd
 from components import (
     country_overview_scatter,
     get_title_country_overview,
-    country_overview_compare,
-    country_overview_period,
+    trends_map_compare,
+    compare_map,
+    trends_map_period,
+    period_map,
     district_overview_scatter,
     get_title_district_overview,
     facility_scatter,
@@ -51,27 +53,24 @@ def global_story_callback(*inputs):
         CONTROLS["reference_year"] = inputs[2].split(" ")[1]
         CONTROLS["reference_month"] = inputs[2].split(" ")[0]
         CONTROLS["aggregation_type"] = inputs[5]
-        CONTROLS["trends_map_compare_agg"] = inputs[6]
-        CONTROLS["trends_map_period_agg"] = inputs[7]
-        CONTROLS["trends_treemap_agg"] = inputs[8]
-        # CONTROLS["report_map_compare_agg"] = inputs[9]
-        # CONTROLS["report_map_period_agg"] = inputs[10]
 
         db.filter_by_policy(CONTROLS["outlier"])
 
         df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
-        for x in [country_overview_scatter,
-                  country_overview_compare,
-                  country_overview_period,
-                  district_overview_scatter,
-                  facility_scatter,
-                  stacked_bar_district,
-                  stacked_bar_reporting_country,
-                  tree_map_district,
-                  reporting_map_compare,
-                  reporting_map_period,
-                  overview]:
+        for x in [
+            country_overview_scatter,
+            trends_map_compare,
+            trends_map_period,
+            district_overview_scatter,
+            facility_scatter,
+            stacked_bar_district,
+            stacked_bar_reporting_country,
+            tree_map_district,
+            reporting_map_compare,
+            reporting_map_period,
+            overview,
+        ]:
             try:
                 x.data = df
             except Exception as e:
@@ -105,8 +104,7 @@ def global_story_callback(*inputs):
 @timeit
 def change_titles_reporting(indicator_view_name, controls):
 
-    print(
-        f"Starting updates for reporting titles with {controls['indicator']}")
+    print(f"Starting updates for reporting titles with {controls['indicator']}")
 
     stacked_bar_reporting_country.title = get_title_reporting_country(
         stacked_bar_reporting_country.data, indicator_view_name, **controls
@@ -145,8 +143,7 @@ def update_on_click(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         facility_scatter.data = ds
-        facility_scatter.figure = facility_scatter._get_figure(
-            facility_scatter.data)
+        facility_scatter.figure = facility_scatter._get_figure(facility_scatter.data)
         facility_scatter.figure_title = (
             f"Evolution of $label$ in {label} (click on the graph above to filter)"
         )
@@ -155,3 +152,103 @@ def update_on_click(*inputs):
         print(e)
 
     return [facility_scatter.figure, facility_scatter.figure_title]
+
+
+@timeit
+def update_trends_map_compare(*inputs):
+
+    try:
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["trends_map_compare_agg"] = inputs[0]
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+        trends_map_compare.data = ds
+        trends_map_compare.title = "$label$"
+
+    except Exception as e:
+        print(e)
+
+    return [trends_map_compare._get_figure(), trends_map_compare.title]
+
+
+@timeit
+def update_trends_map_period(*inputs):
+
+    try:
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["trends_map_period_agg"] = inputs[0]
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+        trends_map_period.data = ds
+        trends_map_period.title = "$label$"
+
+    except Exception as e:
+        print(e)
+
+    return [trends_map_period._get_figure(), trends_map_period.title]
+
+
+@timeit
+def update_tree_map_district(*inputs):
+
+    try:
+
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["trends_treemap_agg"] = inputs[0]
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+
+        tree_map_district.data = ds
+        tree_map_district.figure = tree_map_district._get_figure(tree_map_district.data)
+        tree_map_district.figure_title = "$label$"
+
+    except Exception as e:
+        print(e)
+
+    return [tree_map_district.figure, tree_map_district.figure_title]
+
+
+@timeit
+def update_report_map_compare(*inputs):
+
+    try:
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["report_map_compare_agg"] = inputs[0]
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+
+        reporting_map_compare.data = ds
+        reporting_map_compare.figure = reporting_map_compare._get_figure(
+            reporting_map_compare.data
+        )
+        reporting_map_compare.figure_title = "$label$"
+
+    except Exception as e:
+        print(e)
+
+    return [reporting_map_compare.figure, reporting_map_compare.figure_title]
+
+
+@timeit
+def update_report_map_period(*inputs):
+
+    try:
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["report_map_period_agg"] = inputs[0]
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+
+        reporting_map_period.data = ds
+        reporting_map_period.figure = reporting_map_period._get_figure(
+            reporting_map_period.data
+        )
+        reporting_map_period.figure_title = "$label$"
+
+    except Exception as e:
+        print(e)
+
+    return [reporting_map_period.figure, reporting_map_period.figure_title]

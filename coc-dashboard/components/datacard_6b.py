@@ -16,13 +16,14 @@ def map_reporting_period_plot(data):
 
     return data_out
 
-
 # DATACARD 6 #
 
+
 dropdown = NestedDropdown(
-    id="Select a way to aggregate reporting data",
+    id="report-map-period-agg-dropdown",
     options=["Show only month of interest",
-             "Show average over period"])
+             "Show average over period"],
+    visible_id=False,)
 
 reporting_map_period = MapDataCard(
     data=init_data_set,

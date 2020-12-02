@@ -35,17 +35,22 @@ def initiate_dropdowns():
 
     # Initiate type of aggregation dropdown
 
-    entries = pd.DataFrame({"aggregation_type": [
-        "Compare two months",
-        "Compare moving averages (last 3 months)",
-        "Average over period",
-        "Sum over period"]})
-
-    aggregation_dropdown = NestedDropdownGroup(
-        entries,
-        title="SELECT AN ANALYSIS TIMEFRAME",
-        defaults={"aggregation_type": DEFAULTS.get("aggregation_type")},
+    entries = pd.DataFrame(
+        {
+            "aggregation_type": [
+                "Compare two months",
+                "Compare moving averages (last 3 months)",
+                "Average over period",
+                "Sum over period",
+            ]
+        }
     )
+
+    # aggregation_dropdown = NestedDropdownGroup(
+    #     entries,
+    #     title="SELECT AN ANALYSIS TIMEFRAME",
+    #     defaults={"aggregation_type": DEFAULTS.get("aggregation_type")},
+    # )
 
     # Initiate date dropdown layout
 
@@ -58,9 +63,7 @@ def initiate_dropdowns():
         from_default=DEFAULTS.get("reference_month")
         + " "
         + DEFAULTS.get("reference_year"),
-        to_default=DEFAULTS.get("target_month")
-        + " "
-        + DEFAULTS.get("target_year"),
+        to_default=DEFAULTS.get("target_month") + " " + DEFAULTS.get("target_year"),
     )
 
     # Initiate outlier policy dropdown
@@ -106,7 +109,6 @@ def initiate_dropdowns():
         elements=[
             indicator_dropdown_group,
             district_control_group,
-            aggregation_dropdown,
             date_dropdowns,
             outlier_policy_dropdown_group,
         ],
@@ -131,7 +133,6 @@ def initiate_dropdowns():
         side_nav,
         outlier_policy_dropdown_group,
         indicator_dropdown_group,
-        aggregation_dropdown,
         date_dropdowns,
         district_control_group,
     )

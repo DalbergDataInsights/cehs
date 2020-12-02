@@ -20,9 +20,10 @@ def map_reporting_compare_plot(data):
 # DATACARD 6 #
 
 dropdown = NestedDropdown(
-    id="Select a way to compare reporting data",
+    id="report-map-compare-agg-dropdown",
     options=["Compare month on month",
-             "Compare three months moving average"])
+             "Compare three months moving average"],
+    visible_id=False)
 
 
 reporting_map_compare = MapDataCard(

@@ -87,11 +87,11 @@ class Controls:
 
     def get_class_names(self, state):
         if state == "trends":
-            return ["m-12 col"] * 6
+            return ["m-12 col"] * 5
         elif state == "overview":
-            return ["m-12 col disabled"] * 4 + ["m-12 col"] * 2
+            return ["m-12 col disabled"] * 3 + ["m-12 col"] * 2
         elif state == "reporting":
-            return ["m-12 col"] * 6
+            return ["m-12 col"] * 5
 
 
 class SideNav:

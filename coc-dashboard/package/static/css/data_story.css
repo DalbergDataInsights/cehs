@@ -191,3 +191,25 @@ body {
     opacity: 0.5;
     pointer-events: none;
 }
+
+/* Restyling dropdowns back */
+
+#trends-map-compare-agg-dropdown .Select-control, #trends-map-period-agg-dropdown .Select-control, #treemap-agg-dropdown .Select-control, #report-map-compare-agg-dropdown .Select-control, #report-map-period-agg-dropdown .Select-control {
+    background-color: white !important;
+    border: 1px solid rgb(85, 85, 85) !important;
+}
+
+#trends-map-compare-agg-dropdown .Select-value-label, #trends-map-period-agg-dropdown .Select-value-label, #treemap-agg-dropdown .Select-value-label, #report-map-compare-agg-dropdown .Select-value-label, #report-map-period-agg-dropdown .Select-value-label {
+        color: rgb(85, 85, 85) !important;
+        font-size: 1.2vh;
+    }
+
+#trends-map-compare-agg-dropdown .Select-menu-outer, #trends-map-period-agg-dropdown .Select-menu-outer, #treemap-agg-dropdown .Select-menu-outer, #report-map-compare-agg-dropdown .Select-menu-outer, #report-map-period-agg-dropdown .Select-menu-outer {
+        background-color: white !important;
+        color: black !important;
+        font-size: 1.2vh !important;
+    }
+
+#trends-map-compare-agg-dropdown .Select-arrow, #trends-map-period-agg-dropdown .Select-arrow, #treemap-agg-dropdown .Select-arrow, #report-map-compare-agg-dropdown .Select-arrow, #report-map-period-agg-dropdown .Select-arrow {
+        color: black !important;
+    }
