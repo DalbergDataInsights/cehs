@@ -5,10 +5,7 @@ from store import (
     Database,
     get_df_compare,
     get_df_period,
-    << << << < HEAD
     get_date_list,
-    == == == =
-    >>>>>> > 2a30d909539e836aede2dbba5001baf567d7aba8
 )
 
 import pandas as pd
