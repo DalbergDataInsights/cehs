@@ -59,10 +59,6 @@ stacked_bar_reporting_country = ChartDataCard(
     trace_params=bar_reporting_country_plot_tooltip(init_data_set),
 )
 
-# stacked_bar_reporting_country.set_colors(
-#     {"fig": ["rgb(42, 87, 131)", "rgb(247, 190, 178)", "rgb(211, 41, 61)"]}
-# )
-
 
 stacked_bar_reporting_country.set_colors(
     {

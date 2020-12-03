@@ -8,19 +8,18 @@ from components import (
     country_overview_scatter,
     get_title_country_overview,
     trends_map_compare,
-    compare_map,
     trends_map_period,
-    period_map,
     district_overview_scatter,
     get_title_district_overview,
     facility_scatter,
     stacked_bar_district,
     stacked_bar_reporting_country,
+    bar_reporting_country_plot_tooltip,
+    scatter_reporting_district_plot_tooltip,
     get_title_reporting_country,
     tree_map_district,
     reporting_map_compare,
     reporting_map_period,
-    overview,
     overview,
 )
 
@@ -76,6 +75,11 @@ def global_story_callback(*inputs):
                 print(f"Error updating dataset for {x}")
                 print(e)
 
+        stacked_bar_reporting_country.trace_params = bar_reporting_country_plot_tooltip(
+            df)
+        stacked_bar_district.trace_params = scatter_reporting_district_plot_tooltip(
+            df)
+
         print(f"Datasets updated for {CONTROLS['indicator']}")
     except Exception as e:
         print(e)
@@ -107,7 +111,8 @@ def global_story_callback(*inputs):
 @timeit
 def change_titles_reporting(indicator_view_name, controls):
 
-    print(f"Starting updates for reporting titles with {controls['indicator']}")
+    print(
+        f"Starting updates for reporting titles with {controls['indicator']}")
 
     stacked_bar_reporting_country.title = get_title_reporting_country(
         stacked_bar_reporting_country.data, indicator_view_name, **controls
@@ -146,7 +151,8 @@ def update_on_click(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         facility_scatter.data = ds
-        facility_scatter.figure = facility_scatter._get_figure(facility_scatter.data)
+        facility_scatter.figure = facility_scatter._get_figure(
+            facility_scatter.data)
         facility_scatter.figure_title = (
             f"Evolution of $label$ in {label} (click on the graph above to filter)"
         )
@@ -206,7 +212,8 @@ def update_tree_map_district(*inputs):
         ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
         tree_map_district.data = ds
-        tree_map_district.figure = tree_map_district._get_figure(tree_map_district.data)
+        tree_map_district.figure = tree_map_district._get_figure(
+            tree_map_district.data)
         tree_map_district.figure_title = "$label$"
 
     except Exception as e:

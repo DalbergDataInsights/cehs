@@ -67,11 +67,11 @@ def reporting_count_transform_tooltip(data):
                                       ].to_numpy(),
                     df_unexpected_report[df_unexpected_report.columns[-1]].to_numpy()))
 
-    string = '''On %{x}, reporting stood at %{y:d}%, with:<br>
-                Reported one or above for selected indicator: %{customdata[0]}<br>
-                Reported a null or zero for selected indicator: %{customdata[1]}<br>
-                Did not report on their 105:1 form: %{customdata[2]}<br>
-                Show unexpected reporting pattern: %{customdata[3]}
+    string = '''On %{x}, reporting stood at %{y:d}%, with:
+                <br>Reported one or above for selected indicator: %{customdata[0]}
+                <br>Reported a null or zero for selected indicator: %{customdata[1]}
+                <br>Did not report on their 105:1 form: %{customdata[2]}
+                <br>Show unexpected reporting pattern: %{customdata[3]}
                 <extra></extra>'''
 
     customdata_param = {

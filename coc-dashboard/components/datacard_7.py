@@ -1,4 +1,4 @@
-from store import reporting_count_transform, timeit, init_data_set
+from store import reporting_count_transform, reporting_count_transform_tooltip, timeit, init_data_set
 from package.layout.chart_card import ChartDataCard
 
 
@@ -11,6 +11,15 @@ def scatter_reporting_district_plot(data):
     return data_out
 
 
+@timeit
+def scatter_reporting_district_plot_tooltip(data):
+
+    data_in = data.get("reporting_district")
+    data_out = reporting_count_transform_tooltip(data_in.copy())
+
+    return data_out
+
+
 # DATACARD 7 #
 
 
@@ -18,12 +27,10 @@ stacked_bar_district = ChartDataCard(
     data=init_data_set,
     data_transform=scatter_reporting_district_plot,
     fig_title="$label$",
-    fig_object="Scatter",  # Relies on the 'overlay' layout barmode parameter for stacking
+    fig_object="Scatter",
+    trace_params=scatter_reporting_district_plot_tooltip(init_data_set),
 )
 
-# stacked_bar_district.set_colors(
-#     {"fig": ["rgb(42, 87, 131)", "rgb(247, 190, 178)", "rgb(211, 41, 61)"]}
-# )
 
 stacked_bar_district.set_colors(
     {
