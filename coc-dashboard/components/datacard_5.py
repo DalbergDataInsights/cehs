@@ -49,18 +49,14 @@ default_title = get_title_reporting_country(bar_reporting_country_plot(init_data
                                                 DEFAULTS.get('indicator')),
                                             **DEFAULTS)
 
-customdata = [bar_reporting_country_plot_tooltip(init_data_set).get('Reported one or above for selected indicator').iloc[:, -1:],
 
-
-stacked_bar_reporting_country= ChartDataCard(
+stacked_bar_reporting_country = ChartDataCard(
     data=init_data_set,
     data_transform=bar_reporting_country_plot,
     title=default_title,
     fig_title="$label$",
     fig_object="Scatter",
-    trace_params={
-        'customdata':,
-        'hovertemplate': 'test:%{customdata:.3f}'},
+    trace_params=bar_reporting_country_plot_tooltip(init_data_set),
 )
 
 # stacked_bar_reporting_country.set_colors(

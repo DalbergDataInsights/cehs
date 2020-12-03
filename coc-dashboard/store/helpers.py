@@ -58,14 +58,28 @@ def reporting_count_transform_tooltip(data):
     df_no_positive = get_num(data, 2)
     # Count number of no_form_report
     df_no_form_report = get_num(data, 1)
+    # Count number of unexpected_report
+    df_unexpected_report = get_num(data, -1)
 
-    data = {
-        "Reported one or above for selected indicator": df_positive,
-        "Reported a null or zero for selected indicator": df_no_positive,
-        "Did not report on their 105:1 form": df_no_form_report,
+    data = list(zip(df_positive[df_positive.columns[-1]].to_numpy(),
+                    df_no_positive[df_no_positive.columns[-1]].to_numpy(),
+                    df_no_form_report[df_no_form_report.columns[-1]
+                                      ].to_numpy(),
+                    df_unexpected_report[df_unexpected_report.columns[-1]].to_numpy()))
+
+    string = '''On %{x}, reporting stood at %{y:d}%, with:<br>
+                Reported one or above for selected indicator: %{customdata[0]}<br>
+                Reported a null or zero for selected indicator: %{customdata[1]}<br>
+                Did not report on their 105:1 form: %{customdata[2]}<br>
+                Show unexpected reporting pattern: %{customdata[3]}
+                <extra></extra>'''
+
+    customdata_param = {
+        'customdata': data,
+        'hovertemplate': string
     }
 
-    return data
+    return customdata_param
 
 
 def reporting_count_transform(data):
