@@ -18,7 +18,7 @@ class ChartDataCard(DataCard):
 
         FigType = getattr(go, self.fig_object)
         figure_colors = self.colors.get("fig")
-
+        # [{"name": "", "data": df, "customdata": []}]
         for name, df in data.items():
             x, y = (
                 (df[df.columns[0]], df.index)

@@ -44,6 +44,44 @@ def get_num(df, value=3):
     return new_df
 
 
+def reporting_count_transform_tooltip(data):
+    """
+    Counts occurrence of type of reporting label for each date, returning dictionary
+    """
+    # Set index
+    data = check_index(data)
+    # Remove unnecessary index values
+    data = data.droplevel(["id"])
+    # Count number of positive_indic
+    df_positive = get_num(data, 3)
+    # Count number of no_positive_indic
+    df_no_positive = get_num(data, 2)
+    # Count number of no_form_report
+    df_no_form_report = get_num(data, 1)
+    # Count number of unexpected_report
+    df_unexpected_report = get_num(data, -1)
+
+    data = list(zip(df_positive[df_positive.columns[-1]].to_numpy(),
+                    df_no_positive[df_no_positive.columns[-1]].to_numpy(),
+                    df_no_form_report[df_no_form_report.columns[-1]
+                                      ].to_numpy(),
+                    df_unexpected_report[df_unexpected_report.columns[-1]].to_numpy()))
+
+    string = '''On %{x}, reporting stood at %{y:d}%, with:
+                <br>Reported one or above for selected indicator: %{customdata[0]}
+                <br>Reported a null or zero for selected indicator: %{customdata[1]}
+                <br>Did not report on their 105:1 form: %{customdata[2]}
+                <br>Show unexpected reporting pattern: %{customdata[3]}
+                <extra></extra>'''
+
+    customdata_param = {
+        'customdata': data,
+        'hovertemplate': string
+    }
+
+    return customdata_param
+
+
 def reporting_count_transform(data):
     """
     Counts occurrence of type of reporting label for each date, returning dictionary
@@ -59,11 +97,20 @@ def reporting_count_transform(data):
     # Count number of no_form_report
     df_no_form_report = get_num(data, 1)
 
+    reported = round(
+        (
+            (df_positive + df_no_positive)
+            / (df_positive + df_no_positive + df_no_form_report)
+        )
+        * 100)
+    reported_positive = round(
+        (df_positive / (df_positive + df_no_positive)) * 100)
+
     data = {
-        "Reported one or above for selected indicator": df_positive,
-        "Reported a null or zero for selected indicator": df_no_positive,
-        "Did not report on their 105:1 form": df_no_form_report,
+        "Percentage of facilities expected to report which reported on their 105-1 form": reported,
+        "Percentage of reporting facilities that reported a value of one or above for this indicator": reported_positive
     }
+
     return data
 
 
@@ -434,40 +481,48 @@ def get_report_perc(data, **controls):
             f"{target_month} 1 {target_year}", "%b %d %Y"
         )
 
-        try:
-            reported_positive = data.get(
-                "Reported one or above for selected indicator"
-            ).loc[date_reporting][0]
-        except Exception:
-            reported_positive = 0
+        # try:
+        #     reported_positive = data\
+        #         .get("Reported one or above for selected indicator")\
+        #         .loc[date_reporting][0]
+        # except Exception:
+        #     reported_positive = 0
 
-        try:
-            did_not_report = data.get("Did not report on their 105:1 form").loc[
-                date_reporting
-            ][0]
-        except Exception:
-            did_not_report = 0
+        # try:
+        #     did_not_report = data\
+        #         .get("Did not report on their 105:1 form")\
+        #         .loc[date_reporting][0]
+        # except Exception:
+        #     did_not_report = 0
 
-        try:
-            reported_negative = data.get(
-                "Reported a null or zero for selected indicator"
-            ).loc[date_reporting][0]
-        except Exception:
-            reported_negative = 0
+        # try:
+        #     reported_negative = data\
+        #         .get("Reported a null or zero for selected indicator")\
+        #         .loc[date_reporting][0]
+        # except Exception:
+        #     reported_negative = 0
 
-        reported_perc = round(
-            (
-                (reported_positive + reported_negative)
-                / (reported_positive + did_not_report + reported_negative)
-            ),
-            4,
-        )
-        reported_positive = round(
-            (reported_positive / (reported_positive + reported_negative)), 4
-        )
+        # reported_perc = round(
+        #     (
+        #         (reported_positive + reported_negative)
+        #         / (reported_positive + did_not_report + reported_negative)
+        #     )
+        #     * 100
+        # )
+        # reported_positive = round(
+        #     (reported_positive / (reported_positive + reported_negative)) * 100
+        # )
 
-        descrip_reported = f"around {reported_perc} %"
-        descrip_positive = f"around {reported_positive} %"
+        reported_perc = data\
+            .get("Percentage of facilities expected to report which reported on their 105-1 form")\
+            .loc[date_reporting][0]
+
+        reported_positive = data\
+            .get("Percentage of reporting facilities that reported a value of one or above for this indicator")\
+            .loc[date_reporting][0]
+
+        descrip_reported = f"around {int(reported_perc)} %"
+        descrip_positive = f"around {int(reported_positive)} %"
 
     except Exception:
         descrip_reported = "an unknown percentage"
