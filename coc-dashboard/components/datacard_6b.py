@@ -22,7 +22,7 @@ def map_reporting_period_plot(data):
 dropdown = NestedDropdown(
     id="report-map-period-agg-dropdown",
     options=["Show only month of interest",
-             "Show average over period"],
+             "Show average between month of reference and month of interest period"],
     visible_id=False,)
 
 reporting_map_period = MapDataCard(

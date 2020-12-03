@@ -44,8 +44,8 @@ from .user_interface import (
 callback_ids = {
     outlier_policy_dropdown_group.dropdown_ids[-1]: "value",  # Outlier policy
     indicator_dropdown_group.dropdown_ids[-1]: "value",  # Indicator
-    "date_from": "value",
-    "date_to": "value",
+    "Month of reference": "value",
+    "Month of interest": "value",
     district_control_group.dropdown_ids[-1]: "value",  # District
 }
 
@@ -53,8 +53,8 @@ dropdown_style = [
     "config_group",
     "config_indicator",
     "SELECT A DISTRICT",
-    "date_from",
-    "date_to",
+    "Month of reference",
+    "Month of interest",
 ]
 
 

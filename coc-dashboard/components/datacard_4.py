@@ -51,8 +51,8 @@ dropdown = NestedDropdown(
     id="treemap-agg-dropdown",
     options=[
         "Show only month of interest",
-        "Show sum over period",
-        "Show average over period",
+        "Show sum between month of reference and month of interest period",
+        "Show average between month of reference and month of interest period",
     ],
     visible_id=False,
 )

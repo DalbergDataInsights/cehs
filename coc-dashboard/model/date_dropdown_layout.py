@@ -11,10 +11,10 @@ class DateDropdownLayout:
         self, options, from_default="", to_default="", title="SELECT ANALYSIS TIMEFRAME"
     ):
         self.from_date = NestedDropdown(
-            id="date_from", options=options, visible_id=False, value=from_default
+            id="Month of reference", options=options, visible_id=True, value=from_default,
         )
         self.to_date = NestedDropdown(
-            id="date_to", options=options, visible_id=False, value=to_default
+            id="Month of interest", options=options, visible_id=True, value=to_default,
         )
         self.title = title
         self.callbacks = []

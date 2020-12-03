@@ -91,7 +91,7 @@ def map_bar_country_compare_data(
         trends_map_compare_agg,
     )
 
-    if trends_map_compare_agg == "Compare three months moving average":
+    if trends_map_compare_agg == "Compare quarters averages, using the three month periods ending on month of interest and month of reference":
         quarter = "the three months periods ending in "
     else:
         quarter = ""
@@ -139,7 +139,7 @@ def map_bar_country_period_data(
         ) = f"Total {db.get_indicator_view(indicator)} on {reference_month}-{reference_year} by district"
 
     else:
-        if trends_map_period_agg == "Show sum over period":
+        if trends_map_period_agg == "Show sum between month of reference and month of interest period":
             if isratio:
                 data = "Average"
             else:
@@ -222,7 +222,7 @@ def tree_map_district_dated_data(
     if trends_treemap_agg == "Show only month of interest":
         agg = "Contribution"
         period = f"on {target_month}-{target_year}"
-    elif trends_treemap_agg == "Show sum over period":
+    elif trends_treemap_agg == "Show sum between month of reference and month of interest period":
         if isratio:
             agg = "Average contribution"
             period = f"on {target_month}-{target_year}"
@@ -335,7 +335,7 @@ def map_reporting_compare_data(
         report=True,
     )
 
-    if report_map_compare_agg == "Compare three months moving average":
+    if report_map_compare_agg == "Compare quarters averages, using the three month periods ending on month of interest and month of reference":
         quarter = "the three months periods ending in "
     else:
         quarter = ""

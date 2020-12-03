@@ -230,7 +230,7 @@ def get_date_list(target_year, target_month, reference_year, reference_month):
 
 def filter_df_for_compare(df, date_list, aggregation_type):
 
-    if aggregation_type == "Compare three months moving average":
+    if aggregation_type == "Compare quarters averages, using the three month periods ending on month of interest and month of reference":
         df = df[df.date.isin(date_list)]
     else:
         df = df[df.date.isin([date_list[0], date_list[3]])]
@@ -263,10 +263,10 @@ def calculate_over_period(
     df, indicator, target_date, aggregation_type, report=False, isratio=False
 ):
 
-    if aggregation_type == "Show average over period":
+    if aggregation_type == "Show average between month of reference and month of interest period":
         df[indicator] = round(df[df.columns].mean(axis=1), 0)
 
-    elif aggregation_type == "Show sum over period":
+    elif aggregation_type == "Show sum between month of reference and month of interest period":
         if report | isratio:
             df[indicator] = df[df.columns].mean(axis=1)
         else:
@@ -282,7 +282,7 @@ def calculate_over_period(
 
 def compare_between_dates(df, indicator, date_list, aggregation_type):
 
-    if aggregation_type == "Compare three months moving average":
+    if aggregation_type == "Compare quarters averages, using the three month periods ending on month of interest and month of reference":
 
         df[date_list[0]] = df[date_list[:3]].mean(axis=1)
         df[date_list[3]] = df[date_list[3:]].mean(axis=1)
