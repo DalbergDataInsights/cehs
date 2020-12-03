@@ -36,6 +36,7 @@ def bar_country_compare_plot(data):
 dropdown = NestedDropdown(
     id="trends-map-compare-agg-dropdown",
     options=["Compare month on month", "Compare three months moving average"],
+    value="Compare month on month",
     visible_id=False,
 )
 
@@ -45,7 +46,6 @@ compare_map = MapDataCard(
     geodata=shapefile,
     locations="id",
     map_tolerance=0.005,
-    # trace_params={"texttemplate": "%{x:%}"},
 )
 
 bar_chart_ranks_bottom = ChartDataCard(

@@ -46,14 +46,6 @@ def initiate_dropdowns():
         }
     )
 
-    # aggregation_dropdown = NestedDropdownGroup(
-    #     entries,
-    #     title="SELECT AN ANALYSIS TIMEFRAME",
-    #     defaults={"aggregation_type": DEFAULTS.get("aggregation_type")},
-    # )
-
-    # Initiate date dropdown layout
-
     dates = list(pd.to_datetime(db.raw_data.date.unique()))
     dates.sort()
     dates = [x.strftime("%b %Y") for x in dates]

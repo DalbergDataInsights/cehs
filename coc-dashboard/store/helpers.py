@@ -264,7 +264,7 @@ def calculate_over_period(
 ):
 
     if aggregation_type == "Show average over period":
-        df[indicator] = df[df.columns].mean(axis=1)
+        df[indicator] = round(df[df.columns].mean(axis=1), 0)
 
     elif aggregation_type == "Show sum over period":
         if report | isratio:
@@ -421,13 +421,15 @@ def timeit(f):
 
 
 def get_perc_description(perc):
-    perc_abs = abs(perc)
-    if perc >= 0.1:
+    perc_abs = abs(round(perc * 100, 1))
+    if perc >= 0.5:
         descrip = f"increased by {perc_abs}%"
-    elif perc_abs < 0.1:
+    elif perc_abs < 0.5:
         descrip = "remained stable"
-    elif perc <= 0.1:
+    elif perc <= 0.5:
         descrip = f"decreased by {perc_abs}%"
+    else:
+        descrip = perc
     return descrip
 
 
@@ -467,7 +469,7 @@ def get_time_diff_perc(data, **controls):
 
 def get_report_perc(data, **controls):
     """
-    Returns two strings describing the percentage of reprting facilities, and non-zero reporting facilities
+    Returns two strings describing the percentage of reporting facilities, and non-zero reporting facilities
 
     """
     target_year = controls.get("target_year")

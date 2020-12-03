@@ -27,7 +27,7 @@ class NestedDropdownGroup:
             {
                 "func": self.update_dropdown_options,
                 "input": [(x, "value"), (x, "id"), (y, "id")],
-                "output": [(y, "options")],
+                "output": [(y, "options"), (y, "value")],
             }
             for (x, y) in zip(self.dropdown_ids[:-1], self.dropdown_ids[1:])
         ]
@@ -113,8 +113,7 @@ class NestedDropdownGroup:
                 if self.title
                 else None
             ]
-            + self.get_orientation(self.dropdown_objects,
-                                   vertical=self.vertical),
+            + self.get_orientation(self.dropdown_objects, vertical=self.vertical),
             className="p-3 m-12",
         )
         return layout
@@ -124,19 +123,19 @@ class NestedDropdownGroup:
 
     def get_orientation(self, elements, vertical=True):
         elements = [e.get_layout() for e in elements]
-        layout = [dbc.Row(e) for e in elements] if vertical else [
-            dbc.Row(elements)]
+        layout = [dbc.Row(e) for e in elements] if vertical else [dbc.Row(elements)]
         return layout
 
     @timeit
     def update_dropdown_options(self, *inputs):
+        print(inputs)
         value = inputs[0]
         column = inputs[1]
         child_column = inputs[2]
         filtered_df = self.dataframe[self.dataframe[column] == value]
         options = filtered_df[child_column].unique().tolist()
         dropdown_options = [{"label": x, "value": x} for x in options]
-        return [dropdown_options]
+        return [dropdown_options, options[0]]
 
     def attach_tail_to_callback(self, func, output):
         """Attach callback to the tail element of this dropdown group
