@@ -13,6 +13,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import xlsxwriter
 import csv
+import math
 
 
 # FIXME: For some reason this is not working (even if function is made not private, so I pasted in the functions here for now, but ideally they would be imported)
@@ -395,7 +396,7 @@ class DataCard:
 
         return (lower_bound, upper_bound)
 
-    def get_custom_colorscale(self, range):
+    def get_custom_colorscale(self, ranges):
 
         # TODO Find more stable fix, not using name
         colorscale = list(self.colors.get("fig").values())[0]
@@ -410,7 +411,7 @@ class DataCard:
             5,
         ], "Color list should include 2,3, or 5 colors"
 
-        lower_bound, upper_bound = range
+        lower_bound, upper_bound = ranges
 
         if colorlist_lenght == 2:
             colorscale = [
@@ -421,9 +422,14 @@ class DataCard:
         else:
 
             if lower_bound <= self.center_value <= upper_bound:
+
                 center_norm = (self.center_value - lower_bound) / (
                     upper_bound - lower_bound
                 )
+
+                if math.isnan(center_norm):
+                    center_norm = 0
+
                 colorscale = [
                     [0.0, colorlist[min_color_nb]],
                     [center_norm / 2, colorlist[1]],

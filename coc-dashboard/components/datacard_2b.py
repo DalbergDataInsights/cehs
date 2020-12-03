@@ -38,6 +38,7 @@ dropdown = NestedDropdown(
         "Show sum over period",
         "Show average over period",
     ],
+    value="Show only month of interest",
     visible_id=False,
 )
 
