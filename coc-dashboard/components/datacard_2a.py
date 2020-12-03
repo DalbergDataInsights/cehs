@@ -36,7 +36,7 @@ def bar_country_compare_plot(data):
 dropdown = NestedDropdown(
     id="trends-map-compare-agg-dropdown",
     options=["Compare month on month", "Compare three months moving average"],
-    value="Compare month of month",
+    value="Compare month on month",
     visible_id=False,
 )
 
