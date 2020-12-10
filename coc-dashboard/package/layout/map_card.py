@@ -27,7 +27,7 @@ class MapDataCard(DataCard):
 
         # optional public members
         self.mapbox_style = "carto-positron"
-        self.zoom = 5.50
+        self.zoom = 5
         self.opacity = 1
 
     # Content
