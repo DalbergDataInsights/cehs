@@ -55,7 +55,8 @@ def initiate_dropdowns():
         from_default=DEFAULTS.get("reference_month")
         + " "
         + DEFAULTS.get("reference_year"),
-        to_default=DEFAULTS.get("target_month") + " " + DEFAULTS.get("target_year"),
+        to_default=DEFAULTS.get("target_month") + " " +
+        DEFAULTS.get("target_year"),
     )
 
     # Initiate outlier policy dropdown
@@ -71,11 +72,6 @@ def initiate_dropdowns():
             }
         ),
         title="SELECT AN OUTLIER POLICY",
-        info="""We exclude outliers at facility level - for a given facility and indicator, we look at all data points available since January
-        2018 and replace all data points identified as outliers by the sample's median. We give two options for outlier exclusion. \n
-        A standard deviation-based approach, where all points more than three standard deviations away from the mean are considered outliers.
-        This approach is best suited for 'cleaner', normally distributed data. An interquartile range-based approach, using Tukey's fences method with k=3,
-        which fits a broader range of data distributions but is also more stringent, and hence best suited for 'messier' data.""",
         defaults={
             "SELECT AN OUTLIER POLICY": DEFAULTS.get("outlier"),
         },
@@ -84,7 +80,6 @@ def initiate_dropdowns():
     indicator_dropdown_group = NestedDropdownGroup(
         db.indicator_dropdowns,
         title="SELECT AN INDICATOR",
-        info="We focus on a key set of indicators as advised by experts and described in WHO's list of priority indicators. For simplicity of interpretation and time comparison, we focus on absolute numbers rather than calculated indicators. ",
         defaults={
             "config_group": DEFAULTS.get("indicator_group"),
             "config_indicator": DEFAULTS.get("indicator"),
@@ -107,19 +102,6 @@ def initiate_dropdowns():
         info=f"""
         The data shown here was last fetched from DHIS2 on {db.fetch_date}.""",
     )
-
-    side_nav.trends_info = """Identify data trends, from the national level to the facility level.
-    If you notice any surprising trends, make sure to check the effect of a more stringent outlier exclusion policy on that trend,
-    and explore the reporting tool to better understand whether a reporting issue could explain that trend."""
-
-    side_nav.datarep_info = """We provide two layers of information on reporting rate: \n A form-specific indicator -
-        the percentage of facilities that reported on their 105:1 form out of those expected to report.
-        This is similar to the reporting rates displayed on the DHIS2 system. An indicator-specific
-        indicator - the percentage of facilities that reported a positive number for the selected
-        indicator out of all facilities that have submitted their 105:1 form. This provides added
-        information on how otherwise reporting facilities report on this specific indicator."""
-
-    side_nav.overview_info = """Here we offer a quick overview of the WHO's 20 CEHS indicators. We provide both absolute value and the percentage change compared to the first date in the chosen time frame."""
 
     return (
         side_nav,

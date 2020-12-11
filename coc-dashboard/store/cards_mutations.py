@@ -18,6 +18,7 @@ from datetime import datetime
 
 def overview_data(
     *,
+    outlier,
     target_year,
     target_month,
     reference_year,
@@ -38,7 +39,7 @@ def overview_data(
 # CARD 1
 
 
-def scatter_country_data(*, indicator, **kwargs):
+def scatter_country_data(*, outlier, indicator, **kwargs):
 
     # dfs, static,
 
@@ -64,6 +65,7 @@ def scatter_country_data(*, indicator, **kwargs):
 
 def map_bar_country_compare_data(
     *,
+    outlier,
     indicator,
     target_year,
     target_month,
@@ -105,6 +107,7 @@ def map_bar_country_compare_data(
 
 def map_bar_country_period_data(
     *,
+    outlier,
     indicator,
     target_year,
     target_month,
@@ -136,7 +139,7 @@ def map_bar_country_period_data(
     if trends_map_period_agg == "Show only month of interest":
         title = (
             title
-        ) = f"Total {db.get_indicator_view(indicator)} on {reference_month}-{reference_year} by district"
+        ) = f"Total {db.get_indicator_view(indicator)} on {target_month}-{target_year} by district"
 
     else:
         if trends_map_period_agg == "Show sum between month of reference and month of interest period":
@@ -157,7 +160,7 @@ def map_bar_country_period_data(
 # CARD 3
 
 
-def scatter_district_data(*, indicator, district, **kwargs):
+def scatter_district_data(*, outlier, indicator, district, **kwargs):
 
     db = Database()
 
@@ -183,6 +186,7 @@ def scatter_district_data(*, indicator, district, **kwargs):
 
 def tree_map_district_dated_data(
     *,
+    outlier,
     indicator,
     district,
     target_year,
@@ -222,16 +226,16 @@ def tree_map_district_dated_data(
     if trends_treemap_agg == "Show only month of interest":
         agg = "Contribution"
         period = f"on {target_month}-{target_year}"
-    elif trends_treemap_agg == "Show sum between month of reference and month of interest period":
-        if isratio:
-            agg = "Average contribution"
-            period = f"on {target_month}-{target_year}"
-        else:
-            agg = "Total contribution"
-            period = f"between {reference_month}-{reference_year} and {target_month}-{target_year}"
     else:
-        agg = "Average contribution"
-        period = f"on {target_month}-{target_year}"
+        period = f"between {reference_month}-{reference_year} and {target_month}-{target_year}"
+
+        if trends_treemap_agg == "Show sum between month of reference and month of interest period":
+            if isratio:
+                agg = "Average contribution"
+            else:
+                agg = "Total contribution"
+        else:
+            agg = "Average contribution"
 
     title = f"""{agg} of individual facilities in {district} district to 
             {db.get_indicator_view(indicator)} {period}"""
@@ -241,7 +245,7 @@ def tree_map_district_dated_data(
     return df_district_dated
 
 
-def scatter_facility_data(*, indicator, district, facility, **kwargs):
+def scatter_facility_data(*, outlier, indicator, district, facility, **kwargs):
 
     db = Database()
 
