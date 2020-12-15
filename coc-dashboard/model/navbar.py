@@ -66,9 +66,12 @@ class MenuButton:
 
         layout = html.Div(
             [
-                html.Div(id="side-nav__menu-button__bar1", style=menu_bar_style[0]),
-                html.Div(id="side-nav__menu-button__bar2", style=menu_bar_style[1]),
-                html.Div(id="side-nav__menu-button__bar3", style=menu_bar_style[2]),
+                html.Div(id="side-nav__menu-button__bar1",
+                         style=menu_bar_style[0]),
+                html.Div(id="side-nav__menu-button__bar2",
+                         style=menu_bar_style[1]),
+                html.Div(id="side-nav__menu-button__bar3",
+                         style=menu_bar_style[2]),
             ],
             style=self.get_style(),
             id="side-nav__menu-button",
@@ -79,7 +82,8 @@ class MenuButton:
 
 class Controls:
     def __init__(self, elements):
-        self.el_layout = [dbc.Row(x.layout, style={"margin": "0"}) for x in elements]
+        self.el_layout = [
+            dbc.Row(x.layout, style={"margin": "0"}) for x in elements]
 
     def get_layout(self):
         layout = dbc.Col(self.el_layout)
@@ -251,10 +255,7 @@ class SideNav:
                                 style=self.icon_style,
                             ),
                             " Overview",
-                        ]
-                        + self.get_tooltip(
-                            self.overview_info, "overview-info", icon=False
-                        ),
+                        ],
                         id="overview",
                         className=active_style
                         if active == "overview"
@@ -274,8 +275,7 @@ class SideNav:
                                 style=self.icon_style,
                             ),
                             " Trends",
-                        ]
-                        + self.get_tooltip(self.trends_info, "trends-info", icon=False),
+                        ],
                         id="trends",
                         className=active_style if active == "trends" else passive_style,
                     ),
@@ -293,10 +293,7 @@ class SideNav:
                                 style=self.icon_style,
                             ),
                             " Data quality",
-                        ]
-                        + self.get_tooltip(
-                            self.datarep_info, "reporting-info", icon=False
-                        ),
+                        ],
                         id="reporting",
                         className=active_style
                         if active == "reporting"

@@ -62,8 +62,16 @@ class ChartDataCard(DataCard):
                 "plot_bgcolor": "rgba(255, 255, 255, 1)",
                 "paper_bgcolor": "rgba(255, 255, 255, 1)",
             },
-            xaxis=dict(showgrid=False, zeroline=False),
-            yaxis=dict(showgrid=True, zeroline=True, gridcolor="LightGray"),
+            xaxis=dict(
+                showgrid=False,
+                zeroline=False
+            ),
+            yaxis=dict(
+                showgrid=True,
+                zeroline=True,
+                zerolinecolor="lightgray",
+                gridcolor="lightgray"
+            ),
         )
 
     def style_as_scatter(self, fig):

@@ -80,15 +80,6 @@ class DataCard:
             }
         ]
 
-        # TODO check why this is commented out
-
-        # self.callbacks = [
-        #     {'func': self.__update_figure,
-        #      'input': [(f'{self.my_name}_dropdown', 'value')],
-        #      'output': [(f'{self.my_name}_figure', 'figure'),
-        #                 (f'{self.my_name}_fig_title', 'children')]
-        #      }]
-
     @property
     def colors(self):
         return self.__colors
@@ -559,4 +550,4 @@ class DataCard:
             df_to_concat.insert(0, "trace", trace_name)
             to_concat.append(df_to_concat)
         df = pd.concat(to_concat).reset_index()
-        return [send_data_frame(df.to_excel, f"{df.columns[-1]}.xlsx")]
+        return send_data_frame(df.to_excel, f"{df.columns[-1]}.xlsx")

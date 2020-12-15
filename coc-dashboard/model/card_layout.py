@@ -48,7 +48,7 @@ class CardLayout:
                             html.H5(
                                 self.title,
                                 style={
-                                    "color": "#555555",
+                                    "color": "#225e8c",
                                     "text-align": "center",
                                     "width": "100%",
                                 },
@@ -102,7 +102,8 @@ class CardLayout:
 
             # deal with complex labels
             while "$" in formatted_string:
-                sub = self.__get_substring_between_elements(formatted_string, "$")
+                sub = self.__get_substring_between_elements(
+                    formatted_string, "$")
 
                 try:
                     if "trace" in sub:
@@ -132,7 +133,8 @@ class CardLayout:
     def __get_substring_between_elements(self, string, element, closing_element="$"):
         try:
             out = string.split(element, 1)[1]
-            out = out.split(closing_element, 1)[0] if closing_element in out else None
+            out = out.split(closing_element, 1)[
+                0] if closing_element in out else None
         except IndexError as e:
             out = None
             print(e)

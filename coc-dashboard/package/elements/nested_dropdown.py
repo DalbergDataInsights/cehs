@@ -48,7 +48,7 @@ class NestedDropdown:
         layout = [
             html.Div(
                 html.P(self.id, className="text-center m-0 p-0"),
-                style={"color": "white", "font-size": "1rem"},
+                style={"color": "white", "font-size": "1.6vh"},
             )
             if self.visible_id
             else None,

@@ -46,8 +46,8 @@ def menu_toggle_button(n_clicks):
 def toggle_fade_info(n1, n2, is_open):
     if n1 or n2:
         # Button has never been clicked
-        return [not is_open]
-    return [is_open]
+        return not is_open
+    return is_open
 
 
 @timeit

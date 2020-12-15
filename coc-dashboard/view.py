@@ -8,7 +8,7 @@ import dash_core_components as dcc
 import geopandas as gpd
 import pandas as pd
 
-from store import credentials, side_nav
+from store import credentials, side_nav, info_pane
 
 from components import (
     trends_map_compare,
@@ -38,7 +38,7 @@ ds = DataStory(
         tree_map_district,
         facility_scatter,
     ],
-    ind_elements=[side_nav],
+    ind_elements=[side_nav, info_pane],
 )
 
 ds.init = False

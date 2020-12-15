@@ -1,3 +1,4 @@
+from dash.dependencies import State
 from components import (
     trends_map_compare,
     compare_map,
@@ -37,6 +38,7 @@ from .global_callbacks import (
 from .user_interface import (
     change_page,
     menu_toggle_button,
+    toggle_fade_info,
 )
 
 
@@ -142,6 +144,19 @@ def define_callbacks(ds):
             ]
             + [Output(x + "_container", "className") for x in dropdown_style],
             "function": change_page,
+        },
+        {
+            "inputs": [
+                Input("main-info", "n_clicks"),
+                Input("info-pane__close", "n_clicks")
+            ],
+            "outputs": [
+                Output("info-pane", "is_open"),
+            ],
+            "states":[
+                State("info-pane", "is_open")
+            ],
+            "function": toggle_fade_info,
         },
         # N-click callbacks
         {

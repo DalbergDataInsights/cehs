@@ -21,6 +21,7 @@ from .geopopulation import shapefile  # NOQA: E402
     indicator_dropdown_group,
     date_dropdowns,
     district_control_group,
+    info_pane,
 ) = initiate_dropdowns()
 
 

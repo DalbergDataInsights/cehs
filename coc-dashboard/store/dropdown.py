@@ -1,7 +1,8 @@
 import pandas as pd
-from model import SideNav, DateDropdownLayout
+from model import SideNav, DateDropdownLayout, InfoPane
 import calendar
 from datetime import datetime
+import base64
 
 from .database import Database
 from package.components.nested_dropdown_group import NestedDropdownGroup
@@ -99,9 +100,11 @@ def initiate_dropdowns():
             date_dropdowns,
             outlier_policy_dropdown_group,
         ],
-        info=f"""
-        The data shown here was last fetched from DHIS2 on {db.fetch_date}.""",
+        info="Click for more information",
     )
+
+    info_pane = InfoPane(image="/static/images/info-pane.png",
+                         text=f"""The data shown here was last fetched from DHIS2 on {db.fetch_date}.""")
 
     return (
         side_nav,
@@ -109,4 +112,5 @@ def initiate_dropdowns():
         indicator_dropdown_group,
         date_dropdowns,
         district_control_group,
+        info_pane
     )
