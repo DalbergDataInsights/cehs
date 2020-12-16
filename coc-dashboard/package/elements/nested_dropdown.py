@@ -2,16 +2,20 @@ import dash_bootstrap_components as dbc
 import dash_html_components as html
 import dash_core_components as dcc
 from dash_bootstrap_components.themes import BOOTSTRAP
-from dash.dependencies import Input, Output
+from dash_extensions.enrich import Input, Output
 import pandas as pd
 
 
 class NestedDropdown:
+
+    # TODO: THIS NEEDS A A DEFAULT AND TITLE PROPERTY
+
     def __init__(self, id, options, **kwargs):
         self.id = id
         self.options = self.list_to_options(options)
         self.__value = None
-        self.value = kwargs.pop("value", options[0])
+        value = kwargs.pop("value", None)
+        self.value = value or options[0]
 
         self.parents = []
         self.children = []
@@ -44,7 +48,7 @@ class NestedDropdown:
         layout = [
             html.Div(
                 html.P(self.id, className="text-center m-0 p-0"),
-                style={"color": "#363638"},
+                style={"color": "white", "font-size": "1.6vh"},
             )
             if self.visible_id
             else None,
@@ -55,7 +59,7 @@ class NestedDropdown:
                 persistence=True,
                 persistence_type="session",
                 className="m-1",
-                **kwargs
+                **kwargs,
             ),
         ]
         self.layout = dbc.Col(

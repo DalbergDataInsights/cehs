@@ -1,16 +1,21 @@
+from dash.dependencies import State
 from components import (
-    country_overview_scatter,
-    district_overview_scatter,
+    trends_map_compare,
+    compare_map,
+    trends_map_period,
+    period_map,
     facility_scatter,
     stacked_bar_district,
     stacked_bar_reporting_country,
     tree_map_district,
     stacked_bar_district,
-    reporting_map,
+    reporting_map_compare,
+    reporting_map_period,
     stacked_bar_reporting_country,
 )
 
-from dash.dependencies import Input, Output, State
+from dash_extensions.enrich import Input, Output
+
 
 from store import (
     district_control_group,
@@ -23,22 +28,26 @@ from pprint import pprint as print
 from .global_callbacks import (
     global_story_callback,
     update_on_click,
+    update_trends_map_compare,
+    update_trends_map_period,
+    update_tree_map_district,
+    update_report_map_compare,
+    update_report_map_period,
 )
-
 
 from .user_interface import (
     change_page,
     menu_toggle_button,
+    toggle_fade_info,
 )
 
 
 # Input(id, property), Output(id, property)
 callback_ids = {
     outlier_policy_dropdown_group.dropdown_ids[-1]: "value",  # Outlier policy
-    # indicator_dropdown_group.dropdown_ids[0]: "value",  # Indicator group
     indicator_dropdown_group.dropdown_ids[-1]: "value",  # Indicator
-    "date_from": "value",
-    "date_to": "value",
+    "Month of reference": "value",
+    "Month of interest": "value",
     district_control_group.dropdown_ids[-1]: "value",  # District
 }
 
@@ -46,9 +55,8 @@ dropdown_style = [
     "config_group",
     "config_indicator",
     "SELECT A DISTRICT",
-    "aggregation_type",
-    "date_from",
-    "date_to",
+    "Month of reference",
+    "Month of interest",
 ]
 
 
@@ -57,14 +65,7 @@ def define_callbacks(ds):
     app = ds.app
 
     callbacks = [
-        # Global callbacks
-        {
-            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
-            "outputs": [Output("ds-container", "children")],
-            "function": global_story_callback,
-        },
         # Data cards
-        # TODO : change this manual step below, which results in reporting pane not updating properly
         {
             "inputs": [
                 Input(id, prop)
@@ -78,13 +79,27 @@ def define_callbacks(ds):
         },
         {
             "inputs": [
-                Input(id, prop) for id, prop in reporting_map.callbacks[0].get("input")
+                Input(id, prop)
+                for id, prop in reporting_map_compare.callbacks[0].get("input")
             ],
             "outputs": [
                 Output(id, prop)
-                for id, prop in reporting_map.callbacks[0].get("output")
+                for id, prop in reporting_map_compare.callbacks[0].get("output")
             ],
-            "function": reporting_map.callbacks[0].get("func"),
+            "function": reporting_map_compare.callbacks[0].get("func"),
+            "group": "report-map-compare-agg-update",
+        },
+        {
+            "inputs": [
+                Input(id, prop)
+                for id, prop in reporting_map_period.callbacks[0].get("input")
+            ],
+            "outputs": [
+                Output(id, prop)
+                for id, prop in reporting_map_period.callbacks[0].get("output")
+            ],
+            "function": reporting_map_period.callbacks[0].get("func"),
+            "group": "report-map-period-agg-update",
         },
         {
             "inputs": [
@@ -96,6 +111,12 @@ def define_callbacks(ds):
                 for id, prop in stacked_bar_reporting_country.callbacks[0].get("output")
             ],
             "function": stacked_bar_reporting_country.callbacks[0].get("func"),
+        },
+        # Global callbacks
+        {
+            "inputs": [Input(x, y) for (x, y) in callback_ids.items()],
+            "outputs": [Output("ds-container", "children")],
+            "function": global_story_callback,
         },
         # User interface
         {
@@ -121,8 +142,21 @@ def define_callbacks(ds):
                 Output("nav-buttons", "children"),
                 Output("dash-title", "children"),
             ]
-            + [Output(x+"_container", "className") for x in dropdown_style],
+            + [Output(x + "_container", "className") for x in dropdown_style],
             "function": change_page,
+        },
+        {
+            "inputs": [
+                Input("main-info", "n_clicks"),
+                Input("info-pane__close", "n_clicks")
+            ],
+            "outputs": [
+                Output("info-pane", "is_open"),
+            ],
+            "states":[
+                State("info-pane", "is_open")
+            ],
+            "function": toggle_fade_info,
         },
         # N-click callbacks
         {
@@ -133,14 +167,70 @@ def define_callbacks(ds):
             ],
             "function": update_on_click,
         },
+        # Dropdown callbacks
+        {
+            "inputs": [Input("trends-map-compare-agg-dropdown", "value")],
+            "outputs": [
+                Output(f"{trends_map_compare.my_name}_figure", "children"),
+                Output(f"{trends_map_compare.my_name}_title", "children"),
+            ],
+            "function": update_trends_map_compare,
+            "group": "trends-map-compare-agg-update",
+        },
+        {
+            "inputs": [Input("trends-map-period-agg-dropdown", "value")],
+            "outputs": [
+                Output(f"{trends_map_period.my_name}_figure", "children"),
+                Output(f"{trends_map_period.my_name}_title", "children"),
+            ],
+            "function": update_trends_map_period,
+            "group": "trends-map-period-agg-update",
+        },
+        {
+            "inputs": [Input("treemap-agg-dropdown", "value")],
+            "outputs": [
+                Output(f"{tree_map_district.my_name}_figure", "figure"),
+                Output(f"{tree_map_district.my_name}_fig_title", "children"),
+            ],
+            "function": update_tree_map_district,
+            "group": "treemap-agg-update",
+        },
+        {
+            "inputs": [Input("report-map-compare-agg-dropdown", "value")],
+            "outputs": [
+                Output(f"{reporting_map_compare.my_name}_figure", "figure"),
+                Output(f"{reporting_map_compare.my_name}_fig_title", "children"),
+            ],
+            "function": update_report_map_compare,
+            "group": "report-map-compare-agg-update",
+        },
+        {
+            "inputs": [Input("report-map-period-agg-dropdown", "value")],
+            "outputs": [
+                Output(f"{reporting_map_period.my_name}_figure", "figure"),
+                Output(f"{reporting_map_period.my_name}_fig_title", "children"),
+            ],
+            "function": update_report_map_period,
+            "group": "report-map-period-agg-update",
+        },
     ]
 
     print("==Registering callbacks==")
 
     for callback in callbacks:
         # print(callback)
-        app.callback(
-            output=callback.get("outputs", []),
-            inputs=callback.get("inputs", []),
-            state=callback.get("states", ()),
-        )(callback.get("function"))
+
+        params = {
+            "output": callback.get("outputs", []),
+            "inputs": callback.get("inputs", []),
+            "state": callback.get("states", ()),
+        }
+
+        if callback.get("group"):
+            params["group"] = callback.get("group")
+
+        print(params)
+
+        app.callback(**params)(callback.get("function"))
+
+    print("==Callbacks registered==")

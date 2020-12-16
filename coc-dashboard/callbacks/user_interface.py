@@ -3,13 +3,15 @@ from store import timeit
 from view import ds, side_nav
 from components import (
     country_overview_scatter,
-    country_overview,
+    trends_map_compare,
+    trends_map_period,
     district_overview_scatter,
     facility_scatter,
     stacked_bar_district,
     stacked_bar_reporting_country,
     tree_map_district,
-    reporting_map,
+    reporting_map_compare,
+    reporting_map_period,
     title,
     overview,
     # grid,
@@ -44,8 +46,8 @@ def menu_toggle_button(n_clicks):
 def toggle_fade_info(n1, n2, is_open):
     if n1 or n2:
         # Button has never been clicked
-        return [not is_open]
-    return [is_open]
+        return not is_open
+    return is_open
 
 
 @timeit
@@ -59,7 +61,8 @@ def change_page(*inputs):
         ds.data_cards = [
             title,
             country_overview_scatter,
-            country_overview,
+            trends_map_compare,
+            trends_map_period,
             district_overview_scatter,
             tree_map_district,
             facility_scatter,
@@ -69,7 +72,8 @@ def change_page(*inputs):
         ds.data_cards = [
             title,
             stacked_bar_reporting_country,
-            reporting_map,
+            reporting_map_compare,
+            reporting_map_period,
             stacked_bar_district,
         ]
 

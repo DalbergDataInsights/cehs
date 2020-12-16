@@ -7,17 +7,20 @@ import pandas as pd
 from components import (
     country_overview_scatter,
     get_title_country_overview,
-    country_overview,
+    trends_map_compare,
+    trends_map_period,
     district_overview_scatter,
     get_title_district_overview,
     facility_scatter,
-    get_title_district_treemap,
     stacked_bar_district,
     stacked_bar_reporting_country,
+    bar_reporting_country_plot_tooltip,
+    scatter_reporting_district_plot_tooltip,
     get_title_reporting_country,
     tree_map_district,
-    reporting_map,
-    overview
+    reporting_map_compare,
+    reporting_map_period,
+    overview,
 )
 
 from store import (
@@ -48,58 +51,61 @@ def global_story_callback(*inputs):
         CONTROLS["target_month"] = inputs[3].split(" ")[0]
         CONTROLS["reference_year"] = inputs[2].split(" ")[1]
         CONTROLS["reference_month"] = inputs[2].split(" ")[0]
-        #CONTROLS["indicator_group"] = inputs[1]
 
         db.filter_by_policy(CONTROLS["outlier"])
 
         df = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
 
-        # ds.switch_data_set(df)
-
-        for x in [country_overview_scatter,
-                  country_overview,
-                  district_overview_scatter,
-                  facility_scatter,
-                  stacked_bar_district,
-                  stacked_bar_reporting_country,
-                  tree_map_district,
-                  reporting_map,
-                  overview]:
+        for x in [
+            country_overview_scatter,
+            trends_map_compare,
+            trends_map_period,
+            district_overview_scatter,
+            facility_scatter,
+            stacked_bar_district,
+            stacked_bar_reporting_country,
+            tree_map_district,
+            reporting_map_compare,
+            reporting_map_period,
+            overview,
+        ]:
             try:
                 x.data = df
             except Exception as e:
+                print(f"Error updating dataset for {x}")
                 print(e)
 
-        print(f"Datasets updated for {CONTROLS['indicator']}")
-    except:
-        print(f"Error updating global callback for {CONTROLS['indicator']}")
+        stacked_bar_reporting_country.trace_params = bar_reporting_country_plot_tooltip(
+            df)
+        stacked_bar_district.trace_params = scatter_reporting_district_plot_tooltip(
+            df)
 
-    indicator_view = db.get_indicator_view(CONTROLS['indicator'])
+        print(f"Datasets updated for {CONTROLS['indicator']}")
+    except Exception as e:
+        print(e)
+        print(f"Error updating global callback for {CONTROLS['indicator']}")
+        print(CONTROLS)
+        print(LAST_CONTROLS)
+
+    indicator_view = db.get_indicator_view(CONTROLS["indicator"])
 
     indicator_view_if_ratio = db.get_indicator_view(
-        db.switch_indic_to_numerator(CONTROLS['indicator'],
-                                     popcheck=False))
-
-    indicator_view_if_pop_dependant = db.get_indicator_view(
-        db.switch_indic_to_numerator(CONTROLS['indicator'],
-                                     popcheck=True))
+        db.switch_indic_to_numerator(CONTROLS["indicator"], popcheck=False)
+    )
 
     try:
-        change_titles_reporting(indicator_view_if_ratio,
-                                CONTROLS)
+        change_titles_reporting(indicator_view_if_ratio, CONTROLS)
 
     except:
         print(f"Error updating reporting title for {CONTROLS['indicator']}")
 
     try:
-        change_titles_trends(indicator_view,
-                             indicator_view_if_pop_dependant,
-                             CONTROLS)
+        change_titles_trends(indicator_view, CONTROLS)
 
     except:
         print(f"Error updating trend title for {CONTROLS['indicator']}")
 
-    return [ds.get_layout()]
+    return ds.get_layout()
 
 
 @timeit
@@ -108,30 +114,25 @@ def change_titles_reporting(indicator_view_name, controls):
     print(
         f"Starting updates for reporting titles with {controls['indicator']}")
 
-    stacked_bar_reporting_country.title = get_title_reporting_country(stacked_bar_reporting_country.data,
-                                                                      indicator_view_name,
-                                                                      **controls)
+    stacked_bar_reporting_country.title = get_title_reporting_country(
+        stacked_bar_reporting_country.data, indicator_view_name, **controls
+    )
 
     print(f"Updated reporting titles with {controls['indicator']}")
 
 
 @timeit
-def change_titles_trends(indicator_view_name, indicator_view_name_vetted, controls):
+def change_titles_trends(indicator_view_name, controls):
 
     print(f"Starting updates for trend titles with {controls['indicator']}")
 
-    # TODO data = db.datasets.get('country')
+    country_overview_scatter.title = get_title_country_overview(
+        country_overview_scatter.data, indicator_view_name, **controls
+    )
 
-    country_overview_scatter.title = get_title_country_overview(country_overview_scatter.data,
-                                                                indicator_view_name,
-                                                                **controls)
-
-    district_overview_scatter.title = get_title_district_overview(district_overview_scatter.data,
-                                                                  indicator_view_name,
-                                                                  **controls)
-
-    tree_map_district.title = get_title_district_treemap(indicator_view_name_vetted,
-                                                         **controls)
+    district_overview_scatter.title = get_title_district_overview(
+        district_overview_scatter.data, indicator_view_name, **controls
+    )
 
     print(f"Updated trend titles with {controls['indicator']} with")
 
@@ -139,11 +140,9 @@ def change_titles_trends(indicator_view_name, indicator_view_name_vetted, contro
 @timeit
 def update_on_click(*inputs):
 
-    inp = inputs[0]
-
     try:
 
-        label = inp.get("points")[0].get("label")
+        label = inputs[0].get("points")[0].get("label")
 
         LAST_CONTROLS = CONTROLS.copy()
 
@@ -162,3 +161,106 @@ def update_on_click(*inputs):
         print(e)
 
     return [facility_scatter.figure, facility_scatter.figure_title]
+
+
+@timeit
+def update_trends_map_compare(*inputs):
+
+    try:
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["trends_map_compare_agg"] = inputs[0]
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+        trends_map_compare.data = ds
+        trends_map_compare.title = "$label$"
+
+    except Exception as e:
+        print(e)
+
+    return [trends_map_compare._get_figure(), trends_map_compare.title]
+
+
+@timeit
+def update_trends_map_period(*inputs):
+
+    try:
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["trends_map_period_agg"] = inputs[0]
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+        trends_map_period.data = ds
+        trends_map_period.title = "$label$"
+
+        print(trends_map_period.title)
+
+    except Exception as e:
+        print(e)
+
+    return [trends_map_period._get_figure(), trends_map_period.title]
+
+
+@timeit
+def update_tree_map_district(*inputs):
+
+    try:
+
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["trends_treemap_agg"] = inputs[0]
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+
+        tree_map_district.data = ds
+        tree_map_district.figure = tree_map_district._get_figure(
+            tree_map_district.data)
+        tree_map_district.figure_title = "$label$"
+
+    except Exception as e:
+        print(e)
+
+    return [tree_map_district.figure, tree_map_district.figure_title]
+
+
+@timeit
+def update_report_map_compare(*inputs):
+
+    try:
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["report_map_compare_agg"] = inputs[0]
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+
+        reporting_map_compare.data = ds
+        reporting_map_compare.figure = reporting_map_compare._get_figure(
+            reporting_map_compare.data
+        )
+        reporting_map_compare.figure_title = "$label$"
+
+    except Exception as e:
+        print(e)
+
+    return [reporting_map_compare.figure, reporting_map_compare.figure_title]
+
+
+@timeit
+def update_report_map_period(*inputs):
+
+    try:
+        LAST_CONTROLS = CONTROLS.copy()
+
+        CONTROLS["report_map_period_agg"] = inputs[0]
+
+        ds = define_datasets(controls=CONTROLS, last_controls=LAST_CONTROLS)
+
+        reporting_map_period.data = ds
+        reporting_map_period.figure = reporting_map_period._get_figure(
+            reporting_map_period.data
+        )
+        reporting_map_period.figure_title = "$label$"
+
+    except Exception as e:
+        print(e)
+
+    return [reporting_map_period.figure, reporting_map_period.figure_title]

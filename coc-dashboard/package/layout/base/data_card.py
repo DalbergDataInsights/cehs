@@ -13,6 +13,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import xlsxwriter
 import csv
+import math
 
 
 # FIXME: For some reason this is not working (even if function is made not private, so I pasted in the functions here for now, but ideally they would be imported)
@@ -44,12 +45,14 @@ class DataCard:
         # Style
         self.__colors = self.default_colors.copy()
         self.set_colors(kwargs.get("colors", self.default_colors.copy()))
-        self.center_value = (kwargs.get("center_value", 0))
-        self.excl_outliers_colorscale = (kwargs.get("excl_outliers_colorscale",
-                                                    True))
+        self.center_value = kwargs.get("center_value", 0)
+        self.excl_outliers_colorscale = kwargs.get(
+            "excl_outliers_colorscale", True)
+        self.trace_params = kwargs.get("trace_params")
 
         # Layout
         # Orientation
+        self.dropdown = kwargs.get("dropdown")
         self.orientation_left = kwargs.get("orientation_left", True)
         self.orientation_vertical = kwargs.get("orientation_vertical", False)
 
@@ -76,15 +79,6 @@ class DataCard:
                 "output": [(f"{self.my_name}_download_data", "data")],
             }
         ]
-
-        # TODO check why this is commented out
-
-        # self.callbacks = [
-        #     {'func': self.__update_figure,
-        #      'input': [(f'{self.my_name}_dropdown', 'value')],
-        #      'output': [(f'{self.my_name}_figure', 'figure'),
-        #                 (f'{self.my_name}_fig_title', 'children')]
-        #      }]
 
     @property
     def colors(self):
@@ -121,6 +115,8 @@ class DataCard:
                 showlegend=True,
             )
             fig.update_yaxes(rangemode="tozero")
+            if self.trace_params:
+                fig.update_traces(**self.trace_params)
         self.__figure = fig
 
     @property
@@ -200,10 +196,10 @@ class DataCard:
         layout = dbc.Col(
             [
                 dbc.Row(self.__get_figure_title_layout()),
-                # dbc.Row(
-                #     self.__get_dropdown_layout(),
-                #     className='dropdown-section'
-                # ),
+                dbc.Row(self.dropdown.get_layout(),
+                        className="dropdown-section")
+                if self.dropdown
+                else None,
                 dbc.Row(
                     dbc.Col(
                         dcc.Graph(
@@ -398,46 +394,55 @@ class DataCard:
 
         return (lower_bound, upper_bound)
 
-    def get_custom_colorscale(self, name, range):
+    def get_custom_colorscale(self, ranges):
 
         # TODO Find more stable fix, not using name
-        colorscale = list(self.colors.get('fig').values())[0]
+        colorscale = list(self.colors.get("fig").values())[0]
         colorlist = [x[-1] for x in colorscale]
         min_color_nb = 0
         max_color_nb = -1
 
         colorlist_lenght = len(colorlist)
         assert colorlist_lenght in [
-            2, 3, 5], "Color list should include 2,3, or 5 colors"
+            2,
+            3,
+            5,
+        ], "Color list should include 2,3, or 5 colors"
 
-        lower_bound, upper_bound = range
+        lower_bound, upper_bound = ranges
 
         if colorlist_lenght == 2:
             colorscale = [
                 [0.0, colorlist[min_color_nb]],
-                [1.0, colorlist[max_color_nb]]
+                [1.0, colorlist[max_color_nb]],
             ]
 
         else:
 
             if lower_bound <= self.center_value <= upper_bound:
-                center_norm = (self.center_value-lower_bound) / \
-                    (upper_bound-lower_bound)
+
+                center_norm = (self.center_value - lower_bound) / (
+                    upper_bound - lower_bound
+                )
+
+                if math.isnan(center_norm):
+                    center_norm = 0
+
                 colorscale = [
                     [0.0, colorlist[min_color_nb]],
-                    [center_norm/2, colorlist[1]],
+                    [center_norm / 2, colorlist[1]],
                     [center_norm, colorlist[2]],
-                    [center_norm+(1-center_norm)/2, colorlist[3]],
-                    [1.0, colorlist[max_color_nb]]
+                    [center_norm + (1 - center_norm) / 2, colorlist[3]],
+                    [1.0, colorlist[max_color_nb]],
                 ]
             else:
                 if self.center_value <= lower_bound:
-                    min_color_nb = math.floor(colorlist_lenght/2)
+                    min_color_nb = math.floor(colorlist_lenght / 2)
                 else:
-                    max_color_nb = math.floor(colorlist_lenght/2)
+                    max_color_nb = math.floor(colorlist_lenght / 2)
                 colorscale = [
                     [0.0, colorlist[min_color_nb]],
-                    [1.0, colorlist[max_color_nb]]
+                    [1.0, colorlist[max_color_nb]],
                 ]
 
         colorscale = [x for x in colorscale if x]
@@ -537,10 +542,12 @@ class DataCard:
 
     def __download_graph_data(self, *inputs):
         """Download data associated with a figure"""
-        print("Download callback fired")
-        print(inputs)
 
         # prep data file
-        df = pd.concat(self.data.values()).reset_index()
-
-        return [send_data_frame(df.to_excel, f"{df.columns[-1]}.xlsx")]
+        to_concat = []
+        for trace_name, df in self.data.items():
+            df_to_concat = df.copy()
+            df_to_concat.insert(0, "trace", trace_name)
+            to_concat.append(df_to_concat)
+        df = pd.concat(to_concat).reset_index()
+        return send_data_frame(df.to_excel, f"{df.columns[-1]}.xlsx")

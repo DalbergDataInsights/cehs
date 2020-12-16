@@ -1,10 +1,10 @@
+from store import timeit
+from package.elements.nested_dropdown import NestedDropdown
+import pandas as pd
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 import dash_core_components as dcc
-from dash.dependencies import Input, Output
-import pandas as pd
-from package.elements.nested_dropdown import NestedDropdown
-from store import timeit
+from dash_extensions.enrich import Input, Output
 
 
 class NestedDropdownGroup:
@@ -27,7 +27,7 @@ class NestedDropdownGroup:
             {
                 "func": self.update_dropdown_options,
                 "input": [(x, "value"), (x, "id"), (y, "id")],
-                "output": [(y, "options")],
+                "output": [(y, "options"), (y, "value")],
             }
             for (x, y) in zip(self.dropdown_ids[:-1], self.dropdown_ids[1:])
         ]
@@ -128,13 +128,14 @@ class NestedDropdownGroup:
 
     @timeit
     def update_dropdown_options(self, *inputs):
+        print(inputs)
         value = inputs[0]
         column = inputs[1]
         child_column = inputs[2]
         filtered_df = self.dataframe[self.dataframe[column] == value]
         options = filtered_df[child_column].unique().tolist()
         dropdown_options = [{"label": x, "value": x} for x in options]
-        return [dropdown_options]
+        return [dropdown_options, options[0]]
 
     def attach_tail_to_callback(self, func, output):
         """Attach callback to the tail element of this dropdown group

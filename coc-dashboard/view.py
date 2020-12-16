@@ -8,10 +8,11 @@ import dash_core_components as dcc
 import geopandas as gpd
 import pandas as pd
 
-from store import credentials, side_nav
+from store import credentials, side_nav, info_pane
 
 from components import (
-    country_overview,
+    trends_map_compare,
+    trends_map_period,
     country_overview_scatter,
     district_overview_scatter,
     facility_scatter,
@@ -31,12 +32,13 @@ ds = DataStory(
     data_cards=[
         title,
         country_overview_scatter,
-        country_overview,
+        trends_map_compare,
+        trends_map_period,
         district_overview_scatter,
         tree_map_district,
         facility_scatter,
     ],
-    ind_elements=[side_nav],
+    ind_elements=[side_nav, info_pane],
 )
 
 ds.init = False

@@ -11,46 +11,38 @@ class ChartDataCard(DataCard):
 
         # Capitalizing is important here, because we are going to get the same object name from plotly
         self.fig_object = kwargs.get("fig_object", "Scatter")
-        self.bar_mode = kwargs.get("bar_mode", "stack")
+        self.fig_orientation = kwargs.get("fig_orientation")
 
     def _get_figure(self, data: {str: pd.DataFrame} = None):
         fig = go.Figure()
 
         FigType = getattr(go, self.fig_object)
         figure_colors = self.colors.get("fig")
-
+        # [{"name": "", "data": df, "customdata": []}]
         for name, df in data.items():
+            x, y = (
+                (df[df.columns[0]], df.index)
+                if self.fig_orientation == "h"
+                else (df.index, df[df.columns[0]])
+            )
+
             fig.add_trace(
                 FigType(
-                    x=df.index,
-                    y=df[df.columns[0]],
+                    x=x,
+                    y=y,
                     name=name,
                     marker_color=figure_colors.get(
                         name, next(iter(figure_colors.values()))
                     ),
                     hoverinfo="x+y",
+                    orientation=self.fig_orientation,
                 )
             )
-            if self.bar_mode == "overlay":
-                fig.update_traces(
-                    marker={
-                        "color": "rgb(211, 41, 61)"
-                        # "color": df[df.columns[0]],
-                        # "colorscale": figure_colors.get(name),
-                    },
-                    textposition="inside",
-                    texttemplate="%{x:%}",
-                    orientation="h",
-                    y=df.index,
-                    x=df[df.columns[0]],
-                    showlegend=False,
-                    hoverinfo="none",
-                )
 
         self.style_figure(fig)
 
-        if self.fig_object == "Bar":
-            fig.update_layout(barmode=self.bar_mode)
+        # if self.fig_object == "Bar":
+        #     fig.update_layout(barmode=self.bar_mode)
 
         return fig
 
@@ -70,8 +62,16 @@ class ChartDataCard(DataCard):
                 "plot_bgcolor": "rgba(255, 255, 255, 1)",
                 "paper_bgcolor": "rgba(255, 255, 255, 1)",
             },
-            xaxis=dict(showgrid=False, zeroline=False),
-            yaxis=dict(showgrid=True, zeroline=False, gridcolor="LightGray"),
+            xaxis=dict(
+                showgrid=False,
+                zeroline=False
+            ),
+            yaxis=dict(
+                showgrid=True,
+                zeroline=True,
+                zerolinecolor="lightgray",
+                gridcolor="lightgray"
+            ),
         )
 
     def style_as_scatter(self, fig):
