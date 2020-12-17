@@ -29,6 +29,8 @@ import dash_html_components as html
 
 class Overview(DataCard):
     def __init__(self, data, **kwargs):
+        #self.title = kwargs.pop("title")
+        self.overview_title = kwargs.pop("title")
         super(Overview, self).__init__(data=data, **kwargs)
 
     def _DataCard__get_figure_layout(self):
@@ -38,19 +40,18 @@ class Overview(DataCard):
                     dbc.Col(
                         [
                             html.Div(
-                                html.H5(
-                                    self.figure_title,
+                                html.P(
+                                    self.overview_title,
                                     style={
                                         "font-size": "1.7vw",
-                                        "margin-bottom": "0",
-                                        "font-weight": "bold"
+                                        "font-weight": "bold",
+                                        "text-align": "left",
                                     },
                                     id="overview_title",
                                 )
                             )
-                            if self.figure_title != ""
+                            if self.overview_title != ""
                             else None,
-                            html.Br(),
                         ]
                     )
                 ),
@@ -101,7 +102,7 @@ class IndicatorCard:
             n_chars = len(number)
             for i in range(n_chars, 1, 3):
                 if i != n_chars:
-                    number = number[:i] + "`" + number[i:]
+                    number = number[:i] + "," + number[i:]
 
         return number
 
