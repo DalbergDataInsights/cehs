@@ -422,11 +422,11 @@ def timeit(f):
 
 def get_perc_description(perc):
     perc_abs = abs(round(perc * 100, 1))
-    if perc >= 0.5:
+    if perc >= 0.005:
         descrip = f"increased by {perc_abs}%"
-    elif perc_abs < 0.5:
+    elif perc_abs < 0.005:
         descrip = "remained stable"
-    elif perc <= 0.5:
+    elif perc <= 0.005:
         descrip = f"decreased by {perc_abs}%"
     else:
         descrip = perc
