@@ -108,4 +108,8 @@ def overview_plot(data):
     return {"overview": data}
 
 
-overview = Overview(data=init_data_set, data_transform=overview_plot)
+overview = Overview(
+    data=init_data_set,
+    data_transform=overview_plot,
+    title='Absolute value on month of interest and between month of reference and month of interest for priority indicators'
+)

@@ -2,14 +2,59 @@ from package.layout.base.data_card import DataCard
 import dash_bootstrap_components as dbc
 import dash_html_components as html
 
+#  layout = [
+#             dbc.Row(
+#                 dbc.Col(
+#                     [
+#                         html.Div(
+#                             html.H5(
+#                                 self.title,
+#                                 style={
+#                                     "color": "#225e8c",
+#                                     "text-align": "center",
+#                                     "width": "100%",
+#                                 },
+#                                 id=f"{self.my_name}_title",
+#                             )
+#                         )
+#                         if self.title != ""
+#                         else None
+#                     ]
+#                 )
+#             ),
+#             dbc.Row(self.dropdown.get_layout()),
+#             dbc.Row(self._get_figure(), id=f"{self.my_name}_figure"),
+#         ]
+
 
 class Overview(DataCard):
     def __init__(self, data, **kwargs):
+        #self.title = kwargs.pop("title")
+        self.overview_title = kwargs.pop("title")
         super(Overview, self).__init__(data=data, **kwargs)
 
     def _DataCard__get_figure_layout(self):
         layout = dbc.Col(
             [
+                dbc.Row(
+                    dbc.Col(
+                        [
+                            html.Div(
+                                html.P(
+                                    self.overview_title,
+                                    style={
+                                        "font-size": "1.7vw",
+                                        "font-weight": "bold",
+                                        "text-align": "left",
+                                    },
+                                    id="overview_title",
+                                )
+                            )
+                            if self.overview_title != ""
+                            else None,
+                        ]
+                    )
+                ),
                 dbc.Row(self.figure, id="overview-card"),
                 # dbc.Row(self.__get_link_layout()),
             ]
@@ -57,7 +102,7 @@ class IndicatorCard:
             n_chars = len(number)
             for i in range(n_chars, 1, 3):
                 if i != n_chars:
-                    number = number[:i] + "`" + number[i:]
+                    number = number[:i] + "," + number[i:]
 
         return number
 
