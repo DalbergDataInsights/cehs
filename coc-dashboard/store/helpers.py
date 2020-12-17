@@ -264,15 +264,15 @@ def calculate_over_period(
 ):
 
     if aggregation_type == "Show average between month of reference and month of interest period":
-        df[indicator] = round(df[df.columns].mean(axis=1), 0)
+        df[indicator] = round(df[df.columns].mean(axis=1), 2)
 
     elif aggregation_type == "Show sum between month of reference and month of interest period":
         if report | isratio:
-            df[indicator] = df[df.columns].mean(axis=1)
+            df[indicator] = round(df[df.columns].mean(axis=1), 2)
         else:
-            df[indicator] = df[df.columns].sum(axis=1)
+            df[indicator] = round(df[df.columns].sum(axis=1), 2)
     else:
-        df[indicator] = df[target_date]
+        df[indicator] = round(df[target_date], 2)
 
     df = df[[indicator]].reset_index()
     df = df[~pd.isna(df[indicator])]
