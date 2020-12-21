@@ -76,6 +76,7 @@ class Database(metaclass=SingletonMeta):
             self.raw_data = self.get_repository(self.active_repo)
             self.rep_data = self.get_repository("rep")
             self.set_districts()
+            self.config = self.get_serialized_into_df(Config)
 
         assert self.init, "You must pass a DB bind string to use Database first!"
 
@@ -165,7 +166,7 @@ class Database(metaclass=SingletonMeta):
 
     def filter_by_indicator(self, df, indicator):
 
-        config = self.get_serialized_into_df(Config)
+        config = self.config
 
         function = config[config.config_indicator == indicator][
             "config_function"
@@ -228,8 +229,7 @@ class Database(metaclass=SingletonMeta):
             x.get(rename_from): x.get(rename_to) for x in self.__indicator_serialized
         }
 
-    def get_indicator_view(
-            self, indicator, rename_from="indicator", rename_to="view"):
+    def get_indicator_view(self, indicator, rename_from="indicator", rename_to="view"):
         return self.get_renaming_dict(
             rename_from=f"config_{rename_from}",
             rename_to=f"config_{rename_to}",

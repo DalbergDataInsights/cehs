@@ -1,5 +1,5 @@
 from model import Overview
-from store import init_data_set, timeit, Database
+from store import init_data_set, timeit, Database, get_ratio
 import pandas as pd
 
 
@@ -44,24 +44,53 @@ def overview_plot(data):
 
     data = data.get("date_filter")
 
+    db = Database()
+
     min_date = data.date.min()
     max_date = data.date.max()
 
     # filter indicators
     index = ["date"]
+
     indicators = {
         "OPD attendance": "rgb(39, 190, 182)",
         "1st ANC Visits": "rgb(244, 174, 26)",
         "Deliveries in unit": "rgb(244, 174, 26)",
+        # "Low weight births (incidence)": "rgb(244, 174, 26)",
         "Newborn deaths": "rgb(244, 174, 26)",
         "Maternal deaths": "rgb(244, 174, 26)",
+        "Mothers breastfeeding after delivery": "rgb(244, 174, 26)",
         "DPT3 doses to U1": "rgb(81, 139, 201)",
         "MR1 doses to U1": "rgb(81, 139, 201)",
         "SAM cases identified": "rgb(238, 47, 68)",
-        "1st & 2nd doses of vitamin A to U5": "rgb(103, 191, 107)",
+        "1st doses of vitamin A to U5": "rgb(103, 191, 107)",
         "TB cases registered in treatment unit": "rgb(236, 70, 139)",
         "Injuries related to GBV": "rgb(145, 91, 166)",
+        "Women using oral ovrette contraceptives": "rgb(239, 73, 36)",
+        "Women using injectable contraceptives": "rgb(239, 73, 36)",
+        "HIV-exposed infants receiving ARV": "rgb(244, 129, 112)",
+        # "HIV-positive mothers initiated on ART (incidence)": "rgb(244, 129, 112)",
+        # "Malaria cases treated (incidence)": "rgb(244, 129, 112)",
     }
+
+    not_include = []
+
+    for indicator in indicators.keys():
+        if indicator not in data.columns:
+            try:
+                indicator_data = db.filter_by_indicator(data, indicator)
+                indicator_data, index = get_ratio(
+                    indicator_data, indicator, agg_level="country"
+                )[0:2]
+                print(indicator_data)
+                print(indicator)
+                data[indicator] = indicator_data[indicator]
+            except Exception as e:
+                print(e)
+                not_include.append(indicator)
+
+    for i in not_include:
+        indicators.pop(i)
 
     data = data[index + list(indicators.keys())]
 
@@ -73,8 +102,7 @@ def overview_plot(data):
         data, values="value", index="variable", columns="date"
     ).reset_index()
 
-    data["percentage"] = (data[max_date] - data[min_date]
-                          ) / data[min_date] * 100
+    data["percentage"] = (data[max_date] - data[min_date]) / data[min_date] * 100
 
     data["percentage"] = data["percentage"].apply(lambda x: round(x, 1))
 
@@ -111,5 +139,5 @@ def overview_plot(data):
 overview = Overview(
     data=init_data_set,
     data_transform=overview_plot,
-    title='Absolute value on month of interest and between month of reference and month of interest for priority indicators'
+    title="Absolute value on month of interest and between month of reference and month of interest for priority indicators",
 )
