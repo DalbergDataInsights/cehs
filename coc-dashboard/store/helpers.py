@@ -103,8 +103,11 @@ def reporting_count_transform(data):
             / (df_positive + df_no_positive + df_no_form_report)
         )
         * 100)
+    reported = reported.sort_index()
+
     reported_positive = round(
         (df_positive / (df_positive + df_no_positive)) * 100)
+    reported_positive = reported_positive.sort_index()
 
     data = {
         "Percentage of facilities expected to report which reported on their 105-1 form": reported,
