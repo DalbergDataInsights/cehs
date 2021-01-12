@@ -421,9 +421,12 @@ class DataCard:
 
             if lower_bound <= self.center_value <= upper_bound:
 
-                center_norm = (self.center_value - lower_bound) / (
-                    upper_bound - lower_bound
-                )
+                if upper_bound != lower_bound:
+                    center_norm = (self.center_value - lower_bound) / (
+                        upper_bound - lower_bound
+                    )
+                else:
+                    center_norm = 0
 
                 if math.isnan(center_norm):
                     center_norm = 0

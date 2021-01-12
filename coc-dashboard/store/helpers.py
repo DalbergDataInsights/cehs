@@ -394,8 +394,7 @@ def check_index(df, index=["id", "date", "facility_name"]):
     """
     Check that the dataframe is formatted in the expected way, with expected indexes. Restructure the dataframe (set the indices) if this is not the case.
     """
-    if df.index.values != index:
-
+    if list(df.index.values) != index:
         df = df.reset_index(drop=True).set_index(index)
     return df
 

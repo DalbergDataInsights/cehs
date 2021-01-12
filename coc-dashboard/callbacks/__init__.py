@@ -229,7 +229,7 @@ def define_callbacks(ds):
         if callback.get("group"):
             params["group"] = callback.get("group")
 
-        print(params)
+        # print(params)
 
         app.callback(**params)(callback.get("function"))
 
