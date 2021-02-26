@@ -175,8 +175,7 @@ class Database(metaclass=SingletonMeta):
 
         if is_ratio == False:
             try:
-                cols = list(self.index_columns) + [indicator]
-                df = df[cols]
+                df = df[list(self.index_columns) + [indicator]]
             except Exception as e:
                 print(e)
                 print("No such column is present in the dataframe")
