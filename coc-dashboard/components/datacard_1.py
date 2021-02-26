@@ -9,6 +9,7 @@ from store import (
     DEFAULTS,
     Database,
     get_time_diff_perc,
+    YEARS,
 )
 
 
@@ -21,7 +22,7 @@ def scatter_country_plot(df):
 
     df_country = get_year_and_month_cols(df_country)
 
-    df_country = get_sub_dfs(df_country, "year", [2018, 2019, 2020], "month")
+    df_country = get_sub_dfs(df_country, "year", YEARS, "month")
 
     return df_country
 
@@ -63,9 +64,10 @@ country_overview_scatter = ChartDataCard(
 country_overview_scatter.set_colors(
     {
         "fig": {
-            2018: "rgb(185, 221, 241)",
-            2019: "rgb(106, 155, 195)",
-            2020: "rgb(200, 19, 60)",
+            YEARS[0]: "rgb(185, 221, 241)",
+            YEARS[1]: "rgb(106, 155, 195)",
+            YEARS[2]: "rgb(13, 119, 65)",
+            YEARS[3]: "rgb(200, 19, 60)",
         },
         "title": "white",
         "subtitle": "rgb(34, 94, 140)",

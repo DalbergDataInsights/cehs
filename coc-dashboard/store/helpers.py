@@ -6,6 +6,7 @@ import numpy as np
 import calendar
 from dateutil.relativedelta import relativedelta
 
+
 # Filtering methods for data transform functions
 
 
@@ -482,38 +483,6 @@ def get_report_perc(data, **controls):
         date_reporting = datetime.strptime(
             f"{target_month} 1 {target_year}", "%b %d %Y"
         )
-
-        # try:
-        #     reported_positive = data\
-        #         .get("Reported one or above for selected indicator")\
-        #         .loc[date_reporting][0]
-        # except Exception:
-        #     reported_positive = 0
-
-        # try:
-        #     did_not_report = data\
-        #         .get("Did not report on their 105:1 form")\
-        #         .loc[date_reporting][0]
-        # except Exception:
-        #     did_not_report = 0
-
-        # try:
-        #     reported_negative = data\
-        #         .get("Reported a null or zero for selected indicator")\
-        #         .loc[date_reporting][0]
-        # except Exception:
-        #     reported_negative = 0
-
-        # reported_perc = round(
-        #     (
-        #         (reported_positive + reported_negative)
-        #         / (reported_positive + did_not_report + reported_negative)
-        #     )
-        #     * 100
-        # )
-        # reported_positive = round(
-        #     (reported_positive / (reported_positive + reported_negative)) * 100
-        # )
 
         reported_perc = data\
             .get("Percentage of facilities expected to report which reported on their 105-1 form")\

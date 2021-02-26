@@ -7,6 +7,7 @@ from store import (
     get_year_and_month_cols,
     DEFAULTS,
     Database,
+    YEARS,
 )
 from package.layout.area_card import AreaDataCard
 from package.layout.chart_card import ChartDataCard
@@ -39,7 +40,7 @@ def scatter_facility_plot(data):
 
     data = get_year_and_month_cols(data)
 
-    data = get_sub_dfs(data, "year", [2018, 2019, 2020], "month")
+    data = get_sub_dfs(data, "year", YEARS,  "month")
 
     return data
 
@@ -77,9 +78,10 @@ facility_scatter = ChartDataCard(
 facility_scatter.set_colors(
     {
         "fig": {
-            2018: "rgb(185, 221, 241)",
-            2019: "rgb(106, 155, 195)",
-            2020: "rgb(200, 19, 60)",
-        }
+            YEARS[0]: "rgb(185, 221, 241)",
+            YEARS[1]: "rgb(106, 155, 195)",
+            YEARS[2]: "rgb(13, 119, 65)",
+            YEARS[3]: "rgb(200, 19, 60)",
+        },
     }
 )

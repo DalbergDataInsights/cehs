@@ -3,6 +3,10 @@ from .helpers import *
 from .dropdown import initiate_dropdowns, DEFAULTS
 from .database import Database
 
+
+YEARS = [2018, 2019, 2020, 2021]
+
+
 # READ FROM DATABASE
 
 DATABASE_URI = os.environ["HEROKU_POSTGRESQL_CYAN_URL"]

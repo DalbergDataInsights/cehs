@@ -9,6 +9,7 @@ from store import (
     get_time_diff_perc,
     DEFAULTS,
     Database,
+    YEARS,
 )
 
 
@@ -24,7 +25,7 @@ def scatter_district_plot(df):
 
     df_district = get_year_and_month_cols(df_district)
 
-    df_district = get_sub_dfs(df_district, "year", [2018, 2019, 2020], "month")
+    df_district = get_sub_dfs(df_district, "year", YEARS,  "month")
 
     return df_district
 
@@ -63,9 +64,10 @@ district_overview_scatter = ChartDataCard(
 district_overview_scatter.set_colors(
     {
         "fig": {
-            2018: "rgb(185, 221, 241)",
-            2019: "rgb(106, 155, 195)",
-            2020: "rgb(200, 19, 60)",
-        }
+            YEARS[0]: "rgb(185, 221, 241)",
+            YEARS[1]: "rgb(106, 155, 195)",
+            YEARS[2]: "rgb(13, 119, 65)",
+            YEARS[3]: "rgb(200, 19, 60)",
+        },
     }
 )
